@@ -1,3 +1,4 @@
+import 'package:flicko_video/i18n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,8 +9,8 @@ class TabView extends StatelessWidget {
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
     if (location.startsWith('/home')) return 0;
-    if (location.startsWith('/discover')) return 1;
-    if (location.startsWith('/effects')) return 2;
+    if (location.startsWith('/effects')) return 1;
+    if (location.startsWith('/discover')) return 2;
     if (location.startsWith('/me')) return 3;
     return 0;
   }
@@ -19,9 +20,9 @@ class TabView extends StatelessWidget {
       case 0:
         context.go('/home');
       case 1:
-        context.go('/discover');
-      case 2:
         context.go('/effects');
+      case 2:
+        context.go('/discover');
       case 3:
         context.go('/me');
     }
@@ -29,30 +30,51 @@ class TabView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = _currentIndex(context);
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
+      backgroundColor: const Color(0xFF0D0D1A),
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex(context),
-        onTap: (index) => _onTap(context, index),
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Discover',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.auto_awesome),
-            label: 'Effects',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Me',
-          ),
-        ],
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: BottomNavigationBar(
+          currentIndex: currentIndex,
+          onTap: (index) => _onTap(context, index),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: const Color(0xFF0D0D1A),
+          selectedItemColor: const Color(0xFF6C63FF),
+          unselectedItemColor: Colors.grey,
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w400),
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.lightbulb_outline, size: 22),
+              activeIcon: const Icon(Icons.lightbulb_outline, size: 22),
+              label: l10n.creation,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.auto_awesome_outlined, size: 22),
+              activeIcon: const Icon(Icons.auto_awesome_outlined, size: 22),
+              label: l10n.effects,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.travel_explore_outlined, size: 22),
+              activeIcon: const Icon(Icons.travel_explore_outlined, size: 22),
+              label: l10n.discover,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_rounded, size: 22),
+              activeIcon: const Icon(Icons.person_rounded, size: 22),
+              label: l10n.me,
+            ),
+          ],
+        ),
       ),
     );
   }

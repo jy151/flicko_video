@@ -1,3 +1,4 @@
+import 'package:flicko_video/page/setting/view.dart';
 import 'package:flicko_video/page/tabs/discover/view.dart';
 import 'package:flicko_video/page/tabs/effects/view.dart';
 import 'package:flicko_video/page/tabs/home/view.dart';
@@ -40,5 +41,9 @@ final appRouter = GoRouter(
         ),
       ],
     ),
+      GoRoute( 
+          path: '/setting',
+         builder: (context, state) => SettingView(),
+        ),
   ],
 );
