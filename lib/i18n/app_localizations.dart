@@ -66,6 +66,31 @@ class AppLocalizations {
       'promptBackground': 'Prompt background',
       'generationCount': 'Generation Count',
       'durationUnitSec': 'sec',
+      'tryForFree': 'Try for Free',
+      'emailAddress': 'Email address',
+      'password': 'Password',
+      'signIn': 'Sign In',
+      'signInWithGoogle': 'Sign in with Google',
+      'signInWithApple': 'Sign in with Apple',
+      'agreeToThe': 'I agree to the',
+      'userAgreement': 'User Agreement',
+      'and': 'and',
+      'termsOfService': 'Terms of Service',
+      'pleaseAgreeToTerms': 'Please agree to the terms first',
+      'uploadImage': 'Upload Image',
+      'selectVideoEffects': 'Select Video Effects',
+      'submit': 'Submit',
+      'quarterlyPlan': 'Quarterly Plan',
+      'annualPlan': 'Annual Plan',
+      'lifetimePlan': 'Lifetime Plan',
+      'oneTimePayment': 'One-time payment {price}',
+      'unlockAllPremiumFeatures': 'Unlock All Premium Features',
+      'instantBonus': 'Instant Bonus',
+      'untilPriceGoesUp': '{time} until price goes up',
+      'unlockVipService': 'Unlock VIP Service',
+      'myCredits': 'My Credits',
+      'recharge': 'Recharge',
+      'moreCreditFeatures': 'More credit features are coming soon, stay tuned.',
     },
     'zh-Hans': {
       'appTitle': 'FlickoVideo',
@@ -110,6 +135,31 @@ class AppLocalizations {
       'promptBackground': '提示背景',
       'generationCount': '生成数量',
       'durationUnitSec': '秒',
+      'tryForFree': '免费试用',
+      'emailAddress': '邮箱地址',
+      'password': '密码',
+      'signIn': '登录',
+      'signInWithGoogle': '使用 Google 登录',
+      'signInWithApple': '使用 Apple 登录',
+      'agreeToThe': '我同意',
+      'userAgreement': '用户协议',
+      'and': '和',
+      'termsOfService': '服务条款',
+      'pleaseAgreeToTerms': '请先同意条款',
+      'uploadImage': '上传图片',
+      'selectVideoEffects': '选择视频特效',
+      'submit': '提交',
+      'quarterlyPlan': '季度会员',
+      'annualPlan': '年度会员',
+      'lifetimePlan': '终身会员',
+      'oneTimePayment': '一次性支付 {price}',
+      'unlockAllPremiumFeatures': '解锁全部高级功能',
+      'instantBonus': '即时奖励',
+      'untilPriceGoesUp': '{time} 后价格上涨',
+      'unlockVipService': '解锁 VIP 服务',
+      'myCredits': '我的积分',
+      'recharge': '充值',
+      'moreCreditFeatures': '更多积分功能即将上线，敬请期待。',
     },
     'zh-Hant': {
       'appTitle': 'FlickoVideo',
@@ -154,6 +204,31 @@ class AppLocalizations {
       'promptBackground': '提示背景',
       'generationCount': '生成數量',
       'durationUnitSec': '秒',
+      'tryForFree': '免費試用',
+      'emailAddress': '電子郵件地址',
+      'password': '密碼',
+      'signIn': '登入',
+      'signInWithGoogle': '使用 Google 登入',
+      'signInWithApple': '使用 Apple 登入',
+      'agreeToThe': '我同意',
+      'userAgreement': '用戶協議',
+      'and': '和',
+      'termsOfService': '服務條款',
+      'pleaseAgreeToTerms': '請先同意條款',
+      'uploadImage': '上傳圖片',
+      'selectVideoEffects': '選擇影片特效',
+      'submit': '提交',
+      'quarterlyPlan': '季度會員',
+      'annualPlan': '年度會員',
+      'lifetimePlan': '終身會員',
+      'oneTimePayment': '一次性支付 {price}',
+      'unlockAllPremiumFeatures': '解鎖全部高級功能',
+      'instantBonus': '即時獎勵',
+      'untilPriceGoesUp': '{time} 後價格上漲',
+      'unlockVipService': '解鎖 VIP 服務',
+      'myCredits': '我的積分',
+      'recharge': '充值',
+      'moreCreditFeatures': '更多積分功能即將上線，敬請期待。',
     },
     'ja': {
       'appTitle': 'FlickoVideo',
@@ -198,6 +273,31 @@ class AppLocalizations {
       'promptBackground': '背景プロンプト',
       'generationCount': '生成数',
       'durationUnitSec': '秒',
+      'tryForFree': '無料でお試し',
+      'emailAddress': 'メールアドレス',
+      'password': 'パスワード',
+      'signIn': 'サインイン',
+      'signInWithGoogle': 'Google でサインイン',
+      'signInWithApple': 'Apple でサインイン',
+      'agreeToThe': '同意します：',
+      'userAgreement': '利用規約',
+      'and': 'と',
+      'termsOfService': 'サービス利用規約',
+      'pleaseAgreeToTerms': '利用規約に同意してください',
+      'uploadImage': '画像をアップロード',
+      'selectVideoEffects': 'ビデオエフェクトを選択',
+      'submit': '送信',
+      'quarterlyPlan': '四半期プラン',
+      'annualPlan': '年間プラン',
+      'lifetimePlan': '永久プラン',
+      'oneTimePayment': '一回払い {price}',
+      'unlockAllPremiumFeatures': 'すべてのプレミアム機能を解放',
+      'instantBonus': '即時ボーナス',
+      'untilPriceGoesUp': '{time} 後に値上げ',
+      'unlockVipService': 'VIP サービスを解放',
+      'myCredits': 'マイクレジット',
+      'recharge': 'チャージ',
+      'moreCreditFeatures': 'クレジット機能は近日公開予定です。',
     },
     'ko': {
       'appTitle': 'FlickoVideo',
@@ -242,6 +342,31 @@ class AppLocalizations {
       'promptBackground': '배경 프롬프트',
       'generationCount': '생성 수량',
       'durationUnitSec': '초',
+      'tryForFree': '무료 체험',
+      'emailAddress': '이메일 주소',
+      'password': '비밀번호',
+      'signIn': '로그인',
+      'signInWithGoogle': 'Google로 로그인',
+      'signInWithApple': 'Apple로 로그인',
+      'agreeToThe': '동의합니다: ',
+      'userAgreement': '이용약관',
+      'and': ' 및 ',
+      'termsOfService': '서비스 약관',
+      'pleaseAgreeToTerms': '약관에 동의해주세요',
+      'uploadImage': '이미지 업로드',
+      'selectVideoEffects': '비디오 효과 선택',
+      'submit': '제출',
+      'quarterlyPlan': '분기 플랜',
+      'annualPlan': '연간 플랜',
+      'lifetimePlan': '평생 플랜',
+      'oneTimePayment': '일시불 결제 {price}',
+      'unlockAllPremiumFeatures': '모든 프리미엄 기능 잠금 해제',
+      'instantBonus': '즉시 보너스',
+      'untilPriceGoesUp': '{time} 후 가격 인상',
+      'unlockVipService': 'VIP 서비스 잠금 해제',
+      'myCredits': '내 크레딧',
+      'recharge': '충전',
+      'moreCreditFeatures': '더 많은 크레딧 기능이 곧 출시됩니다.',
     },
     'fr': {
       'appTitle': 'FlickoVideo',
@@ -286,6 +411,31 @@ class AppLocalizations {
       'promptBackground': 'Arrière-plan du prompt',
       'generationCount': 'Nombre de générations',
       'durationUnitSec': 's',
+      'tryForFree': 'Essai gratuit',
+      'emailAddress': 'Adresse e-mail',
+      'password': 'Mot de passe',
+      'signIn': 'Se connecter',
+      'signInWithGoogle': 'Se connecter avec Google',
+      'signInWithApple': 'Se connecter avec Apple',
+      'agreeToThe': 'J\'accepte les ',
+      'userAgreement': 'Conditions d\'utilisation',
+      'and': ' et ',
+      'termsOfService': 'Conditions de service',
+      'pleaseAgreeToTerms': 'Veuillez accepter les conditions',
+      'uploadImage': 'Télécharger une image',
+      'selectVideoEffects': 'Sélectionner les effets vidéo',
+      'submit': 'Soumettre',
+      'quarterlyPlan': 'Forfait trimestriel',
+      'annualPlan': 'Forfait annuel',
+      'lifetimePlan': 'Forfait à vie',
+      'oneTimePayment': 'Paiement unique {price}',
+      'unlockAllPremiumFeatures': 'Débloquer toutes les fonctionnalités premium',
+      'instantBonus': 'Bonus instantané',
+      'untilPriceGoesUp': '{time} avant l’augmentation du prix',
+      'unlockVipService': 'Débloquer le service VIP',
+      'myCredits': 'Mes crédits',
+      'recharge': 'Recharger',
+      'moreCreditFeatures': 'Plus de fonctionnalités de crédit arrivent bientôt.',
     },
   };
 
@@ -338,9 +488,38 @@ class AppLocalizations {
   String get promptBackground => _text('promptBackground');
   String get generationCount => _text('generationCount');
   String get durationUnitSec => _text('durationUnitSec');
+  String get tryForFree => _text('tryForFree');
+  String get emailAddress => _text('emailAddress');
+  String get password => _text('password');
+  String get signIn => _text('signIn');
+  String get signInWithGoogle => _text('signInWithGoogle');
+  String get signInWithApple => _text('signInWithApple');
+  String get agreeToThe => _text('agreeToThe');
+  String get userAgreement => _text('userAgreement');
+  String get and => _text('and');
+  String get termsOfService => _text('termsOfService');
+  String get pleaseAgreeToTerms => _text('pleaseAgreeToTerms');
+  String get uploadImage => _text('uploadImage');
+  String get selectVideoEffects => _text('selectVideoEffects');
+  String get submit => _text('submit');
+  String get quarterlyPlan => _text('quarterlyPlan');
+  String get annualPlan => _text('annualPlan');
+  String get lifetimePlan => _text('lifetimePlan');
+  String get unlockAllPremiumFeatures => _text('unlockAllPremiumFeatures');
+  String get instantBonus => _text('instantBonus');
+  String get unlockVipService => _text('unlockVipService');
+  String get myCredits => _text('myCredits');
+  String get recharge => _text('recharge');
+  String get moreCreditFeatures => _text('moreCreditFeatures');
 
   String comingSoon(String title) =>
       _text('comingSoon').replaceAll('{title}', title);
+
+  String oneTimePayment(String price) =>
+      _text('oneTimePayment').replaceAll('{price}', price);
+
+  String untilPriceGoesUp(String time) =>
+      _text('untilPriceGoesUp').replaceAll('{time}', time);
 }
 
 class _AppLocalizationsDelegate

@@ -2,6 +2,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 import '../../../widgets/app_network_image.dart';
@@ -257,63 +258,66 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
   }
 
   Widget _buildEffectCard(EffectItem item, AppLocalizations l10n) {
-    return AspectRatio(
-      aspectRatio: 0.8,
-      child: Stack(
-        children: [
-          AppNetworkImage(
-            imageUrl: item.thumbnail,
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.cover,
-            borderRadius: BorderRadius.circular(8),
-            placeholderColor: const Color(0xFF2A2A4A),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(8),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-                ),
-              ),
-              child: Text(
-                item.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white70, fontSize: 10),
-              ),
+    return GestureDetector(
+      onTap: () => context.push('/effects_create'),
+      child: AspectRatio(
+        aspectRatio: 0.8,
+        child: Stack(
+          children: [
+            AppNetworkImage(
+              imageUrl: item.thumbnail,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+              borderRadius: BorderRadius.circular(8),
+              placeholderColor: const Color(0xFF2A2A4A),
             ),
-          ),
-          if (item.isVip)
             Positioned(
-              top: 6,
-              right: 6,
+              left: 0,
+              right: 0,
+              bottom: 0,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6C63FF),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(8),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                  ),
                 ),
                 child: Text(
-                  l10n.vip,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white70, fontSize: 10),
+                ),
+              ),
+            ),
+            if (item.isVip)
+              Positioned(
+                top: 6,
+                right: 6,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6C63FF),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    l10n.vip,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

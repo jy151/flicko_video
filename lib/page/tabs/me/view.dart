@@ -1,12 +1,12 @@
-import 'package:flicko_video/i18n/app_localizations.dart';
+import 'state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../widgets/app_network_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flicko_video/i18n/app_localizations.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
-import '../../../widgets/app_network_image.dart';
-import 'state.dart';
 
 class MeView extends ConsumerStatefulWidget {
   const MeView({super.key});
@@ -125,11 +125,18 @@ class _MeViewState extends ConsumerState<MeView> {
           children: [
             const Text('🎁', style: TextStyle(fontSize: 20)),
             const SizedBox(width: 12),
-            const Text('💎', style: TextStyle(fontSize: 16)),
-            const SizedBox(width: 4),
-            Text(
-              '${state.credits}',
-              style: const TextStyle(color: Colors.white, fontSize: 15),
+            GestureDetector(
+              onTap: () => context.push('/recharge'),
+              child: Row(
+                children: [
+                  const Text('💎', style: TextStyle(fontSize: 16)),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${state.credits}',
+                    style: const TextStyle(color: Colors.white, fontSize: 15),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(width: 12),
             GestureDetector(
@@ -149,22 +156,26 @@ class _MeViewState extends ConsumerState<MeView> {
   Widget _buildProfile(MeState state, AppLocalizations l10n) {
     return Row(
       children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: const BoxDecoration(
-            color: Color(0xFFE53935),
-            shape: BoxShape.circle,
-          ),
-          child: const Center(
-            child: Text(
-              'f\nAI',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
+        //  跳转进入登录页面
+        GestureDetector(
+          onTap: () => context.push('/login'),
+          child: Container(
+            width: 60,
+            height: 60,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE53935),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Text(
+                'f\nAI',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  height: 1.2,
+                ),
               ),
             ),
           ),
@@ -255,21 +266,24 @@ class _MeViewState extends ConsumerState<MeView> {
                       '${l10n.expirationDate}: ${state.vipExpiry}',
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD4A843),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        l10n.upgradeNow,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () => context.push('/member'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD4A843),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          l10n.upgradeNow,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
