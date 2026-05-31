@@ -29,6 +29,8 @@ class AppLocaleController extends StateNotifier<AppLocaleState> {
     await AppBox.setLanguage(appLocale.code);
     state = AppLocaleState(locale: appLocale.locale);
   }
+
+  void init() {}
 }
 
 final appLocaleControllerProvider =

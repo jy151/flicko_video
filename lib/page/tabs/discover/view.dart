@@ -1,3 +1,4 @@
+import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,8 +16,12 @@ class DiscoverView extends ConsumerStatefulWidget {
 }
 
 class _DiscoverViewState extends ConsumerState<DiscoverView> {
-  final RefreshController _refreshController = RefreshController();
-
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  @override
+  void initState() {
+    ref.read(discoverProvider.notifier).init();
+    super.initState();
+  }
   @override
   void dispose() {
     _refreshController.dispose();
@@ -30,7 +35,11 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
   }
 
   Future<void> _onLoading() async {
-    await ref.read(discoverProvider.notifier).loadMore();
+    final hasMore = await ref.read(discoverProvider.notifier).loadMore();
+    if (!hasMore) {
+      _refreshController.loadNoData();
+      return;
+    }
     _refreshController.loadComplete();
   }
 
@@ -44,7 +53,7 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(l10n),
+            _buildHeader(state, l10n),
             Expanded(
               child: SmartRefresher(
                 controller: _refreshController,
@@ -54,43 +63,10 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
                   waterDropColor: Color(0xFF6C63FF),
                   complete: Icon(Icons.check, color: Color(0xFF6C63FF)),
                 ),
-                footer: CustomFooter(
-                  builder: (context, mode) {
-                    Widget body = Text(
-                      l10n.pullUpToLoadMore,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    );
-
-                    if (mode == LoadStatus.loading) {
-                      body = const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Color(0xFF6C63FF),
-                        ),
-                      );
-                    } else if (mode == LoadStatus.failed) {
-                      body = Text(
-                        l10n.loadFailed,
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      );
-                    } else if (mode == LoadStatus.canLoading) {
-                      body = Text(
-                        l10n.releaseToLoadMore,
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      );
-                    }
-
-                    return SizedBox(
-                      height: 56,
-                      child: Center(child: body),
-                    );
-                  },
-                ),
+              
                 onRefresh: _onRefresh,
                 onLoading: _onLoading,
-                child: CustomScrollView(
+                child: CustomScrollView( 
                   slivers: [
                     SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -114,48 +90,63 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
     );
   }
 
-  Widget _buildHeader(AppLocalizations l10n) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            l10n.explore,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF6C63FF),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('\u{1F451}', style: TextStyle(fontSize: 12)),
-                const SizedBox(width: 4),
-                Text(
-                  l10n.pro,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+  Widget _buildHeader(DiscoverState state, AppLocalizations l10n) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.explore,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
-            ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6C63FF),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('\u{1F451}', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.pro,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: 16,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: state.categories.length,
+            itemBuilder: (context, index) {
+              return Text(state.categories[index].title ?? '',style: TextStyle(color: 
+              Colors.white),);
+            },
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildCard(DiscoverItem item, int index) {
+  Widget _buildCard(Work item, int index) {
     final heights = [180.0, 220.0, 200.0, 240.0, 210.0, 190.0, 200.0, 230.0];
     final height = heights[index % heights.length];
 
@@ -170,7 +161,7 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
         fit: StackFit.expand,
         children: [
           AppNetworkImage(
-            imageUrl: item.imageUrl,
+            imageUrl: item.cover ?? '',
             fit: BoxFit.cover,
             placeholderColor: const Color(0xFF2A2A4A),
           ),
@@ -203,7 +194,7 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      item.username,
+                      item.member?.name ?? ' 暂无名称',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -219,7 +210,7 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
                   ),
                   const SizedBox(width: 3),
                   Text(
-                    '${item.likes}',
+                    '${item.hot}',
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 11,

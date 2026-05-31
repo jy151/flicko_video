@@ -1,3 +1,4 @@
+import 'package:flicko_video/app_controller.dart';
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flicko_video/i18n/locale_controller.dart';
 import 'package:flicko_video/router/app_router.dart';
@@ -6,13 +7,25 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
-class AppView extends ConsumerWidget {
+class AppView extends ConsumerStatefulWidget {
   const AppView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final localeState = ref.watch(appLocaleControllerProvider);
+  ConsumerState<AppView> createState() => _AppViewState();
+}
 
+class _AppViewState extends ConsumerState<AppView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(appControllerProvider.notifier).init();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localeState = ref.watch(appLocaleControllerProvider);
     return RefreshConfiguration(
       headerBuilder: () =>
           WaterDropHeader(), // Configure the default header indicator. If you have the same header indicator for each page, you need to set this
@@ -48,5 +61,9 @@ class AppView extends ConsumerWidget {
       ),
     );
   }
-}
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+}

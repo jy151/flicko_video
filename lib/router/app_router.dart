@@ -13,7 +13,7 @@ import 'package:flicko_video/page/recharge/view.dart';
 final appRouter = GoRouter(
   initialLocation: '/home',
   routes: [
-    ShellRoute(
+    ShellRoute( 
       builder: (context, state, child) {
         return TabView(child: child);
       },

@@ -17,7 +17,11 @@ class MeView extends ConsumerStatefulWidget {
 
 class _MeViewState extends ConsumerState<MeView> {
   final RefreshController _refreshController = RefreshController();
-
+  @override
+  void initState() {
+    super.initState();
+    ref.read(meProvider.notifier).init();
+  }
   @override
   void dispose() {
     _refreshController.dispose();

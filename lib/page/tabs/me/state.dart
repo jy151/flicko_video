@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flicko_video/api/api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -100,6 +101,15 @@ class MeNotifier extends StateNotifier<MeState> {
     state = state.copyWith(
       page: nextPage,
       works: [...state.works, ...moreWorks],
+    );
+  }
+
+  Future<void> init() async {
+    final member = await Api.getMember();
+    state = state.copyWith(
+      email: member?.email ?? 'guest@flicko.com',
+      userId: member?.memberId?.toString() ?? '',
+      credits: member?.voiceDuration ?? 0,
     );
   }
 }

@@ -1,42 +1,76 @@
 import 'dart:core';
 import 'dart:core' as core;
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flicko_video/api/model/config_model.dart';
+import 'package:flicko_video/app_controller.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
+import 'package:flicko_video/page/tabs/home/widgets/image_style_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import 'state.dart';
 
-class HomeView extends ConsumerWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
+  @override
+  ConsumerState<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends ConsumerState<HomeView> {
+  // Mock 数据，让骨架屏在 loading 时有内容可渲染
+  static final _mockAiModels = List.generate(
+    3,
+    (i) => AiModel(
+      id: i,
+      title: 'Model Name',
+      waitSecond: 60,
+      tags: 'NEW',
+      credits: {'5': 10, '10': 20},
+    ),
+  );
+
+  static const _mockDurations = <String, dynamic>{'5': 10, '10': 20, '15': 30};
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(homeProvider);
+
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column( 
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              _buildHeader(state, l10n),
-              const SizedBox(height: 16),
-              _buildPromptArea(ref, state, l10n),
-              const SizedBox(height: 12),
-              _buildModeSelector(ref, state, l10n),
-              const SizedBox(height: 20),
-              _buildAiModelSection(ref, state, l10n),
-              const SizedBox(height: 20),
-              _buildDurationSection(ref, state, l10n),
-              const SizedBox(height: 20),
-              _buildStyleSection(l10n),
-              const SizedBox(height: 24),
-            ],
+        child: Skeletonizer(
+          containersColor: Colors.white12,
+          enableSwitchAnimation: true,
+          enabled: state.loading,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                _buildHeader(state, l10n),
+                const SizedBox(height: 16),
+                _buildPromptArea(ref, state, l10n),
+                const SizedBox(height: 12),
+                _buildModeSelector(ref, state, l10n),
+                const SizedBox(height: 20),
+                _buildAiModelSection(ref, state, l10n),
+                const SizedBox(height: 20),
+                _buildDurationSection(ref, state, l10n),
+                const SizedBox(height: 20),
+                _buildStyleSection(l10n, state),
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),
@@ -50,7 +84,7 @@ class HomeView extends ConsumerWidget {
         Text(
           l10n.create,
           style: TextStyle(
-            color: Colors.white, 
+            color: Colors.white,
             fontSize: 28,
             fontWeight: FontWeight.bold,
           ),
@@ -60,7 +94,7 @@ class HomeView extends ConsumerWidget {
             const Text('💎', style: TextStyle(fontSize: 18)),
             const SizedBox(width: 4),
             Text(
-              '${state.credits}',
+              '0',
               style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],
@@ -69,8 +103,13 @@ class HomeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildPromptArea(WidgetRef ref, HomeState state, AppLocalizations l10n) {
+  Widget _buildPromptArea(
+    WidgetRef ref,
+    HomeState state,
+    AppLocalizations l10n,
+  ) {
     final showImage = state.videoMode == VideoMode.imageToVideo;
+    final credits = state.availableDurations[state.selectedDurationKey];
 
     return AnimatedContainer(
       duration: const core.Duration(milliseconds: 260),
@@ -92,10 +131,7 @@ class HomeView extends ConsumerWidget {
               return SizeTransition(
                 sizeFactor: animation,
                 axisAlignment: -1,
-                child: FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
+                child: FadeTransition(opacity: animation, child: child),
               );
             },
             child: showImage
@@ -111,9 +147,10 @@ class HomeView extends ConsumerWidget {
           ),
           AnimatedSwitcher(
             duration: const core.Duration(milliseconds: 220),
-            child: TextField( 
+            child: TextField(
               key: ValueKey(showImage),
-              onChanged: (text) => ref.read(homeProvider.notifier).setPromptText(text),
+              onChanged: (text) =>
+                  ref.read(homeProvider.notifier).setPromptText(text),
               maxLines: showImage ? 5 : 3,
               style: const TextStyle(color: Colors.white, fontSize: 14),
               decoration: InputDecoration(
@@ -141,12 +178,15 @@ class HomeView extends ConsumerWidget {
               const Text('💎', style: TextStyle(fontSize: 14)),
               const SizedBox(width: 4),
               Text(
-                '${state.credits}',
+                '${credits}',
                 style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
               const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF6C63FF),
                   borderRadius: BorderRadius.circular(20),
@@ -190,144 +230,163 @@ class HomeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildModeSelector(WidgetRef ref, HomeState state, AppLocalizations l10n) {
-    return Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () =>
-                ref.read(homeProvider.notifier).setVideoMode(VideoMode.imageToVideo),
-            child: AnimatedContainer(
-              duration: const core.Duration(milliseconds: 220),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: state.videoMode == VideoMode.imageToVideo
-                    ? const Color(0xFF2A2A4A)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF2A2A4A)),
-                boxShadow: state.videoMode == VideoMode.imageToVideo
-                    ? const [
-                        BoxShadow(
-                          color: Color(0x226C63FF),
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
-                        ),
-                      ]
-                    : const [],
-              ),
-              child: Center(
-                child: AnimatedDefaultTextStyle(
-                  duration: const core.Duration(milliseconds: 220),
-                  curve: Curves.easeInOut,
-                  style: TextStyle(
-                    color: state.videoMode == VideoMode.imageToVideo
-                        ? Colors.white
-                        : Colors.grey,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+  Widget _buildModeSelector(
+    WidgetRef ref,
+    HomeState state,
+    AppLocalizations l10n,
+  ) {
+    return Skeletonizer(
+      containersColor: Colors.white12,
+      enabled: state.loading,
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => ref
+                  .read(homeProvider.notifier)
+                  .setVideoMode(VideoMode.imageToVideo),
+              child: AnimatedContainer(
+                duration: const core.Duration(milliseconds: 220),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: state.videoMode == VideoMode.imageToVideo
+                      ? const Color(0xFF2A2A4A)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF2A2A4A)),
+                  boxShadow: state.videoMode == VideoMode.imageToVideo
+                      ? const [
+                          BoxShadow(
+                            color: Color(0x226C63FF),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ]
+                      : const [],
+                ),
+                child: Center(
+                  child: AnimatedDefaultTextStyle(
+                    duration: const core.Duration(milliseconds: 220),
+                    curve: Curves.easeInOut,
+                    style: TextStyle(
+                      color: state.videoMode == VideoMode.imageToVideo
+                          ? Colors.white
+                          : Colors.grey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    child: Text(l10n.imageToVideo),
                   ),
-                  child: Text(l10n.imageToVideo),
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: GestureDetector(
-            onTap: () =>
-                ref.read(homeProvider.notifier).setVideoMode(VideoMode.textToVideo),
-            child: AnimatedContainer(
-              duration: const core.Duration(milliseconds: 220),
-              curve: Curves.easeInOut,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: state.videoMode == VideoMode.textToVideo
-                    ? const Color(0xFF2A2A4A)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF2A2A4A)),
-                boxShadow: state.videoMode == VideoMode.textToVideo
-                    ? const [
-                        BoxShadow(
-                          color: Color(0x226C63FF),
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
-                        ),
-                      ]
-                    : const [],
-              ),
-              child: Center(
-                child: AnimatedDefaultTextStyle(
-                  duration: const core.Duration(milliseconds: 220),
-                  curve: Curves.easeInOut,
-                  style: TextStyle(
-                    color: state.videoMode == VideoMode.textToVideo
-                        ? Colors.white
-                        : Colors.grey,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+          const SizedBox(width: 8),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => ref
+                  .read(homeProvider.notifier)
+                  .setVideoMode(VideoMode.textToVideo),
+              child: AnimatedContainer(
+                duration: const core.Duration(milliseconds: 220),
+                curve: Curves.easeInOut,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: state.videoMode == VideoMode.textToVideo
+                      ? const Color(0xFF2A2A4A)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF2A2A4A)),
+                  boxShadow: state.videoMode == VideoMode.textToVideo
+                      ? const [
+                          BoxShadow(
+                            color: Color(0x226C63FF),
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
+                          ),
+                        ]
+                      : const [],
+                ),
+                child: Center(
+                  child: AnimatedDefaultTextStyle(
+                    duration: const core.Duration(milliseconds: 220),
+                    curve: Curves.easeInOut,
+                    style: TextStyle(
+                      color: state.videoMode == VideoMode.textToVideo
+                          ? Colors.white
+                          : Colors.grey,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    child: Text(l10n.textToVideo),
                   ),
-                  child: Text(l10n.textToVideo),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildAiModelSection(WidgetRef ref, HomeState state, AppLocalizations l10n) {
+  Widget _buildAiModelSection(
+    WidgetRef ref,
+    HomeState state,
+    AppLocalizations l10n,
+  ) {
+    final models = state.loading ? _mockAiModels : state.aiModels;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.aiModel,
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            _buildModelChip(ref, state, AiModel.wan21, 'Wan 2.1', '30 sec', l10n.hotBadge, l10n),
-            const SizedBox(width: 8),
-            _buildModelChip(ref, state, AiModel.wan22, 'Wan 2.2', '45 sec', l10n.newBadge, l10n),
-            const SizedBox(width: 8),
-            _buildModelChip(ref, state, AiModel.wan23, 'Wan 2.3', '60 sec', l10n.hotBadge, l10n),
-          ],
+        SizedBox(
+          height: 60,
+          child: ListView.separated(
+            padding: EdgeInsets.zero,
+            scrollDirection: Axis.horizontal,
+            itemCount: models.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              return _buildModelChip(ref, state, models[index]);
+            },
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildModelChip(
-    WidgetRef ref,
-    HomeState state,
-    AiModel model,
-   String name,
-    String time,
-   String badge,
-   AppLocalizations l10n,
-  ) {
-    final isSelected = state.selectedModel == model;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => ref.read(homeProvider.notifier).setAiModel(model),
-        child: AnimatedScale( 
+  Widget _buildModelChip(WidgetRef ref, HomeState state, AiModel model) {
+    final isSelected = state.selectedModelId == model.id;
+    return GestureDetector(
+      onTap: () => ref.read(homeProvider.notifier).setAiModel(model),
+      child: SizedBox(
+        width: 150,
+        child: AnimatedScale(
           scale: isSelected ? 1.0 : 0.96,
-          duration: core.Duration(milliseconds: 220), 
+          duration: core.Duration(milliseconds: 220),
           curve: Curves.easeOutBack,
           child: AnimatedContainer(
             duration: const core.Duration(milliseconds: 220),
             curve: Curves.easeInOut,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF6C63FF) : const Color(0xFF1A1A2E),
+              color: isSelected
+                  ? const Color(0xFF6C63FF)
+                  : const Color(0xFF1A1A2E),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: isSelected ? const Color(0xFF6C63FF) : const Color(0xFF2A2A4A),
+                color: isSelected
+                    ? const Color(0xFF6C63FF)
+                    : const Color(0xFF2A2A4A),
               ),
               boxShadow: isSelected
                   ? const [
@@ -349,7 +408,7 @@ class HomeView extends ConsumerWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
-                  child: Text(name),
+                  child: Text(model.title ?? ''),
                 ),
                 const SizedBox(height: 4),
                 Row(
@@ -362,21 +421,24 @@ class HomeView extends ConsumerWidget {
                         color: isSelected ? Colors.white70 : Colors.grey,
                         fontSize: 11,
                       ),
-                      child: Text(time),
+                      child: Text("${model.waitSecond}s"),
                     ),
                     const SizedBox(width: 4),
                     AnimatedContainer(
                       duration: const core.Duration(milliseconds: 220),
                       curve: Curves.easeInOut,
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 1,
+                      ),
                       decoration: BoxDecoration(
-                        color: badge == l10n.newBadge
+                        color: model.tags == 'NEW'
                             ? const Color(0xFF4CAF50)
                             : const Color(0xFFFF5722),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        badge,
+                        model.tags ?? '',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
@@ -394,23 +456,36 @@ class HomeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildDurationSection(WidgetRef ref, HomeState state, AppLocalizations l10n) {
+  Widget _buildDurationSection(
+    WidgetRef ref,
+    HomeState state,
+    AppLocalizations l10n,
+  ) {
+    final durations = state.loading ? _mockDurations : state.availableDurations;
+    final keys = durations.keys.toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.duration,
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            _buildDurationChip(ref, state, Duration.s5, '5s'),
-            const SizedBox(width: 8),
-            _buildDurationChip(ref, state, Duration.s10, '10s'),
-            const SizedBox(width: 8),
-            _buildDurationChip(ref, state, Duration.s15, '15s'),
-          ],
+        SizedBox(
+          height: 44,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: keys.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final key = keys[index];
+              return _buildDurationChip(ref, state, key, '${key}s');
+            },
+          ),
         ),
       ],
     );
@@ -419,13 +494,14 @@ class HomeView extends ConsumerWidget {
   Widget _buildDurationChip(
     WidgetRef ref,
     HomeState state,
-    Duration duration,
+    String duration,
     core.String label,
   ) {
-    final isSelected = state.selectedDuration == duration;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => ref.read(homeProvider.notifier).setDuration(duration),
+    final isSelected = state.selectedDurationKey == duration;
+    return GestureDetector(
+      onTap: () => ref.read(homeProvider.notifier).setDuration(duration),
+      child: SizedBox(
+        width: 120,
         child: AnimatedScale(
           scale: isSelected ? 1.0 : 0.97,
           duration: const core.Duration(milliseconds: 220),
@@ -435,10 +511,14 @@ class HomeView extends ConsumerWidget {
             curve: Curves.easeInOut,
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF6C63FF) : const Color(0xFF1A1A2E),
+              color: isSelected
+                  ? const Color(0xFF6C63FF)
+                  : const Color(0xFF1A1A2E),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isSelected ? const Color(0xFF6C63FF) : const Color(0xFF2A2A4A),
+                color: isSelected
+                    ? const Color(0xFF6C63FF)
+                    : const Color(0xFF2A2A4A),
               ),
               boxShadow: isSelected
                   ? const [
@@ -468,39 +548,83 @@ class HomeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildStyleSection(AppLocalizations l10n) {
+  Widget _buildStyleSection(AppLocalizations l10n, HomeState state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.styleGuide,
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A2E),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey[700],
-                  borderRadius: BorderRadius.circular(20),
+        Skeletonizer(
+          enabled: state.loading,
+          child: Builder(
+            builder: (context) {
+              if (state.selectImageStyle == null || state.loading) {
+                return Container(
+                  height: 80,
+                  width: double.infinity,
+                  color: Color(0xff1a1a2e),
+                );
+              }
+              final selectImageStyle = state.selectImageStyle!;
+              return GestureDetector(
+                onTap: () => showImageStyleDialog(
+                  context: context,
+                  initGroupIndex: state.imageGroups.indexWhere(
+                    (item) => item.id == state.selectImageGroup?.id,
+                  ),
+                  list: state.imageGroups,
+                  onSelect: (imageGroupIndex, imageStyleIndex) {
+                    ref
+                        .read(homeProvider.notifier)
+                        .setImageGroup(index: imageGroupIndex);
+                    ref
+                        .read(homeProvider.notifier)
+                        .setImageStyle(index: imageStyleIndex);
+                  },
                 ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                l10n.auto,
-                style: TextStyle(color: Colors.white, fontSize: 14),
-              ),
-              const Spacer(),
-              const Icon(Icons.chevron_right, color: Colors.grey),
-            ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A2E),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: CachedNetworkImageProvider(
+                              selectImageStyle.cover ?? '',
+                            ),
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        selectImageStyle.title ?? '暂无名称',
+                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.chevron_right, color: Colors.grey),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ],

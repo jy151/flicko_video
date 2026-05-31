@@ -1,120 +1,70 @@
 import 'dart:async';
 
+import 'package:flicko_video/api/api.dart';
+import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class DiscoverItem {
-  final String username;
-  final int likes;
-  final String imageUrl;
-  final double aspectRatio;
 
-  const DiscoverItem({
-    required this.username,
-    required this.likes,
-    required this.imageUrl,
-    this.aspectRatio = 1.0,
-  });
+part 'state.freezed.dart';
+
+@freezed
+abstract class DiscoverState with _$DiscoverState {
+  const factory DiscoverState({
+    @Default([]) List<Work> items,
+    @Default([]) List<ShowcaseCategory> categories,
+    @Default(0) int lastId,
+    @Default(true) bool loading,
+  }) = _DiscoverState;
 }
 
-class DiscoverState {
-  final List<DiscoverItem> items;
-  final int page;
-
-  const DiscoverState({
-    this.items = const [
-      DiscoverItem(
-        username: 'Evan',
-        likes: 454,
-        imageUrl: 'https://picsum.photos/300/200?random=1',
-        aspectRatio: 1.2,
-      ),
-      DiscoverItem(
-        username: 'Nolan',
-        likes: 648,
-        imageUrl: 'https://picsum.photos/300/200?random=2',
-        aspectRatio: 0.9,
-      ),
-      DiscoverItem(
-        username: 'Blake',
-        likes: 792,
-        imageUrl: 'https://picsum.photos/300/200?random=3',
-        aspectRatio: 1.0,
-      ),
-      DiscoverItem(
-        username: 'Owen',
-        likes: 578,
-        imageUrl: 'https://picsum.photos/300/200?random=4',
-        aspectRatio: 1.1,
-      ),
-      DiscoverItem(
-        username: 'Gavin',
-        likes: 109,
-        imageUrl: 'https://picsum.photos/300/200?random=5',
-        aspectRatio: 1.3,
-      ),
-      DiscoverItem(
-        username: 'Hunter',
-        likes: 854,
-        imageUrl: 'https://picsum.photos/300/200?random=6',
-        aspectRatio: 0.85,
-      ),
-      DiscoverItem(
-        username: 'Lily',
-        likes: 321,
-        imageUrl: 'https://picsum.photos/300/200?random=7',
-        aspectRatio: 1.0,
-      ),
-      DiscoverItem(
-        username: 'Max',
-        likes: 567,
-        imageUrl: 'https://picsum.photos/300/200?random=8',
-        aspectRatio: 0.9,
-      ),
-    ],
-    this.page = 1,
-  });
-
-  DiscoverState copyWith({
-    List<DiscoverItem>? items,
-    int? page,
-  }) {
-    return DiscoverState(
-      items: items ?? this.items,
-      page: page ?? this.page,
-    );
-  }
-}
-
-class DiscoverNotifier extends StateNotifier<DiscoverState> {
+ class DiscoverNotifier extends StateNotifier<DiscoverState> {
   DiscoverNotifier() : super(const DiscoverState());
 
-  Future<void> refresh() async {
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    state = const DiscoverState();
+
+  Future<bool> loadMore() async {
+    final resp = await Api.getShowcaseWorks(lastId: state.lastId);
+    if (state.loading) {
+      state = state.copyWith(loading: false);
+    }
+    if (resp.isEmpty) {
+      return false;
+    }
+    final lastId = resp.last.id;
+    state = state.copyWith(
+      lastId: lastId ?? 0,
+      items: [...state.items, ...resp],
+    );
+    return true;
+  }
+ 
+  Future<void> refresh() async{
+   state = state.copyWith(lastId: 0,items: []);
+   await loadMore();
+ 
   }
 
-  Future<void> loadMore() async {
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    final nextPage = state.page + 1;
-    final moreItems = List.generate(6, (index) {
-      final seed = (nextPage - 1) * 10 + index + 1;
-      return DiscoverItem(
-        username: 'User $seed',
-        likes: 100 + seed * 13,
-        imageUrl: 'https://picsum.photos/300/200?random=$seed',
-        aspectRatio: index.isEven ? 1.0 : 0.9,
-      );
-    });
+  Future<void> init() async {
+    // await getShowcaseCategories();
+  }
 
-    state = state.copyWith(
-      page: nextPage,
-      items: [...state.items, ...moreItems],
-    );
+  Future<void> getShowcaseCategories() async {
+    try {
+      /// TODO 获取分类接口 404
+      final categories = await Api.getShowcaseCategories();
+      state = state.copyWith(categories: categories);
+    } catch (e) {
+      state = state.copyWith(categories: []);
+      
+    }
   }
 }
 
-final discoverProvider =
-    StateNotifierProvider<DiscoverNotifier, DiscoverState>((ref) {
-  return DiscoverNotifier();
-});
+final discoverProvider = StateNotifierProvider<DiscoverNotifier, DiscoverState>(
+  (ref) {
+    final notifire= DiscoverNotifier();
+    notifire.refresh();
+    return notifire;
+  },
+);
