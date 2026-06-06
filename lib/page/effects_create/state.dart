@@ -1,74 +1,48 @@
-class VideoEffect {
-  final String id;
-  final String title;
-  final String thumbnail;
-  final bool isVip;
-
-  const VideoEffect({
-    required this.id,
-    required this.title,
-    required this.thumbnail,
-    this.isVip = false,
-  });
-}
+import 'package:flicko_video/api/model/video_model.dart';
 
 class EffectsCreateState {
   final String? selectedImagePath;
-  final String? selectedEffectId;
-  final List<VideoEffect> videoEffects;
-  final String previewImageUrl;
-  final int credits;
+  final String? selectedImageBase64;
+  final int? selectedTemplateId;
+  final List<Template> templates;
   final bool isLoading;
 
   const EffectsCreateState({
     this.selectedImagePath,
-    this.selectedEffectId,
-    this.videoEffects = const [],
-    this.previewImageUrl = 'https://picsum.photos/800/600?random=100',
-    this.credits = 59,
+    this.selectedImageBase64,
+    this.selectedTemplateId,
+    this.templates = const [],
     this.isLoading = false,
   });
 
-  factory EffectsCreateState.initial() {
-    return EffectsCreateState(
-      videoEffects: [
-        const VideoEffect(
-          id: '1',
-          title: '20260319...',
-          thumbnail: 'https://picsum.photos/200/200?random=10',
-          isVip: true,
-        ),
-        const VideoEffect(
-          id: '2',
-          title: '450x_aut...',
-          thumbnail: 'https://picsum.photos/200/200?random=11',
-          isVip: true,
-        ),
-        const VideoEffect(
-          id: '3',
-          title: '450x_aut...',
-          thumbnail: 'https://picsum.photos/200/200?random=12',
-          isVip: true,
-        ),
-      ],
-      selectedEffectId: '1',
-    );
+  Template? get selectedTemplate {
+    for (final template in templates) {
+      if (template.id == selectedTemplateId) {
+        return template;
+      }
+    }
+    return templates.isEmpty ? null : templates.first;
   }
+
+  String get previewAnimationUrl {
+    final template = selectedTemplate;
+    return template?.animation ?? template?.cover ?? template?.video ?? '';
+  }
+
+  int get creditCost => selectedTemplate?.source ?? 48;
 
   EffectsCreateState copyWith({
     String? selectedImagePath,
-    String? selectedEffectId,
-    List<VideoEffect>? videoEffects,
-    String? previewImageUrl,
-    int? credits,
+    String? selectedImageBase64,
+    int? selectedTemplateId,
+    List<Template>? templates,
     bool? isLoading,
   }) {
     return EffectsCreateState(
       selectedImagePath: selectedImagePath ?? this.selectedImagePath,
-      selectedEffectId: selectedEffectId ?? this.selectedEffectId,
-      videoEffects: videoEffects ?? this.videoEffects,
-      previewImageUrl: previewImageUrl ?? this.previewImageUrl,
-      credits: credits ?? this.credits,
+      selectedImageBase64: selectedImageBase64 ?? this.selectedImageBase64,
+      selectedTemplateId: selectedTemplateId ?? this.selectedTemplateId,
+      templates: templates ?? this.templates,
       isLoading: isLoading ?? this.isLoading,
     );
   }

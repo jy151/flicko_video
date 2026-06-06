@@ -55,9 +55,9 @@ class VipInfo {
 @JsonSerializable()
 class SubscribeItem {
   final int? id;
-  final String? scene;
-  final String? scope;
-  final String? type;
+  final int? scene;
+  final int? scope;
+  final int? type;
   final GoogleSubscribe? google;
   final AppleSubscribe? apple;
 
@@ -81,7 +81,7 @@ class GoogleSubscribe {
   final String? id;
   final String? name;
   final String? goodsId;
-  final double? amount;
+  final String? amount;
   final int? expireDay;
   final double? price;
   final double? marketPrice;

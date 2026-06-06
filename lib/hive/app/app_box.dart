@@ -41,7 +41,7 @@ class AppBox {
     await box.put(_isFirstLaunchKey, isFirstLaunch);
   }
 
-  static bool get isFirstLaunch {
+  static bool get isFirstLaunch { 
     return box.get(_isFirstLaunchKey) as bool? ?? true; 
   }
 

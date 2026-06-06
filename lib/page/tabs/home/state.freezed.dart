@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HomeState {
 
- VideoMode get videoMode; int get selectedModelId; String get selectedDurationKey; Map<String, dynamic> get availableDurations; String? get selectedImagePath; String get promptText; int get maxPromptLength; List<AiModel> get textModels; List<AiModel> get imageModels; List<AiModel> get aiModels; bool get loading; List<ImageStyleGroup> get imageGroups; ImageStyleGroup? get selectImageGroup; List<ImageStyle> get imageStyles; ImageStyle? get selectImageStyle;
+ VideoMode get videoMode; int get selectedModelId; String get selectedDurationKey; Map<String, dynamic> get availableDurations; String? get selectedImagePath; String? get selectedImageBase64; String get promptText; int get maxPromptLength; List<AiModel> get textModels; List<AiModel> get imageModels; List<AiModel> get aiModels; int get credits; bool get loading; bool get isSubmitting; List<ImageStyleGroup> get imageGroups; ImageStyleGroup? get selectImageGroup; List<ImageStyle> get imageStyles; ImageStyle? get selectImageStyle;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $HomeStateCopyWith<HomeState> get copyWith => _$HomeStateCopyWithImpl<HomeState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.videoMode, videoMode) || other.videoMode == videoMode)&&(identical(other.selectedModelId, selectedModelId) || other.selectedModelId == selectedModelId)&&(identical(other.selectedDurationKey, selectedDurationKey) || other.selectedDurationKey == selectedDurationKey)&&const DeepCollectionEquality().equals(other.availableDurations, availableDurations)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.promptText, promptText) || other.promptText == promptText)&&(identical(other.maxPromptLength, maxPromptLength) || other.maxPromptLength == maxPromptLength)&&const DeepCollectionEquality().equals(other.textModels, textModels)&&const DeepCollectionEquality().equals(other.imageModels, imageModels)&&const DeepCollectionEquality().equals(other.aiModels, aiModels)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other.imageGroups, imageGroups)&&(identical(other.selectImageGroup, selectImageGroup) || other.selectImageGroup == selectImageGroup)&&const DeepCollectionEquality().equals(other.imageStyles, imageStyles)&&(identical(other.selectImageStyle, selectImageStyle) || other.selectImageStyle == selectImageStyle));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.videoMode, videoMode) || other.videoMode == videoMode)&&(identical(other.selectedModelId, selectedModelId) || other.selectedModelId == selectedModelId)&&(identical(other.selectedDurationKey, selectedDurationKey) || other.selectedDurationKey == selectedDurationKey)&&const DeepCollectionEquality().equals(other.availableDurations, availableDurations)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.selectedImageBase64, selectedImageBase64) || other.selectedImageBase64 == selectedImageBase64)&&(identical(other.promptText, promptText) || other.promptText == promptText)&&(identical(other.maxPromptLength, maxPromptLength) || other.maxPromptLength == maxPromptLength)&&const DeepCollectionEquality().equals(other.textModels, textModels)&&const DeepCollectionEquality().equals(other.imageModels, imageModels)&&const DeepCollectionEquality().equals(other.aiModels, aiModels)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&const DeepCollectionEquality().equals(other.imageGroups, imageGroups)&&(identical(other.selectImageGroup, selectImageGroup) || other.selectImageGroup == selectImageGroup)&&const DeepCollectionEquality().equals(other.imageStyles, imageStyles)&&(identical(other.selectImageStyle, selectImageStyle) || other.selectImageStyle == selectImageStyle));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,videoMode,selectedModelId,selectedDurationKey,const DeepCollectionEquality().hash(availableDurations),selectedImagePath,promptText,maxPromptLength,const DeepCollectionEquality().hash(textModels),const DeepCollectionEquality().hash(imageModels),const DeepCollectionEquality().hash(aiModels),loading,const DeepCollectionEquality().hash(imageGroups),selectImageGroup,const DeepCollectionEquality().hash(imageStyles),selectImageStyle);
+int get hashCode => Object.hash(runtimeType,videoMode,selectedModelId,selectedDurationKey,const DeepCollectionEquality().hash(availableDurations),selectedImagePath,selectedImageBase64,promptText,maxPromptLength,const DeepCollectionEquality().hash(textModels),const DeepCollectionEquality().hash(imageModels),const DeepCollectionEquality().hash(aiModels),credits,loading,isSubmitting,const DeepCollectionEquality().hash(imageGroups),selectImageGroup,const DeepCollectionEquality().hash(imageStyles),selectImageStyle);
 
 @override
 String toString() {
-  return 'HomeState(videoMode: $videoMode, selectedModelId: $selectedModelId, selectedDurationKey: $selectedDurationKey, availableDurations: $availableDurations, selectedImagePath: $selectedImagePath, promptText: $promptText, maxPromptLength: $maxPromptLength, textModels: $textModels, imageModels: $imageModels, aiModels: $aiModels, loading: $loading, imageGroups: $imageGroups, selectImageGroup: $selectImageGroup, imageStyles: $imageStyles, selectImageStyle: $selectImageStyle)';
+  return 'HomeState(videoMode: $videoMode, selectedModelId: $selectedModelId, selectedDurationKey: $selectedDurationKey, availableDurations: $availableDurations, selectedImagePath: $selectedImagePath, selectedImageBase64: $selectedImageBase64, promptText: $promptText, maxPromptLength: $maxPromptLength, textModels: $textModels, imageModels: $imageModels, aiModels: $aiModels, credits: $credits, loading: $loading, isSubmitting: $isSubmitting, imageGroups: $imageGroups, selectImageGroup: $selectImageGroup, imageStyles: $imageStyles, selectImageStyle: $selectImageStyle)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $HomeStateCopyWith<$Res>  {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) = _$HomeStateCopyWithImpl;
 @useResult
 $Res call({
- VideoMode videoMode, int selectedModelId, String selectedDurationKey, Map<String, dynamic> availableDurations, String? selectedImagePath, String promptText, int maxPromptLength, List<AiModel> textModels, List<AiModel> imageModels, List<AiModel> aiModels, bool loading, List<ImageStyleGroup> imageGroups, ImageStyleGroup? selectImageGroup, List<ImageStyle> imageStyles, ImageStyle? selectImageStyle
+ VideoMode videoMode, int selectedModelId, String selectedDurationKey, Map<String, dynamic> availableDurations, String? selectedImagePath, String? selectedImageBase64, String promptText, int maxPromptLength, List<AiModel> textModels, List<AiModel> imageModels, List<AiModel> aiModels, int credits, bool loading, bool isSubmitting, List<ImageStyleGroup> imageGroups, ImageStyleGroup? selectImageGroup, List<ImageStyle> imageStyles, ImageStyle? selectImageStyle
 });
 
 
@@ -62,19 +62,22 @@ class _$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? videoMode = null,Object? selectedModelId = null,Object? selectedDurationKey = null,Object? availableDurations = null,Object? selectedImagePath = freezed,Object? promptText = null,Object? maxPromptLength = null,Object? textModels = null,Object? imageModels = null,Object? aiModels = null,Object? loading = null,Object? imageGroups = null,Object? selectImageGroup = freezed,Object? imageStyles = null,Object? selectImageStyle = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? videoMode = null,Object? selectedModelId = null,Object? selectedDurationKey = null,Object? availableDurations = null,Object? selectedImagePath = freezed,Object? selectedImageBase64 = freezed,Object? promptText = null,Object? maxPromptLength = null,Object? textModels = null,Object? imageModels = null,Object? aiModels = null,Object? credits = null,Object? loading = null,Object? isSubmitting = null,Object? imageGroups = null,Object? selectImageGroup = freezed,Object? imageStyles = null,Object? selectImageStyle = freezed,}) {
   return _then(_self.copyWith(
 videoMode: null == videoMode ? _self.videoMode : videoMode // ignore: cast_nullable_to_non_nullable
 as VideoMode,selectedModelId: null == selectedModelId ? _self.selectedModelId : selectedModelId // ignore: cast_nullable_to_non_nullable
 as int,selectedDurationKey: null == selectedDurationKey ? _self.selectedDurationKey : selectedDurationKey // ignore: cast_nullable_to_non_nullable
 as String,availableDurations: null == availableDurations ? _self.availableDurations : availableDurations // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,selectedImagePath: freezed == selectedImagePath ? _self.selectedImagePath : selectedImagePath // ignore: cast_nullable_to_non_nullable
+as String?,selectedImageBase64: freezed == selectedImageBase64 ? _self.selectedImageBase64 : selectedImageBase64 // ignore: cast_nullable_to_non_nullable
 as String?,promptText: null == promptText ? _self.promptText : promptText // ignore: cast_nullable_to_non_nullable
 as String,maxPromptLength: null == maxPromptLength ? _self.maxPromptLength : maxPromptLength // ignore: cast_nullable_to_non_nullable
 as int,textModels: null == textModels ? _self.textModels : textModels // ignore: cast_nullable_to_non_nullable
 as List<AiModel>,imageModels: null == imageModels ? _self.imageModels : imageModels // ignore: cast_nullable_to_non_nullable
 as List<AiModel>,aiModels: null == aiModels ? _self.aiModels : aiModels // ignore: cast_nullable_to_non_nullable
-as List<AiModel>,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
+as List<AiModel>,credits: null == credits ? _self.credits : credits // ignore: cast_nullable_to_non_nullable
+as int,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
+as bool,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,imageGroups: null == imageGroups ? _self.imageGroups : imageGroups // ignore: cast_nullable_to_non_nullable
 as List<ImageStyleGroup>,selectImageGroup: freezed == selectImageGroup ? _self.selectImageGroup : selectImageGroup // ignore: cast_nullable_to_non_nullable
 as ImageStyleGroup?,imageStyles: null == imageStyles ? _self.imageStyles : imageStyles // ignore: cast_nullable_to_non_nullable
@@ -164,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( VideoMode videoMode,  int selectedModelId,  String selectedDurationKey,  Map<String, dynamic> availableDurations,  String? selectedImagePath,  String promptText,  int maxPromptLength,  List<AiModel> textModels,  List<AiModel> imageModels,  List<AiModel> aiModels,  bool loading,  List<ImageStyleGroup> imageGroups,  ImageStyleGroup? selectImageGroup,  List<ImageStyle> imageStyles,  ImageStyle? selectImageStyle)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( VideoMode videoMode,  int selectedModelId,  String selectedDurationKey,  Map<String, dynamic> availableDurations,  String? selectedImagePath,  String? selectedImageBase64,  String promptText,  int maxPromptLength,  List<AiModel> textModels,  List<AiModel> imageModels,  List<AiModel> aiModels,  int credits,  bool loading,  bool isSubmitting,  List<ImageStyleGroup> imageGroups,  ImageStyleGroup? selectImageGroup,  List<ImageStyle> imageStyles,  ImageStyle? selectImageStyle)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,_that.availableDurations,_that.selectedImagePath,_that.promptText,_that.maxPromptLength,_that.textModels,_that.imageModels,_that.aiModels,_that.loading,_that.imageGroups,_that.selectImageGroup,_that.imageStyles,_that.selectImageStyle);case _:
+return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,_that.availableDurations,_that.selectedImagePath,_that.selectedImageBase64,_that.promptText,_that.maxPromptLength,_that.textModels,_that.imageModels,_that.aiModels,_that.credits,_that.loading,_that.isSubmitting,_that.imageGroups,_that.selectImageGroup,_that.imageStyles,_that.selectImageStyle);case _:
   return orElse();
 
 }
@@ -185,10 +188,10 @@ return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( VideoMode videoMode,  int selectedModelId,  String selectedDurationKey,  Map<String, dynamic> availableDurations,  String? selectedImagePath,  String promptText,  int maxPromptLength,  List<AiModel> textModels,  List<AiModel> imageModels,  List<AiModel> aiModels,  bool loading,  List<ImageStyleGroup> imageGroups,  ImageStyleGroup? selectImageGroup,  List<ImageStyle> imageStyles,  ImageStyle? selectImageStyle)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( VideoMode videoMode,  int selectedModelId,  String selectedDurationKey,  Map<String, dynamic> availableDurations,  String? selectedImagePath,  String? selectedImageBase64,  String promptText,  int maxPromptLength,  List<AiModel> textModels,  List<AiModel> imageModels,  List<AiModel> aiModels,  int credits,  bool loading,  bool isSubmitting,  List<ImageStyleGroup> imageGroups,  ImageStyleGroup? selectImageGroup,  List<ImageStyle> imageStyles,  ImageStyle? selectImageStyle)  $default,) {final _that = this;
 switch (_that) {
 case _HomeState():
-return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,_that.availableDurations,_that.selectedImagePath,_that.promptText,_that.maxPromptLength,_that.textModels,_that.imageModels,_that.aiModels,_that.loading,_that.imageGroups,_that.selectImageGroup,_that.imageStyles,_that.selectImageStyle);case _:
+return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,_that.availableDurations,_that.selectedImagePath,_that.selectedImageBase64,_that.promptText,_that.maxPromptLength,_that.textModels,_that.imageModels,_that.aiModels,_that.credits,_that.loading,_that.isSubmitting,_that.imageGroups,_that.selectImageGroup,_that.imageStyles,_that.selectImageStyle);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +208,10 @@ return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( VideoMode videoMode,  int selectedModelId,  String selectedDurationKey,  Map<String, dynamic> availableDurations,  String? selectedImagePath,  String promptText,  int maxPromptLength,  List<AiModel> textModels,  List<AiModel> imageModels,  List<AiModel> aiModels,  bool loading,  List<ImageStyleGroup> imageGroups,  ImageStyleGroup? selectImageGroup,  List<ImageStyle> imageStyles,  ImageStyle? selectImageStyle)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( VideoMode videoMode,  int selectedModelId,  String selectedDurationKey,  Map<String, dynamic> availableDurations,  String? selectedImagePath,  String? selectedImageBase64,  String promptText,  int maxPromptLength,  List<AiModel> textModels,  List<AiModel> imageModels,  List<AiModel> aiModels,  int credits,  bool loading,  bool isSubmitting,  List<ImageStyleGroup> imageGroups,  ImageStyleGroup? selectImageGroup,  List<ImageStyle> imageStyles,  ImageStyle? selectImageStyle)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,_that.availableDurations,_that.selectedImagePath,_that.promptText,_that.maxPromptLength,_that.textModels,_that.imageModels,_that.aiModels,_that.loading,_that.imageGroups,_that.selectImageGroup,_that.imageStyles,_that.selectImageStyle);case _:
+return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,_that.availableDurations,_that.selectedImagePath,_that.selectedImageBase64,_that.promptText,_that.maxPromptLength,_that.textModels,_that.imageModels,_that.aiModels,_that.credits,_that.loading,_that.isSubmitting,_that.imageGroups,_that.selectImageGroup,_that.imageStyles,_that.selectImageStyle);case _:
   return null;
 
 }
@@ -220,7 +223,7 @@ return $default(_that.videoMode,_that.selectedModelId,_that.selectedDurationKey,
 
 
 class _HomeState implements HomeState {
-  const _HomeState({this.videoMode = VideoMode.imageToVideo, this.selectedModelId = 0, this.selectedDurationKey = '', final  Map<String, dynamic> availableDurations = const {}, this.selectedImagePath = null, this.promptText = '', this.maxPromptLength = 2000, final  List<AiModel> textModels = const [], final  List<AiModel> imageModels = const [], final  List<AiModel> aiModels = const [], this.loading = false, final  List<ImageStyleGroup> imageGroups = const [], this.selectImageGroup = null, final  List<ImageStyle> imageStyles = const [], this.selectImageStyle = null}): _availableDurations = availableDurations,_textModels = textModels,_imageModels = imageModels,_aiModels = aiModels,_imageGroups = imageGroups,_imageStyles = imageStyles;
+  const _HomeState({this.videoMode = VideoMode.imageToVideo, this.selectedModelId = 0, this.selectedDurationKey = '', final  Map<String, dynamic> availableDurations = const {}, this.selectedImagePath = null, this.selectedImageBase64 = null, this.promptText = '', this.maxPromptLength = 2000, final  List<AiModel> textModels = const [], final  List<AiModel> imageModels = const [], final  List<AiModel> aiModels = const [], this.credits = 0, this.loading = false, this.isSubmitting = false, final  List<ImageStyleGroup> imageGroups = const [], this.selectImageGroup = null, final  List<ImageStyle> imageStyles = const [], this.selectImageStyle = null}): _availableDurations = availableDurations,_textModels = textModels,_imageModels = imageModels,_aiModels = aiModels,_imageGroups = imageGroups,_imageStyles = imageStyles;
   
 
 @override@JsonKey() final  VideoMode videoMode;
@@ -234,6 +237,7 @@ class _HomeState implements HomeState {
 }
 
 @override@JsonKey() final  String? selectedImagePath;
+@override@JsonKey() final  String? selectedImageBase64;
 @override@JsonKey() final  String promptText;
 @override@JsonKey() final  int maxPromptLength;
  final  List<AiModel> _textModels;
@@ -257,7 +261,9 @@ class _HomeState implements HomeState {
   return EqualUnmodifiableListView(_aiModels);
 }
 
+@override@JsonKey() final  int credits;
 @override@JsonKey() final  bool loading;
+@override@JsonKey() final  bool isSubmitting;
  final  List<ImageStyleGroup> _imageGroups;
 @override@JsonKey() List<ImageStyleGroup> get imageGroups {
   if (_imageGroups is EqualUnmodifiableListView) return _imageGroups;
@@ -285,16 +291,16 @@ _$HomeStateCopyWith<_HomeState> get copyWith => __$HomeStateCopyWithImpl<_HomeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.videoMode, videoMode) || other.videoMode == videoMode)&&(identical(other.selectedModelId, selectedModelId) || other.selectedModelId == selectedModelId)&&(identical(other.selectedDurationKey, selectedDurationKey) || other.selectedDurationKey == selectedDurationKey)&&const DeepCollectionEquality().equals(other._availableDurations, _availableDurations)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.promptText, promptText) || other.promptText == promptText)&&(identical(other.maxPromptLength, maxPromptLength) || other.maxPromptLength == maxPromptLength)&&const DeepCollectionEquality().equals(other._textModels, _textModels)&&const DeepCollectionEquality().equals(other._imageModels, _imageModels)&&const DeepCollectionEquality().equals(other._aiModels, _aiModels)&&(identical(other.loading, loading) || other.loading == loading)&&const DeepCollectionEquality().equals(other._imageGroups, _imageGroups)&&(identical(other.selectImageGroup, selectImageGroup) || other.selectImageGroup == selectImageGroup)&&const DeepCollectionEquality().equals(other._imageStyles, _imageStyles)&&(identical(other.selectImageStyle, selectImageStyle) || other.selectImageStyle == selectImageStyle));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.videoMode, videoMode) || other.videoMode == videoMode)&&(identical(other.selectedModelId, selectedModelId) || other.selectedModelId == selectedModelId)&&(identical(other.selectedDurationKey, selectedDurationKey) || other.selectedDurationKey == selectedDurationKey)&&const DeepCollectionEquality().equals(other._availableDurations, _availableDurations)&&(identical(other.selectedImagePath, selectedImagePath) || other.selectedImagePath == selectedImagePath)&&(identical(other.selectedImageBase64, selectedImageBase64) || other.selectedImageBase64 == selectedImageBase64)&&(identical(other.promptText, promptText) || other.promptText == promptText)&&(identical(other.maxPromptLength, maxPromptLength) || other.maxPromptLength == maxPromptLength)&&const DeepCollectionEquality().equals(other._textModels, _textModels)&&const DeepCollectionEquality().equals(other._imageModels, _imageModels)&&const DeepCollectionEquality().equals(other._aiModels, _aiModels)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.loading, loading) || other.loading == loading)&&(identical(other.isSubmitting, isSubmitting) || other.isSubmitting == isSubmitting)&&const DeepCollectionEquality().equals(other._imageGroups, _imageGroups)&&(identical(other.selectImageGroup, selectImageGroup) || other.selectImageGroup == selectImageGroup)&&const DeepCollectionEquality().equals(other._imageStyles, _imageStyles)&&(identical(other.selectImageStyle, selectImageStyle) || other.selectImageStyle == selectImageStyle));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,videoMode,selectedModelId,selectedDurationKey,const DeepCollectionEquality().hash(_availableDurations),selectedImagePath,promptText,maxPromptLength,const DeepCollectionEquality().hash(_textModels),const DeepCollectionEquality().hash(_imageModels),const DeepCollectionEquality().hash(_aiModels),loading,const DeepCollectionEquality().hash(_imageGroups),selectImageGroup,const DeepCollectionEquality().hash(_imageStyles),selectImageStyle);
+int get hashCode => Object.hash(runtimeType,videoMode,selectedModelId,selectedDurationKey,const DeepCollectionEquality().hash(_availableDurations),selectedImagePath,selectedImageBase64,promptText,maxPromptLength,const DeepCollectionEquality().hash(_textModels),const DeepCollectionEquality().hash(_imageModels),const DeepCollectionEquality().hash(_aiModels),credits,loading,isSubmitting,const DeepCollectionEquality().hash(_imageGroups),selectImageGroup,const DeepCollectionEquality().hash(_imageStyles),selectImageStyle);
 
 @override
 String toString() {
-  return 'HomeState(videoMode: $videoMode, selectedModelId: $selectedModelId, selectedDurationKey: $selectedDurationKey, availableDurations: $availableDurations, selectedImagePath: $selectedImagePath, promptText: $promptText, maxPromptLength: $maxPromptLength, textModels: $textModels, imageModels: $imageModels, aiModels: $aiModels, loading: $loading, imageGroups: $imageGroups, selectImageGroup: $selectImageGroup, imageStyles: $imageStyles, selectImageStyle: $selectImageStyle)';
+  return 'HomeState(videoMode: $videoMode, selectedModelId: $selectedModelId, selectedDurationKey: $selectedDurationKey, availableDurations: $availableDurations, selectedImagePath: $selectedImagePath, selectedImageBase64: $selectedImageBase64, promptText: $promptText, maxPromptLength: $maxPromptLength, textModels: $textModels, imageModels: $imageModels, aiModels: $aiModels, credits: $credits, loading: $loading, isSubmitting: $isSubmitting, imageGroups: $imageGroups, selectImageGroup: $selectImageGroup, imageStyles: $imageStyles, selectImageStyle: $selectImageStyle)';
 }
 
 
@@ -305,7 +311,7 @@ abstract mixin class _$HomeStateCopyWith<$Res> implements $HomeStateCopyWith<$Re
   factory _$HomeStateCopyWith(_HomeState value, $Res Function(_HomeState) _then) = __$HomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- VideoMode videoMode, int selectedModelId, String selectedDurationKey, Map<String, dynamic> availableDurations, String? selectedImagePath, String promptText, int maxPromptLength, List<AiModel> textModels, List<AiModel> imageModels, List<AiModel> aiModels, bool loading, List<ImageStyleGroup> imageGroups, ImageStyleGroup? selectImageGroup, List<ImageStyle> imageStyles, ImageStyle? selectImageStyle
+ VideoMode videoMode, int selectedModelId, String selectedDurationKey, Map<String, dynamic> availableDurations, String? selectedImagePath, String? selectedImageBase64, String promptText, int maxPromptLength, List<AiModel> textModels, List<AiModel> imageModels, List<AiModel> aiModels, int credits, bool loading, bool isSubmitting, List<ImageStyleGroup> imageGroups, ImageStyleGroup? selectImageGroup, List<ImageStyle> imageStyles, ImageStyle? selectImageStyle
 });
 
 
@@ -322,19 +328,22 @@ class __$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? videoMode = null,Object? selectedModelId = null,Object? selectedDurationKey = null,Object? availableDurations = null,Object? selectedImagePath = freezed,Object? promptText = null,Object? maxPromptLength = null,Object? textModels = null,Object? imageModels = null,Object? aiModels = null,Object? loading = null,Object? imageGroups = null,Object? selectImageGroup = freezed,Object? imageStyles = null,Object? selectImageStyle = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? videoMode = null,Object? selectedModelId = null,Object? selectedDurationKey = null,Object? availableDurations = null,Object? selectedImagePath = freezed,Object? selectedImageBase64 = freezed,Object? promptText = null,Object? maxPromptLength = null,Object? textModels = null,Object? imageModels = null,Object? aiModels = null,Object? credits = null,Object? loading = null,Object? isSubmitting = null,Object? imageGroups = null,Object? selectImageGroup = freezed,Object? imageStyles = null,Object? selectImageStyle = freezed,}) {
   return _then(_HomeState(
 videoMode: null == videoMode ? _self.videoMode : videoMode // ignore: cast_nullable_to_non_nullable
 as VideoMode,selectedModelId: null == selectedModelId ? _self.selectedModelId : selectedModelId // ignore: cast_nullable_to_non_nullable
 as int,selectedDurationKey: null == selectedDurationKey ? _self.selectedDurationKey : selectedDurationKey // ignore: cast_nullable_to_non_nullable
 as String,availableDurations: null == availableDurations ? _self._availableDurations : availableDurations // ignore: cast_nullable_to_non_nullable
 as Map<String, dynamic>,selectedImagePath: freezed == selectedImagePath ? _self.selectedImagePath : selectedImagePath // ignore: cast_nullable_to_non_nullable
+as String?,selectedImageBase64: freezed == selectedImageBase64 ? _self.selectedImageBase64 : selectedImageBase64 // ignore: cast_nullable_to_non_nullable
 as String?,promptText: null == promptText ? _self.promptText : promptText // ignore: cast_nullable_to_non_nullable
 as String,maxPromptLength: null == maxPromptLength ? _self.maxPromptLength : maxPromptLength // ignore: cast_nullable_to_non_nullable
 as int,textModels: null == textModels ? _self._textModels : textModels // ignore: cast_nullable_to_non_nullable
 as List<AiModel>,imageModels: null == imageModels ? _self._imageModels : imageModels // ignore: cast_nullable_to_non_nullable
 as List<AiModel>,aiModels: null == aiModels ? _self._aiModels : aiModels // ignore: cast_nullable_to_non_nullable
-as List<AiModel>,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
+as List<AiModel>,credits: null == credits ? _self.credits : credits // ignore: cast_nullable_to_non_nullable
+as int,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
+as bool,isSubmitting: null == isSubmitting ? _self.isSubmitting : isSubmitting // ignore: cast_nullable_to_non_nullable
 as bool,imageGroups: null == imageGroups ? _self._imageGroups : imageGroups // ignore: cast_nullable_to_non_nullable
 as List<ImageStyleGroup>,selectImageGroup: freezed == selectImageGroup ? _self.selectImageGroup : selectImageGroup // ignore: cast_nullable_to_non_nullable
 as ImageStyleGroup?,imageStyles: null == imageStyles ? _self._imageStyles : imageStyles // ignore: cast_nullable_to_non_nullable

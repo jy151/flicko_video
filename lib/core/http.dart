@@ -15,7 +15,7 @@ class Http {
       receiveTimeout: const Duration(seconds: 15),
       responseType: ResponseType.json,
     ));
-
+ 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         final token = AuthBox.token;

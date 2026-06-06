@@ -1,4 +1,4 @@
-package com.song.flicko_video.flicko_video
+package video.flicko.app
 
 import io.flutter.embedding.android.FlutterActivity
 

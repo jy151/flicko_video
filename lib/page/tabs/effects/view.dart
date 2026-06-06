@@ -1,12 +1,15 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
+import 'package:flicko_video/page/effects_create/view.dart';
+import 'package:flicko_video/page/tabs/effects/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../widgets/app_network_image.dart';
-import 'state.dart';
 
 class EffectsView extends ConsumerStatefulWidget {
   const EffectsView({super.key});
@@ -17,6 +20,40 @@ class EffectsView extends ConsumerStatefulWidget {
 
 class _EffectsViewState extends ConsumerState<EffectsView> {
   final RefreshController _refreshController = RefreshController();
+  var _initialLoading = false;
+
+  static final _mockCreativeHome = CreativeHome.fromJson({
+    'banners': List.generate(
+      3,
+      (index) => {'animation': 'https://example.com/banner-$index.jpg'},
+    ),
+    'categories': List.generate(
+      3,
+      (categoryIndex) => {
+        'title': 'Category Name',
+        'templates': List.generate(
+          3,
+          (templateIndex) => {
+            'title': 'Template Name',
+            'cover':
+                'https://example.com/template-$categoryIndex-$templateIndex.jpg',
+            'tags': 'NEW',
+          },
+        ),
+      },
+    ),
+  });
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || ref.read(effectsProvider).creativeHome != null) {
+        return;
+      }
+      _loadInitialData();
+    });
+  }
 
   @override
   void dispose() {
@@ -24,10 +61,31 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
     super.dispose();
   }
 
+  Future<void> _loadInitialData() async {
+    setState(() {
+      _initialLoading = true;
+    });
+
+    try {
+      await ref.read(effectsProvider.notifier).refresh();
+    } catch (_) {
+      // Keep the page usable if the initial request fails.
+    } finally {
+      if (mounted) {
+        setState(() {
+          _initialLoading = false;
+        });
+      }
+    }
+  }
+
   Future<void> _onRefresh() async {
-    await ref.read(effectsProvider.notifier).refresh();
-    _refreshController.refreshCompleted();
-    _refreshController.resetNoData();
+    try {
+      await ref.read(effectsProvider.notifier).refresh();
+    } finally {
+      _refreshController.refreshCompleted();
+      _refreshController.resetNoData();
+    }
   }
 
   Future<void> _onLoading() async {
@@ -39,13 +97,15 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
   Widget build(BuildContext context) {
     final state = ref.watch(effectsProvider);
     final l10n = AppLocalizations.of(context);
+    final showSkeleton = _initialLoading && state.creativeHome == null;
+    final creativeHome = showSkeleton ? _mockCreativeHome : state.creativeHome;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
       body: SmartRefresher(
         controller: _refreshController,
         enablePullDown: true,
-        enablePullUp: true,
+        enablePullUp: false,
         header: const WaterDropMaterialHeader(
           color: Color(0xFF6C63FF),
           backgroundColor: Color(0xFF0D0D1A),
@@ -78,27 +138,40 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
               );
             }
 
-            return SizedBox(
-              height: 56,
-              child: Center(child: body),
-            );
+            return SizedBox(height: 56, child: Center(child: body));
           },
         ),
         onRefresh: _onRefresh,
         onLoading: _onLoading,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildBannerWithHeader(ref, state, l10n),
-              const SizedBox(height: 16),
-              ...state.categories.map(
-                (category) => Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: _buildCategorySection(category, l10n),
+        child: Skeletonizer(
+          containersColor: Colors.white12,
+          enableSwitchAnimation: true,
+          enabled: showSkeleton,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildBannerWithHeader(
+                  ref,
+                  creativeHome,
+                  l10n,
+                  credits: state.credits,
+                  skeletonEnabled: showSkeleton,
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                ...creativeHome?.categories?.map(
+                      (category) => Padding(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        child: _buildCategorySection(
+                          category,
+                          l10n,
+                          skeletonEnabled: showSkeleton,
+                        ),
+                      ),
+                    ) ??
+                    [],
+              ],
+            ),
           ),
         ),
       ),
@@ -107,9 +180,16 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
 
   Widget _buildBannerWithHeader(
     WidgetRef ref,
-    EffectsState state,
-    AppLocalizations l10n,
-  ) {
+    CreativeHome? creativeHome,
+    AppLocalizations l10n, {
+    required int credits,
+    required bool skeletonEnabled,
+  }) {
+    if (creativeHome == null) {
+      return const SizedBox();
+    }
+    final banners = creativeHome.banners ?? [];
+
     return Stack(
       children: [
         Column(
@@ -117,7 +197,7 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
             SizedBox(
               height: 380,
               child: Swiper(
-                itemCount: state.bannerImages.length,
+                itemCount: banners.length,
                 autoplay: true,
                 autoplayDelay: 4000,
                 onIndexChanged: (index) {
@@ -135,10 +215,21 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
                   ),
                 ),
                 itemBuilder: (context, index) {
-                  return AppNetworkImage(
-                    imageUrl: state.bannerImages[index],
-                    fit: BoxFit.cover,
-                    placeholderColor: const Color(0xFF1A1A2E),
+                  if (skeletonEnabled) {
+                    return Container(color: const Color(0xFF1A1A2E));
+                  }
+
+                  final banner = banners[index];
+                  return GestureDetector(
+                    onTap: () => _openBannerEffectsCreate(
+                      creativeHome,
+                      selectedTemplateId: banner.template?.id,
+                    ),
+                    child: AppNetworkImage(
+                      imageUrl: banner.animation ?? '',
+                      fit: BoxFit.cover,
+                      placeholderColor: const Color(0xFF1A1A2E),
+                    ),
                   );
                 },
               ),
@@ -176,29 +267,43 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6C63FF),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('\u{1F451}', style: TextStyle(fontSize: 12)),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.pro,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                GestureDetector(
+                  onTap: () => context.push('/recharge'),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6C63FF),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('💎', style: TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$credits',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        const Text('\u{1F451}', style: TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.pro,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -209,7 +314,13 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
     );
   }
 
-  Widget _buildCategorySection(EffectCategory category, AppLocalizations l10n) {
+  Widget _buildCategorySection(
+    Category category,
+    AppLocalizations l10n, {
+    required bool skeletonEnabled,
+  }) {
+    final templates = category.templates ?? [];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -219,35 +330,47 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                category.name,
+                category.title ?? '暂无分类',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Row(
-                children: [
-                  Text(
-                    l10n.all,
-                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
-                  ),
-                  Icon(Icons.chevron_right, color: Colors.grey[400], size: 18),
-                ],
+              GestureDetector(
+                onTap: () => _openEffectsAll(category.id),
+                child: Row(
+                  children: [
+                    Text(
+                      l10n.all,
+                      style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.grey[400],
+                      size: 18,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           Row(
             children: List.generate(
-              category.items.length > 3 ? 3 : category.items.length,
+              templates.length > 3 ? 3 : templates.length,
               (index) => Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(
                     left: index == 0 ? 0 : 5,
                     right: index == 2 ? 0 : 5,
                   ),
-                  child: _buildEffectCard(category.items[index], l10n),
+                  child: _buildEffectCard(
+                    templates[index],
+                    category,
+                    l10n,
+                    skeletonEnabled: skeletonEnabled,
+                  ),
                 ),
               ),
             ),
@@ -257,21 +380,32 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
     );
   }
 
-  Widget _buildEffectCard(EffectItem item, AppLocalizations l10n) {
+  Widget _buildEffectCard(
+    Template item,
+    Category category,
+    AppLocalizations l10n, {
+    required bool skeletonEnabled,
+  }) {
     return GestureDetector(
-      onTap: () => context.push('/effects_create'),
+      onTap: () => _openEffectsCreate(category, selectedTemplateId: item.id),
       child: AspectRatio(
         aspectRatio: 0.8,
         child: Stack(
           children: [
-            AppNetworkImage(
-              imageUrl: item.thumbnail,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-              borderRadius: BorderRadius.circular(8),
-              placeholderColor: const Color(0xFF2A2A4A),
-            ),
+            if (skeletonEnabled)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(color: const Color(0xFF2A2A4A)),
+              )
+            else
+              AppNetworkImage(
+                imageUrl: item.animation ?? item.cover ?? '',
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                borderRadius: BorderRadius.circular(8),
+                placeholderColor: const Color(0xFF2A2A4A),
+              ),
             Positioned(
               left: 0,
               right: 0,
@@ -285,29 +419,35 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.7),
+                    ],
                   ),
                 ),
                 child: Text(
-                  item.title,
+                  item.title ?? '',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.white70, fontSize: 10),
                 ),
               ),
             ),
-            if (item.isVip)
+            if (item.tags != null)
               Positioned(
                 top: 6,
                 right: 6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF6C63FF),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    l10n.vip,
+                    item.tags ?? '',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 9,
@@ -318,6 +458,48 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _openEffectsCreate(Category category, {int? selectedTemplateId}) {
+    context.push(
+      '/effects_create',
+      extra: EffectsCreateArgs(
+        templates: category.templates ?? [],
+        selectedTemplateId: selectedTemplateId,
+      ),
+    );
+  }
+
+  void _openEffectsAll(int? categoryId) {
+    context.push(
+      Uri(
+        path: '/effects_all',
+        queryParameters: {
+          if (categoryId != null) 'categoryId': categoryId.toString(),
+        },
+      ).toString(),
+    );
+  }
+
+  void _openBannerEffectsCreate(
+    CreativeHome creativeHome, {
+    int? selectedTemplateId,
+  }) {
+    final bannerTemplates = (creativeHome.banners ?? [])
+        .map((banner) => banner.template)
+        .whereType<Template>();
+    final templates = [
+      ...bannerTemplates,
+      ...creativeHome.recommends ?? const <Template>[],
+    ];
+
+    context.push(
+      '/effects_create',
+      extra: EffectsCreateArgs(
+        templates: templates,
+        selectedTemplateId: selectedTemplateId,
       ),
     );
   }

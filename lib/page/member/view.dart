@@ -5,11 +5,27 @@ import 'package:go_router/go_router.dart';
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MemberView extends ConsumerWidget {
+class MemberView extends ConsumerStatefulWidget {
   const MemberView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _MemberViewState();
+}
+
+class _MemberViewState extends ConsumerState<MemberView> {
+  @override
+  initState() {
+    super.initState();
+
+      final controller = ref.read(memberControllerProvider.notifier);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async =>   await  controller.init());
+  
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(memberControllerProvider);
     final controller = ref.read(memberControllerProvider.notifier);
     final l10n = AppLocalizations.of(context);

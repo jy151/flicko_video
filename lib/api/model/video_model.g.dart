@@ -69,8 +69,13 @@ Template _$TemplateFromJson(Map<String, dynamic> json) => Template(
   cover: json['cover'] as String?,
   video: json['video'] as String?,
   prompt: json['prompt'] as String?,
+  animation: json['animation'] as String?,
   level: (json['level'] as num?)?.toInt(),
   extend: json['extend'],
+  tags: json['tags'] as String?,
+  source: (json['source'] as num?)?.toInt(),
+  score: (json['score'] as num?)?.toInt(),
+  vipScore: (json['vipScore'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$TemplateToJson(Template instance) => <String, dynamic>{
@@ -80,7 +85,12 @@ Map<String, dynamic> _$TemplateToJson(Template instance) => <String, dynamic>{
   'video': instance.video,
   'prompt': instance.prompt,
   'level': instance.level,
+  'animation': instance.animation,
   'extend': instance.extend,
+  'tags': instance.tags,
+  'source': instance.source,
+  'score': instance.score,
+  'vipScore': instance.vipScore,
 };
 
 Work _$WorkFromJson(Map<String, dynamic> json) => Work(

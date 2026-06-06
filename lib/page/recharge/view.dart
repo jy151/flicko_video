@@ -1,4 +1,5 @@
 import 'package:flicko_video/i18n/i18n.dart';
+import 'package:flicko_video/widgets/app_feedback_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,11 +7,16 @@ import 'package:go_router/go_router.dart';
 import 'controller.dart';
 import 'state.dart';
 
-class RechargeView extends ConsumerWidget {
+class RechargeView extends ConsumerStatefulWidget {
   const RechargeView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  createState() => _RechargeViewState();
+}
+
+class _RechargeViewState extends ConsumerState<RechargeView> {
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(rechargeControllerProvider);
     final controller = ref.read(rechargeControllerProvider.notifier);
     final l10n = AppLocalizations.of(context);
@@ -63,7 +69,14 @@ class RechargeView extends ConsumerWidget {
             icon: const Icon(Icons.close, color: Colors.white, size: 26),
           ),
           const Spacer(),
-          const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 20),
+          IconButton(
+            onPressed: () => showAppFeedbackDialog(context),
+            icon: const Icon(
+              Icons.chat_bubble_outline,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
         ],
       ),
     );
@@ -79,10 +92,7 @@ class RechargeView extends ConsumerWidget {
           children: [
             Text(
               l10n.myCredits,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(height: 4),
             Text(
@@ -100,7 +110,10 @@ class RechargeView extends ConsumerWidget {
     );
   }
 
-  Widget _buildPackagesGrid(RechargeState state, RechargeController controller) {
+  Widget _buildPackagesGrid(
+    RechargeState state,
+    RechargeController controller,
+  ) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

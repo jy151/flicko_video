@@ -53,9 +53,9 @@ Map<String, dynamic> _$VipInfoToJson(VipInfo instance) => <String, dynamic>{
 SubscribeItem _$SubscribeItemFromJson(Map<String, dynamic> json) =>
     SubscribeItem(
       id: (json['id'] as num?)?.toInt(),
-      scene: json['scene'] as String?,
-      scope: json['scope'] as String?,
-      type: json['type'] as String?,
+      scene: (json['scene'] as num?)?.toInt(),
+      scope: (json['scope'] as num?)?.toInt(),
+      type: (json['type'] as num?)?.toInt(),
       google: json['google'] == null
           ? null
           : GoogleSubscribe.fromJson(json['google'] as Map<String, dynamic>),
@@ -79,7 +79,7 @@ GoogleSubscribe _$GoogleSubscribeFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String?,
       name: json['name'] as String?,
       goodsId: json['goodsId'] as String?,
-      amount: (json['amount'] as num?)?.toDouble(),
+      amount: json['amount'] as String?,
       expireDay: (json['expireDay'] as num?)?.toInt(),
       price: (json['price'] as num?)?.toDouble(),
       marketPrice: (json['marketPrice'] as num?)?.toDouble(),

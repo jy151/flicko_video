@@ -5,8 +5,6 @@ import 'package:flicko_video/api/model/member_model.dart';
 import 'package:flicko_video/api/model/subscribe_model.dart';
 import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/core/http.dart';
-import 'package:flicko_video/hive/app/app_box.dart';
-import 'package:flicko_video/hive/auth/auth_box.dart';
 
 class Api {
   static final Http _http = Http();
@@ -23,19 +21,22 @@ class Api {
     String? inviterChannel,
     String? inviterApp,
   }) async {
-    final res = await _http.post('/auth/activation', data: {
-      'source': source,
-      if (accessToken != null) 'accessToken': accessToken,
-      if (account != null) 'account': account,
-      if (password != null) 'password': password,
-      if (gender != null) 'gender': gender,
-      if (inviterCode != null) 'inviterCode': inviterCode,
-      if (inviterChannel != null) 'inviterChannel': inviterChannel,
-      if (inviterApp != null) 'inviterApp': inviterApp,
-    });
+    final res = await _http.post(
+      '/auth/activation',
+      data: {
+        'source': source,
+        'accessToken': ?accessToken,
+        'account': ?account,
+        'password': ?password,
+        'gender': ?gender,
+        'inviterCode': ?inviterCode,
+        'inviterChannel': ?inviterChannel,
+        'inviterApp': ?inviterApp,
+      },
+    );
     if (res.isSuccess && res.data is Map<String, dynamic>) {
       final auth = AuthResponse.fromJson(res.data as Map<String, dynamic>);
- 
+
       return auth;
     }
     return null;
@@ -43,7 +44,7 @@ class Api {
 
   static Future<ApiResponse> logout() async {
     final res = await _http.get('/auth/logout');
- 
+
     return res;
   }
 
@@ -82,16 +83,21 @@ class Api {
     required String feedbackContent,
     String? feedbackEmail,
   }) async {
-    return await _http.post('/member/feedback', data: {
-      'memberId': memberId,
-      'feedbackContent': feedbackContent,
-      if (feedbackEmail != null) 'feedbackEmail': feedbackEmail,
-    });
+    return await _http.post(
+      '/member/feedback',
+      data: {
+        'memberId': memberId,
+        'feedbackContent': feedbackContent,
+        'feedbackEmail': ?feedbackEmail,
+      },
+    );
   }
 
   // ==================== Attribution ====================
 
-  static Future<ApiResponse> reportAttribution(Map<String, dynamic> data) async {
+  static Future<ApiResponse> reportAttribution(
+    Map<String, dynamic> data,
+  ) async {
     return await _http.post('/attribution/adjust/client', data: data);
   }
 
@@ -106,7 +112,10 @@ class Api {
   }
 
   static Future<List<AiModel>> getAiModelsByType(String type) async {
-    final res = await _http.get('/ai/aigc/model/credit', params: {'type': type});
+    final res = await _http.get(
+      '/ai/aigc/model/credit',
+      params: {'type': type},
+    );
     if (res.isSuccess && res.data is List) {
       return (res.data as List)
           .map((e) => AiModel.fromJson(e as Map<String, dynamic>))
@@ -127,12 +136,22 @@ class Api {
     return await _http.post('/behavior/rept/app', data: data);
   }
 
-  static Future<ApiResponse> getBalance(String memberId) async {
-    return await _http.get('/config/balance', params: {'member_id': memberId});
+  static Future<Balance?> getBalance(String memberId) async {
+    final res = await _http.get(
+      '/ai/aigc/model/balance',
+      params: {'member_id': memberId},
+    );
+    if (res.isSuccess && res.data is Map<String, dynamic>) {
+      return Balance.fromJson(res.data as Map<String, dynamic>);
+    }
+    return null;
   }
 
   static Future<OrderCheckResponse?> checkOrder(String orderId) async {
-    final res = await _http.get('/config/order_check', params: {'order_id': orderId});
+    final res = await _http.get(
+      '/config/order_check',
+      params: {'order_id': orderId},
+    );
     if (res.data is Map<String, dynamic>) {
       return OrderCheckResponse.fromJson(res.data as Map<String, dynamic>);
     }
@@ -143,10 +162,10 @@ class Api {
     required int productId,
     required String payType,
   }) async {
-    final res = await _http.post('/config/order_create', data: {
-      'product_id': productId,
-      'pay_type': payType,
-    });
+    final res = await _http.post(
+      '/config/order_create',
+      data: {'product_id': productId, 'pay_type': payType},
+    );
     if (res.data is Map<String, dynamic>) {
       return OrderCreateResponse.fromJson(res.data as Map<String, dynamic>);
     }
@@ -184,7 +203,7 @@ class Api {
   }
 
   static Future<List<Work>> getVideoWorks() async {
-    final res = await _http.get('/video/work/video');
+    final res = await _http.get('/ai/work/all');
     if (res.isSuccess && res.data is List) {
       return (res.data as List)
           .map((e) => Work.fromJson(e as Map<String, dynamic>))
@@ -220,7 +239,7 @@ class Api {
   }
 
   static Future<ApiResponse> deleteWork(int id) async {
-    return await _http.delete('/video/work/$id');
+    return await _http.delete('/video/creative/$id');
   }
 
   static Future<String?> uploadImage(String imagePath) async {
@@ -242,14 +261,15 @@ class Api {
     int? duration,
     int? templateId,
   }) async {
-    final res = await _http.post('/video/ai/create', data: {
+    final formData = FormData.fromMap({
       'type': type,
-      if (prompt != null) 'prompt': prompt,
-      if (image != null) 'image': image,
-      if (styleId != null) 'parameters.styleId': styleId,
-      if (duration != null) 'parameters.duration': duration,
-      if (templateId != null) 'templateId': templateId,
+      'prompt': ?prompt,
+      'image': ?image,
+      'parameters.styleId': ?styleId,
+      'parameters.duration': ?duration,
+      'templateId': ?templateId,
     });
+    final res = await _http.post('/video/ai/create', data: formData);
     if (res.isSuccess && res.data is Map<String, dynamic>) {
       return AiCreateResponse.fromJson(res.data as Map<String, dynamic>);
     }
@@ -260,10 +280,10 @@ class Api {
     required String promptId,
     required int type,
   }) async {
-    final res = await _http.get('/video/ai/status', params: {
-      'prompt_id': promptId,
-      'type': type,
-    });
+    final res = await _http.get(
+      '/video/ai/status',
+      params: {'prompt_id': promptId, 'type': type},
+    );
     if (res.isSuccess && res.data is Map<String, dynamic>) {
       return AiStatusResponse.fromJson(res.data as Map<String, dynamic>);
     }
@@ -272,7 +292,7 @@ class Api {
 
   static Future<List<ShowcaseCategory>> getShowcaseCategories() async {
     final res = await _http.get('/ai/aigc/recommend/discover/work');
-    if (res.isSuccess && res.data is List) { 
+    if (res.isSuccess && res.data is List) {
       return (res.data as List)
           .map((e) => ShowcaseCategory.fromJson(e as Map<String, dynamic>))
           .toList();
@@ -286,12 +306,15 @@ class Api {
     int size = 20,
     int lastId = 0,
   }) async {
-    final res = await _http.get('/ai/aigc/recommend/discover/work', params: {
-      'categoryId': categoryId,
-      'sort': sort,
-      'size': size,
-      'lastId': lastId,
-    });
+    final res = await _http.get(
+      '/ai/aigc/recommend/discover/work',
+      params: {
+        'categoryId': categoryId,
+        'sort': sort,
+        'size': size,
+        'lastId': lastId,
+      },
+    );
     if (res.isSuccess && res.data is List) {
       return (res.data as List)
           .map((e) => Work.fromJson(e as Map<String, dynamic>))

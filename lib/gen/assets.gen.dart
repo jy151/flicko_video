@@ -11,6 +11,16 @@
 
 import 'package:flutter/widgets.dart';
 
+class $AssetsIconGen {
+  const $AssetsIconGen();
+
+  /// File path: assets/icon/logo.png
+  AssetGenImage get logo => const AssetGenImage('assets/icon/logo.png');
+
+  /// List of all assets
+  List<AssetGenImage> get values => [logo];
+}
+
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
@@ -20,13 +30,20 @@ class $AssetsImagesGen {
   /// File path: assets/images/guge.png
   AssetGenImage get guge => const AssetGenImage('assets/images/guge.png');
 
+  /// File path: assets/images/loading.svg
+  String get loading => 'assets/images/loading.svg';
+
+  /// File path: assets/images/video.png
+  AssetGenImage get video => const AssetGenImage('assets/images/video.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [apple, guge];
+  List<dynamic> get values => [apple, guge, loading, video];
 }
 
 class Assets {
   const Assets._();
 
+  static const $AssetsIconGen icon = $AssetsIconGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
 }
 

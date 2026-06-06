@@ -1,16 +1,60 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flicko_video/api/model/video_model.dart';
+
 import 'state.dart';
 import 'controller.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flicko_video/i18n/i18n.dart';
+import 'package:flicko_video/page/effects_all/view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flicko_video/widgets/app_network_image.dart';
+import 'package:image_picker/image_picker.dart';
 
-class EffectsCreateView extends ConsumerWidget {
-  const EffectsCreateView({super.key});
+class EffectsCreateArgs {
+  const EffectsCreateArgs({required this.templates, this.selectedTemplateId});
+
+  final List<Template> templates;
+  final int? selectedTemplateId;
+}
+
+class EffectsCreateView extends ConsumerStatefulWidget {
+  final List<Template> templates;
+  final int? selectedTemplateId;
+
+  const EffectsCreateView({
+    super.key,
+    required this.templates,
+    this.selectedTemplateId,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<EffectsCreateView> createState() => _EffectsCreateViewState();
+}
+
+class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
+  final _imagePicker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      ref
+          .read(effectsCreateProvider.notifier)
+          .setTemplates(
+            widget.templates,
+            selectedTemplateId: widget.selectedTemplateId,
+          );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(effectsCreateProvider);
     final controller = ref.read(effectsCreateProvider.notifier);
     final l10n = AppLocalizations.of(context);
@@ -26,7 +70,7 @@ class EffectsCreateView extends ConsumerWidget {
                 children: [
                   _buildPreviewImage(context, state),
                   const SizedBox(height: 24),
-                  _buildUploadImageSection(l10n),
+                  _buildUploadImageSection(state, controller, l10n),
                   const SizedBox(height: 24),
                   _buildVideoEffectsSection(state, controller, l10n),
                 ],
@@ -46,7 +90,7 @@ class EffectsCreateView extends ConsumerWidget {
           width: double.infinity,
           height: 300,
           child: AppNetworkImage(
-            imageUrl: state.previewImageUrl,
+            imageUrl: state.previewAnimationUrl,
             fit: BoxFit.cover,
             placeholderColor: const Color(0xFF1A1A2E),
           ),
@@ -92,7 +136,11 @@ class EffectsCreateView extends ConsumerWidget {
     );
   }
 
-  Widget _buildUploadImageSection(AppLocalizations l10n) {
+  Widget _buildUploadImageSection(
+    EffectsCreateState state,
+    EffectsCreateController controller,
+    AppLocalizations l10n,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -110,9 +158,7 @@ class EffectsCreateView extends ConsumerWidget {
           Stack(
             children: [
               GestureDetector(
-                onTap: () {
-                  // TODO: Implement image picker
-                },
+                onTap: () => _pickImage(controller),
                 child: Container(
                   width: 100,
                   height: 100,
@@ -124,9 +170,21 @@ class EffectsCreateView extends ConsumerWidget {
                       width: 1,
                     ),
                   ),
-                  child: const Center(
-                    child: Icon(Icons.add, color: Colors.white54, size: 32),
-                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: state.selectedImagePath == null
+                      ? const Center(
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.white54,
+                            size: 32,
+                          ),
+                        )
+                      : Image.file(
+                          File(state.selectedImagePath!),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               Positioned(
@@ -178,14 +236,24 @@ class EffectsCreateView extends ConsumerWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              Row(
-                children: [
-                  Text(
-                    l10n.all,
-                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
-                  ),
-                  Icon(Icons.chevron_right, color: Colors.grey[400], size: 18),
-                ],
+              GestureDetector(
+                onTap: () => context.push(
+                  '/effects_all',
+                  extra: EffectsAllArgs(templates: state.templates),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      l10n.all,
+                      style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.grey[400],
+                      size: 18,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -194,12 +262,12 @@ class EffectsCreateView extends ConsumerWidget {
             height: 120,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: state.videoEffects.length,
+              itemCount: state.templates.length,
               separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
-                final effect = state.videoEffects[index];
-                final isSelected = effect.id == state.selectedEffectId;
-                return _buildEffectItem(effect, isSelected, controller);
+                final template = state.templates[index];
+                final isSelected = template.id == state.selectedTemplateId;
+                return _buildEffectItem(template, isSelected, controller);
               },
             ),
           ),
@@ -209,12 +277,12 @@ class EffectsCreateView extends ConsumerWidget {
   }
 
   Widget _buildEffectItem(
-    VideoEffect effect,
+    Template template,
     bool isSelected,
     EffectsCreateController controller,
   ) {
     return GestureDetector(
-      onTap: () => controller.selectEffect(effect.id),
+      onTap: () => controller.selectTemplate(template.id),
       child: SizedBox(
         width: 90,
         child: Column(
@@ -234,14 +302,14 @@ class EffectsCreateView extends ConsumerWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(isSelected ? 6 : 8),
                     child: AppNetworkImage(
-                      imageUrl: effect.thumbnail,
+                      imageUrl: template.animation ?? template.cover ?? '',
                       width: 90,
                       height: 80,
                       fit: BoxFit.cover,
                       placeholderColor: const Color(0xFF2A2A4A),
                     ),
                   ),
-                  if (effect.isVip)
+                  if ((template.level ?? 0) > 0)
                     Positioned(
                       top: 4,
                       right: 4,
@@ -269,7 +337,7 @@ class EffectsCreateView extends ConsumerWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              effect.title,
+              template.title ?? '',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.white70, fontSize: 11),
@@ -292,7 +360,9 @@ class EffectsCreateView extends ConsumerWidget {
           width: double.infinity,
           height: 52,
           child: ElevatedButton(
-            onPressed: state.isLoading ? null : () => controller.submit(),
+            onPressed: state.isLoading
+                ? null
+                : () => _submitTemplateTask(context, controller, l10n),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4A9EF7),
               foregroundColor: Colors.white,
@@ -324,7 +394,7 @@ class EffectsCreateView extends ConsumerWidget {
                       const Text('💎', style: TextStyle(fontSize: 14)),
                       const SizedBox(width: 4),
                       Text(
-                        '${state.credits}',
+                        '${state.creditCost}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -336,5 +406,64 @@ class EffectsCreateView extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _submitTemplateTask(
+    BuildContext context,
+    EffectsCreateController controller,
+    AppLocalizations l10n,
+  ) async {
+    try {
+      final result = await controller.submit();
+      if (!context.mounted) {
+        return;
+      }
+      _handleSubmitSuccess(context, result);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text(l10n.templateCreateSubmitted),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text(_formatSubmitError(error, l10n)),
+        ),
+      );
+    }
+  }
+
+  Future<void> _pickImage(EffectsCreateController controller) async {
+    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+
+    final bytes = await image.readAsBytes();
+    controller.setSelectedImage(
+      path: image.path,
+      base64Image: base64Encode(bytes),
+    );
+  }
+
+  void _handleSubmitSuccess(BuildContext context, AiCreateResponse? result) {
+    // TODO(song): 在这里补充提交成功后的页面跳转逻辑。
+    // 例如：context.go('/your_success_page', extra: result);
+  }
+
+  String _formatSubmitError(Object error, AppLocalizations l10n) {
+    if (error is EffectsCreateException) {
+      return switch (error.error) {
+        EffectsCreateError.noTemplate => l10n.selectTemplateFirst,
+        EffectsCreateError.noImage => l10n.selectImageFirst,
+        EffectsCreateError.submitFailed => l10n.templateCreateFailed,
+      };
+    }
+    return error.toString().replaceFirst('Exception: ', '');
   }
 }

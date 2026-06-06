@@ -1,13 +1,18 @@
+import 'dart:convert';
 import 'dart:core';
 import 'dart:core' as core;
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/api/model/config_model.dart';
-import 'package:flicko_video/app_controller.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
+import 'package:flicko_video/page/tabs/home/controller.dart';
 import 'package:flicko_video/page/tabs/home/widgets/image_style_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import 'state.dart';
@@ -19,6 +24,8 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView> {
+  final _imagePicker = ImagePicker();
+
   // Mock 数据，让骨架屏在 loading 时有内容可渲染
   static final _mockAiModels = List.generate(
     3,
@@ -44,32 +51,34 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D1A),
-      body: SafeArea(
-        child: Skeletonizer(
-          containersColor: Colors.white12,
-          enableSwitchAnimation: true,
-          enabled: state.loading,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                _buildHeader(state, l10n),
-                const SizedBox(height: 16),
-                _buildPromptArea(ref, state, l10n),
-                const SizedBox(height: 12),
-                _buildModeSelector(ref, state, l10n),
-                const SizedBox(height: 20),
-                _buildAiModelSection(ref, state, l10n),
-                const SizedBox(height: 20),
-                _buildDurationSection(ref, state, l10n),
-                const SizedBox(height: 20),
-                _buildStyleSection(l10n, state),
-                const SizedBox(height: 24),
-              ],
+    return KeyboardDismisser(
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0D0D1A),
+        body: SafeArea(
+          child: Skeletonizer(
+            containersColor: Colors.white12,
+            enableSwitchAnimation: true,
+            enabled: state.loading,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  _buildHeader(state, l10n),
+                  const SizedBox(height: 16),
+                  _buildPromptArea(ref, state, l10n),
+                  const SizedBox(height: 12),
+                  _buildModeSelector(ref, state, l10n),
+                  const SizedBox(height: 20),
+                  _buildAiModelSection(ref, state, l10n),
+                  const SizedBox(height: 20),
+                  _buildDurationSection(ref, state, l10n),
+                  const SizedBox(height: 20),
+                  _buildStyleSection(l10n, state),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
           ),
         ),
@@ -94,7 +103,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             const Text('💎', style: TextStyle(fontSize: 18)),
             const SizedBox(width: 4),
             Text(
-              '0',
+              '${state.credits}',
               style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ],
@@ -139,7 +148,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     key: const ValueKey('image-upload'),
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildAddImageButton(l10n),
+                      _buildAddImageButton(state, l10n),
                       const SizedBox(height: 12),
                     ],
                   )
@@ -178,26 +187,42 @@ class _HomeViewState extends ConsumerState<HomeView> {
               const Text('💎', style: TextStyle(fontSize: 14)),
               const SizedBox(width: 4),
               Text(
-                '${credits}',
+                '${credits ?? 0}',
                 style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
               const SizedBox(width: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6C63FF),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  l10n.create,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: state.isSubmitting
+                    ? null
+                    : () => _submitCreateTask(context, ref, l10n),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
+                  decoration: BoxDecoration(
+                    color: state.isSubmitting
+                        ? const Color(0xFF4D4D68)
+                        : const Color(0xFF6C63FF),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: state.isSubmitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          l10n.create,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ],
@@ -207,25 +232,36 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  Widget _buildAddImageButton(AppLocalizations l10n) {
-    return Container(
-      width: 88,
-      height: 72,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.white54, width: 1),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.transparent,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.add, color: Colors.white54, size: 22),
-          const SizedBox(height: 4),
-          Text(
-            l10n.addImage,
-            style: const TextStyle(color: Colors.white54, fontSize: 11),
-          ),
-        ],
+  Widget _buildAddImageButton(HomeState state, AppLocalizations l10n) {
+    return GestureDetector(
+      onTap: () => _pickImage(ref.read(homeProvider.notifier)),
+      child: Container(
+        width: 88,
+        height: 72,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.white54, width: 1),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.transparent,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: state.selectedImagePath == null
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.add, color: Colors.white54, size: 22),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.addImage,
+                    style: const TextStyle(color: Colors.white54, fontSize: 11),
+                  ),
+                ],
+              )
+            : Image.file(
+                File(state.selectedImagePath!),
+                width: 88,
+                height: 72,
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }
@@ -354,7 +390,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             padding: EdgeInsets.zero,
             scrollDirection: Axis.horizontal,
             itemCount: models.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               return _buildModelChip(ref, state, models[index]);
             },
@@ -480,7 +516,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: keys.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final key = keys[index];
               return _buildDurationChip(ref, state, key, '${key}s');
@@ -629,5 +665,65 @@ class _HomeViewState extends ConsumerState<HomeView> {
         ),
       ],
     );
+  }
+
+  Future<void> _pickImage(HomeNotifier controller) async {
+    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+
+    final bytes = await image.readAsBytes();
+    controller.setSelectedImage(
+      path: image.path,
+      base64Image: base64Encode(bytes),
+    );
+  }
+
+  Future<void> _submitCreateTask(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    try {
+      final result = await ref.read(homeProvider.notifier).submitCreateTask();
+      if (!context.mounted) {
+        return;
+      }
+      _handleSubmitSuccess(context, result);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text(l10n.createTaskSubmitted),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text(_formatCreateError(error, l10n)),
+        ),
+      );
+    }
+  }
+
+  void _handleSubmitSuccess(BuildContext context, AiCreateResponse? result) {
+    // TODO(song): 在这里补充 i2v/t2v 提交成功后的页面跳转逻辑。
+    // 例如：context.go('/your_success_page', extra: result);
+  }
+
+  String _formatCreateError(Object error, AppLocalizations l10n) {
+    if (error is HomeCreateException) {
+      return switch (error.error) {
+        HomeCreateError.noImage => l10n.selectImageFirst,
+        HomeCreateError.noPrompt => l10n.enterPromptFirst,
+        HomeCreateError.noDuration => l10n.selectDurationFirst,
+        HomeCreateError.submitFailed => l10n.createTaskFailed,
+      };
+    }
+    return error.toString().replaceFirst('Exception: ', '');
   }
 }

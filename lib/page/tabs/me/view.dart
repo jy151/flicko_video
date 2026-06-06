@@ -1,3 +1,7 @@
+import 'package:flicko_video/api/model/video_model.dart';
+import 'package:flicko_video/gen/assets.gen.dart';
+import 'package:flicko_video/page/tabs/me/controller.dart';
+
 import 'state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,8 +9,6 @@ import 'package:go_router/go_router.dart';
 import '../../../widgets/app_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
-import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
-
 
 class MeView extends ConsumerStatefulWidget {
   const MeView({super.key});
@@ -16,27 +18,10 @@ class MeView extends ConsumerStatefulWidget {
 }
 
 class _MeViewState extends ConsumerState<MeView> {
-  final RefreshController _refreshController = RefreshController();
   @override
   void initState() {
     super.initState();
     ref.read(meProvider.notifier).init();
-  }
-  @override
-  void dispose() {
-    _refreshController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onRefresh() async {
-    await ref.read(meProvider.notifier).refreshWorks();
-    _refreshController.refreshCompleted();
-    _refreshController.resetNoData();
-  }
-
-  Future<void> _onLoading() async {
-    await ref.read(meProvider.notifier).loadMoreWorks();
-    _refreshController.loadComplete();
   }
 
   @override
@@ -47,62 +32,20 @@ class _MeViewState extends ConsumerState<MeView> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
       body: SafeArea(
-        child: SmartRefresher(
-          controller: _refreshController,
-          enablePullDown: true,
-          enablePullUp: true,
-          header: const WaterDropHeader(
-            waterDropColor: Color(0xFF6C63FF),
-            complete: Icon(Icons.check, color: Color(0xFF6C63FF)),
-          ),
-          footer: CustomFooter(
-            builder: (context, mode) {
-              Widget body = Text(
-                l10n.pullUpToLoadMore,
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              );
-
-              if (mode == LoadStatus.loading) {
-                body = const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Color(0xFF6C63FF),
-                  ),
-                );
-              } else if (mode == LoadStatus.failed) {
-                body = Text(
-                  l10n.loadFailed,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                );
-              } else if (mode == LoadStatus.canLoading) {
-                body = Text(
-                  l10n.releaseToLoadMore,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
-                );
-              }
-
-              return SizedBox(height: 56, child: Center(child: body));
-            },
-          ),
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 16),
-                _buildHeader(context, state, l10n),
-                const SizedBox(height: 20),
-                _buildProfile(state, l10n),
-                const SizedBox(height: 16),
-                _buildVipCard(state, l10n),
-                const SizedBox(height: 24),
-                _buildWorksSection(state, l10n),
-              ],
-            ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              _buildHeader(context, state, l10n),
+              const SizedBox(height: 20),
+              _buildProfile(state, l10n),
+              const SizedBox(height: 16),
+              _buildVipCard(state, l10n),
+              const SizedBox(height: 24),
+              _buildWorksSection(state, l10n),
+            ],
           ),
         ),
       ),
@@ -337,25 +280,85 @@ class _MeViewState extends ConsumerState<MeView> {
           ),
         ),
         const SizedBox(height: 14),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 0.85,
-          ),
-          itemCount: state.works.length,
-          itemBuilder: (context, index) {
-            return _buildWorkCard(state.works[index]);
-          },
-        ),
+        if (state.works.isEmpty)
+          _buildEmptyWorks(l10n)
+        else
+          _buildWorkGrid(state),
       ],
     );
   }
 
-  Widget _buildWorkCard(WorkItem item) {
+  Widget _buildEmptyWorks(AppLocalizations l10n) {
+    return SizedBox(
+      width: double.infinity,
+      height: 220,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 72,
+            height: 72,
+            child: Center(
+              child: Assets.images.video.image(width: 64, height: 64),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.noWorks,
+            style: const TextStyle(
+              color: Colors.white54,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 40,
+            child: ElevatedButton(
+              onPressed: () => context.go('/home'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6C63FF),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Text(
+                l10n.startCreating,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWorkGrid(MeState state) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: state.works.length,
+      itemBuilder: (context, index) {
+        return _buildWorkCard(state.works[index]);
+      },
+    );
+  }
+
+  Widget _buildWorkCard(Work item) {
+    final thumbnailUrl = item.cover ?? item.image ?? item.video ?? '';
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1A1A2E),
@@ -366,34 +369,25 @@ class _MeViewState extends ConsumerState<MeView> {
         fit: StackFit.expand,
         children: [
           AppNetworkImage(
-            imageUrl: item.thumbnailUrl,
+            imageUrl: thumbnailUrl,
             fit: BoxFit.cover,
             placeholderColor: const Color(0xFF2A2A4A),
           ),
           Positioned(
             left: 6,
+            right: 6,
             bottom: 6,
             child: Row(
               children: [
                 const Icon(Icons.videocam, color: Colors.white70, size: 12),
                 const SizedBox(width: 3),
-                Text(
-                  item.duration,
-                  style: const TextStyle(color: Colors.white70, fontSize: 10),
+                const Text(
+                  '00:05',
+                  style: TextStyle(color: Colors.white70, fontSize: 10),
                 ),
+                const Spacer(),
+                const Icon(Icons.more_horiz, color: Colors.white70, size: 16),
               ],
-            ),
-          ),
-          Positioned(
-            right: 6,
-            bottom: 6,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              child: const Icon(
-                Icons.more_horiz,
-                color: Colors.white70,
-                size: 16,
-              ),
             ),
           ),
         ],

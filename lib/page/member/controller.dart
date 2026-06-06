@@ -1,3 +1,4 @@
+import 'package:flicko_video/api/api.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import 'state.dart';
@@ -36,9 +37,17 @@ class MemberController extends StateNotifier<MemberState> {
       state = state.copyWith(isLoading: false);
     }
   }
+
+  Future<void> init() async {
+   final resp = await Api.getSubscribeInfo();
+
+  }
+
+  
+
 }
 
 final memberControllerProvider =
     StateNotifierProvider<MemberController, MemberState>((ref) {
-      return MemberController();
+  return MemberController();
     });

@@ -1,8 +1,10 @@
 import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
+import 'package:flicko_video/page/discover_detail/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
 
 import '../../../widgets/app_network_image.dart';
@@ -16,12 +18,15 @@ class DiscoverView extends ConsumerStatefulWidget {
 }
 
 class _DiscoverViewState extends ConsumerState<DiscoverView> {
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
   @override
   void initState() {
     ref.read(discoverProvider.notifier).init();
     super.initState();
   }
+
   @override
   void dispose() {
     _refreshController.dispose();
@@ -63,10 +68,10 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
                   waterDropColor: Color(0xFF6C63FF),
                   complete: Icon(Icons.check, color: Color(0xFF6C63FF)),
                 ),
-              
+
                 onRefresh: _onRefresh,
                 onLoading: _onLoading,
-                child: CustomScrollView( 
+                child: CustomScrollView(
                   slivers: [
                     SliverPadding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -107,7 +112,10 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF6C63FF),
                   borderRadius: BorderRadius.circular(16),
@@ -137,8 +145,10 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
             scrollDirection: Axis.horizontal,
             itemCount: state.categories.length,
             itemBuilder: (context, index) {
-              return Text(state.categories[index].title ?? '',style: TextStyle(color: 
-              Colors.white),);
+              return Text(
+                state.categories[index].title ?? '',
+                style: TextStyle(color: Colors.white),
+              );
             },
           ),
         ),
@@ -150,77 +160,82 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
     final heights = [180.0, 220.0, 200.0, 240.0, 210.0, 190.0, 200.0, 230.0];
     final height = heights[index % heights.length];
 
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: const Color(0xFF1A1A2E),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          AppNetworkImage(
-            imageUrl: item.cover ?? '',
-            fit: BoxFit.cover,
-            placeholderColor: const Color(0xFF2A2A4A),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
+    return GestureDetector(
+      onTap: () {
+        context.push('/discover_detail', extra: DiscoverDetailArgs(work: item));
+      },
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFF1A1A2E),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            AppNetworkImage(
+              imageUrl: item.cover ?? '',
+              fit: BoxFit.cover,
+              placeholderColor: const Color(0xFF2A2A4A),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.7),
+                    ],
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[600],
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        item.member?.name ?? ' 暂无名称',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.favorite_border,
+                      color: Colors.white70,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '${item.counter?.likeCount ?? 0}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[600],
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      item.member?.name ?? ' 暂无名称',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const Icon(
-                    Icons.favorite_border,
-                    color: Colors.white70,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    '${item.hot}',
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

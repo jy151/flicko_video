@@ -66,5 +66,27 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>GIDClientID</key>
+	<string>667306979952-gk90ien959vs4r87hi53m22c6s5df6oi.apps.googleusercontent.com</string>
+	<key>GIDServerClientID</key>
+	<string>667306979952-1qvcj0qud2v4pmo0a525gtubm7vo013l.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.667306979952-gk90ien959vs4r87hi53m22c6s5df6oi</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Flicko Video needs photo library access to choose images for video generation.</string>
 </dict>
 </plist>

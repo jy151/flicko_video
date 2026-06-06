@@ -9,12 +9,7 @@ class CreativeHome {
   final List<Category>? categories;
   final List<Template>? recommends;
 
-  CreativeHome({
-    this.guides,
-    this.banners,
-    this.categories,
-    this.recommends,
-  });
+  CreativeHome({this.guides, this.banners, this.categories, this.recommends});
 
   factory CreativeHome.fromJson(Map<String, dynamic> json) =>
       _$CreativeHomeFromJson(json);
@@ -29,12 +24,7 @@ class Banner {
   final String? animation;
   final Template? template;
 
-  Banner({
-    this.type,
-    this.banner,
-    this.animation,
-    this.template,
-  });
+  Banner({this.type, this.banner, this.animation, this.template});
 
   factory Banner.fromJson(Map<String, dynamic> json) => _$BannerFromJson(json);
 
@@ -49,13 +39,7 @@ class Category {
   final List<Template>? templates;
   final int? extend;
 
-  Category({
-    this.id,
-    this.style,
-    this.title,
-    this.templates,
-    this.extend,
-  });
+  Category({this.id, this.style, this.title, this.templates, this.extend});
 
   factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
@@ -71,7 +55,12 @@ class Template {
   final String? video;
   final String? prompt;
   final int? level;
+  final String? animation;
   final dynamic extend;
+  final String? tags;
+  final int? source;
+  final int? score;
+  final int? vipScore;
 
   Template({
     this.id,
@@ -79,8 +68,13 @@ class Template {
     this.cover,
     this.video,
     this.prompt,
+    this.animation,
     this.level,
     this.extend,
+    this.tags,
+    this.source,
+    this.score,
+    this.vipScore,
   });
 
   factory Template.fromJson(Map<String, dynamic> json) =>
@@ -128,11 +122,7 @@ class WorkMember {
   final String? name;
   final String? portrait;
 
-  WorkMember({
-    this.memberId,
-    this.name,
-    this.portrait,
-  });
+  WorkMember({this.memberId, this.name, this.portrait});
 
   factory WorkMember.fromJson(Map<String, dynamic> json) =>
       _$WorkMemberFromJson(json);
@@ -146,11 +136,7 @@ class WorkCounter {
   final int? shareCount;
   final int? commentCount;
 
-  WorkCounter({
-    this.likeCount,
-    this.shareCount,
-    this.commentCount,
-  });
+  WorkCounter({this.likeCount, this.shareCount, this.commentCount});
 
   factory WorkCounter.fromJson(Map<String, dynamic> json) =>
       _$WorkCounterFromJson(json);
@@ -205,18 +191,14 @@ class AiCreateResponse {
 }
 
 @JsonSerializable()
-class AiStatusResponse {
+class AiStatusResponse { 
   final String? status;
   @JsonKey(name: 'video_urls')
   final List<String>? videoUrls;
   @JsonKey(name: 'queue_position')
   final int? queuePosition;
 
-  AiStatusResponse({
-    this.status,
-    this.videoUrls,
-    this.queuePosition,
-  });
+  AiStatusResponse({this.status, this.videoUrls, this.queuePosition});
 
   factory AiStatusResponse.fromJson(Map<String, dynamic> json) =>
       _$AiStatusResponseFromJson(json);
@@ -230,11 +212,7 @@ class ShowcaseCategory {
   final String? title;
   final dynamic extend;
 
-  ShowcaseCategory({
-    this.id,
-    this.title,
-    this.extend,
-  });
+  ShowcaseCategory({this.id, this.title, this.extend});
 
   factory ShowcaseCategory.fromJson(Map<String, dynamic> json) =>
       _$ShowcaseCategoryFromJson(json);

@@ -30,9 +30,9 @@ class LoginView extends ConsumerWidget {
               const SizedBox(height: 32),
               _buildEmailField(controller, l10n),
               const SizedBox(height: 16),
-              _buildPasswordField(state, controller, l10n),
-              // const SizedBox(height: 24),
-              // _buildSignInButton(context, state, controller, l10n),
+              _buildPasswordField(context, state, controller, l10n),
+              const SizedBox(height: 24),
+              _buildSignInButton(context, state, controller, l10n),
               const SizedBox(height: 16),
               _buildGoogleSignInButton(context, state, controller, l10n),
               const SizedBox(height: 12),
@@ -52,6 +52,7 @@ class LoginView extends ConsumerWidget {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
+        image: DecorationImage(image: Assets.icon.logo.provider()),
         color: Colors.grey[700],
         borderRadius: BorderRadius.circular(16),
       ),
@@ -79,6 +80,7 @@ class LoginView extends ConsumerWidget {
       child: TextField(
         onChanged: controller.setEmail,
         keyboardType: TextInputType.emailAddress,
+        textInputAction: TextInputAction.next,
         style: const TextStyle(color: Colors.black87, fontSize: 16),
         decoration: InputDecoration(
           hintText: l10n.emailAddress,
@@ -94,6 +96,7 @@ class LoginView extends ConsumerWidget {
   }
 
   Widget _buildPasswordField(
+    BuildContext context,
     LoginState state,
     LoginController controller,
     AppLocalizations l10n,
@@ -106,6 +109,8 @@ class LoginView extends ConsumerWidget {
       child: TextField(
         onChanged: controller.setPassword,
         obscureText: state.obscurePassword,
+        textInputAction: TextInputAction.done,
+        onSubmitted: (_) => _onSignIn(context, state, controller, l10n),
         style: const TextStyle(color: Colors.black87, fontSize: 16),
         decoration: InputDecoration(
           hintText: l10n.password,
@@ -249,12 +254,12 @@ class LoginView extends ConsumerWidget {
     );
   }
 
-  void _onSignIn(
+  Future<void> _onSignIn(
     BuildContext context,
     LoginState state,
     LoginController controller,
     AppLocalizations l10n,
-  ) {
+  ) async {
     if (!state.agreedToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -264,7 +269,35 @@ class LoginView extends ConsumerWidget {
       );
       return;
     }
-    controller.signIn();
+
+    try {
+      final result = await controller.signInWithPassword();
+      if (!context.mounted) {
+        return;
+      }
+
+      if (result.success) {
+        Navigator.of(context).maybePop();
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text(result.errorMessage ?? l10n.loadFailed),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text('账号密码登录失败：$error'),
+        ),
+      );
+    }
   }
 
   Widget _buildAppleSignInButton(
@@ -303,12 +336,12 @@ class LoginView extends ConsumerWidget {
     );
   }
 
-  void _onGoogleSignIn(
+  Future<void> _onGoogleSignIn(
     BuildContext context,
     LoginState state,
     LoginController controller,
     AppLocalizations l10n,
-  ) {
+  ) async {
     if (!state.agreedToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -318,15 +351,43 @@ class LoginView extends ConsumerWidget {
       );
       return;
     }
-    controller.signInWithGoogle();
+
+    try {
+      final result = await controller.signInWithGoogle();
+      if (!context.mounted) {
+        return;
+      }
+
+      if (result.success) {
+        Navigator.of(context).maybePop();
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text(result.errorMessage ?? l10n.loadFailed),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text('Google 登录失败：$error'),
+        ),
+      );
+    }
   }
 
-  void _onAppleSignIn(
+  Future<void> _onAppleSignIn(
     BuildContext context,
     LoginState state,
     LoginController controller,
     AppLocalizations l10n,
-  ) {
+  ) async {
     if (!state.agreedToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -336,6 +397,34 @@ class LoginView extends ConsumerWidget {
       );
       return;
     }
-    controller.signInWithApple();
+
+    try {
+      final result = await controller.signInWithApple();
+      if (!context.mounted) {
+        return;
+      }
+
+      if (result.success) {
+        Navigator.of(context).maybePop();
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text(result.errorMessage ?? l10n.loadFailed),
+        ),
+      );
+    } catch (error) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: const Color(0xFF1A1A2E),
+          content: Text('Apple 登录失败：$error'),
+        ),
+      );
+    }
   }
 }

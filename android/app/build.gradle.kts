@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.song.flicko_video.flicko_video"
+    namespace = "video.flicko.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.song.flicko_video.flicko_video"
+        applicationId = "video.flicko.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -30,11 +30,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs { 
+        create("app") {
+            storeFile = file("app.jks")
+            storePassword = "avast666888"
+            keyAlias = "key0"
+            keyPassword = "avast666888"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("app")
+        }
+
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("app")
         }
     }
 }
