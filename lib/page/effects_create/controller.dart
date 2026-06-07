@@ -1,5 +1,6 @@
 import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/api/api.dart';
+import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import 'state.dart';
@@ -37,10 +38,10 @@ class EffectsCreateController extends StateNotifier<EffectsCreateState> {
     state = state.copyWith(
       selectedImagePath: path,
       selectedImageBase64: base64Image,
-    ); 
+    );
   }
 
-  Future<AiCreateResponse?> submit() async { 
+  Future<AiCreateResponse?> submit() async {
     final template = state.selectedTemplate;
     final templateId = template?.id;
     if (templateId == null) {
@@ -62,9 +63,18 @@ class EffectsCreateController extends StateNotifier<EffectsCreateState> {
       if (result == null) {
         throw const EffectsCreateException(EffectsCreateError.submitFailed);
       }
+      await _syncBalanceAfterCreate();
       return result;
     } finally {
       state = state.copyWith(isLoading: false);
+    }
+  }
+
+  Future<void> _syncBalanceAfterCreate() async {
+    try {
+      await UserBox.syncBalance();
+    } catch (_) {
+      // The create task already succeeded; balance will refresh on next sync.
     }
   }
 }

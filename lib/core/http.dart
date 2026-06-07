@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flicko_video/hive/app/app_box.dart';
 import 'package:flicko_video/hive/auth/auth_box.dart';
 
 class Http {
@@ -9,31 +8,35 @@ class Http {
   late final Dio _dio;
 
   Http._internal() {
-    _dio = Dio(BaseOptions(
-      baseUrl: 'https://bridgecode.flicko.video/api/v1/',
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
-      responseType: ResponseType.json,
-    ));
- 
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) {
-        final token = AuthBox.token;
-        if (token.isNotEmpty) {
-          options.headers['Authorization'] = token;
-        }
-        if (_userAgentClient != null) {
-          options.headers['User-Agent-Client'] = _userAgentClient;
-        }
-        handler.next(options);
-      },
-      onResponse: (response, handler) {
-        handler.next(response);
-      },
-      onError: (error, handler) {
-        handler.next(error);
-      },
-    ));
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: 'https://bridgecode.flicko.video/api/v1/',
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+        responseType: ResponseType.json,
+      ),
+    );
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          final token = AuthBox.token;
+          if (token.isNotEmpty) {
+            options.headers['Authorization'] = token;
+          }
+          if (_userAgentClient != null) {
+            options.headers['User-Agent-Client'] = _userAgentClient;
+          }
+          handler.next(options);
+        },
+        onResponse: (response, handler) {
+          handler.next(response);
+        },
+        onError: (error, handler) {
+          handler.next(error);
+        },
+      ),
+    );
   }
 
   String? _userAgentClient;
@@ -62,7 +65,12 @@ class Http {
     CancelToken? cancelToken,
   }) async {
     return _request(
-      () => _dio.post(path, data: data, queryParameters: params, cancelToken: cancelToken),
+      () => _dio.post(
+        path,
+        data: data,
+        queryParameters: params,
+        cancelToken: cancelToken,
+      ),
     );
   }
 
@@ -73,7 +81,12 @@ class Http {
     CancelToken? cancelToken,
   }) async {
     return _request(
-      () => _dio.put(path, data: data, queryParameters: params, cancelToken: cancelToken),
+      () => _dio.put(
+        path,
+        data: data,
+        queryParameters: params,
+        cancelToken: cancelToken,
+      ),
     );
   }
 
@@ -84,7 +97,12 @@ class Http {
     CancelToken? cancelToken,
   }) async {
     return _request(
-      () => _dio.delete(path, data: data, queryParameters: params, cancelToken: cancelToken),
+      () => _dio.delete(
+        path,
+        data: data,
+        queryParameters: params,
+        cancelToken: cancelToken,
+      ),
     );
   }
 
@@ -131,21 +149,16 @@ class ApiResponse {
   final String message;
   final int? time;
 
-  ApiResponse({
-    required this.code,
-    this.data,
-    this.message = '',
-    this.time,
-  });
+  ApiResponse({required this.code, this.data, this.message = '', this.time});
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
     return ApiResponse(
       code: json['code'] as int? ?? -1,
       data: json['data'],
-      message: json['message'] as String? ?? '',
+      message: (json['message'] ?? json['msg']) as String? ?? '',
       time: json['time'] as int?,
     );
   }
 
-  bool get isSuccess => code == 200;
+  bool get isSuccess => code == 200 || code == 1 || code == 0;
 }

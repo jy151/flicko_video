@@ -12,6 +12,8 @@ import 'package:flicko_video/page/effects_all/view.dart';
 import 'package:flicko_video/page/effects_create/view.dart';
 import 'package:flicko_video/page/member/view.dart';
 import 'package:flicko_video/page/recharge/view.dart';
+import 'package:flicko_video/page/create_result/state.dart';
+import 'package:flicko_video/page/create_result/view.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/home',
@@ -91,6 +93,16 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/recharge',
       builder: (context, state) => const RechargeView(),
+    ),
+    GoRoute(
+      path: '/create_result',
+      builder: (context, state) {
+        final extra = state.extra;
+        if (extra is CreateResultArgs) {
+          return CreateResultView(task: extra.task);
+        }
+        return const CreateResultView();
+      },
     ),
   ],
 );

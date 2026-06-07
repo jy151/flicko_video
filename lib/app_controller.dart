@@ -1,6 +1,7 @@
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/api/model/config_model.dart';
 import 'package:flicko_video/hive/auth/auth_box.dart';
+import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import 'app_state.dart';
@@ -10,6 +11,7 @@ class AppController extends StateNotifier<AppState> {
 
   Future<void>? _initRequest;
   Future<void>? _loginRequest;
+  Future<void>? _userSyncRequest;
   Future<AiModelConfig?>? _aiModelConfigRequest;
 
   /// 初始化应用
@@ -20,6 +22,7 @@ class AppController extends StateNotifier<AppState> {
 
   Future<void> _init() async {
     await _ensureLoggedIn();
+    await syncUserData();
     await loadAiModelConfig();
   }
 
@@ -29,6 +32,41 @@ class AppController extends StateNotifier<AppState> {
         _loginRequest = null;
       });
       await _loginRequest;
+    }
+  }
+
+  Future<void> syncUserData() async {
+    final pendingRequest = _userSyncRequest;
+    if (pendingRequest != null) {
+      await pendingRequest;
+      return;
+    }
+
+    final request = _syncUserData();
+    _userSyncRequest = request;
+    try {
+      await request;
+    } finally {
+      if (identical(_userSyncRequest, request)) {
+        _userSyncRequest = null;
+      }
+    }
+  }
+
+  Future<void> _syncUserData() async {
+    if (!AuthBox.isLoggedIn) {
+      return;
+    }
+
+    try {
+      final member = await UserBox.syncUserInfo();
+      await UserBox.syncBalance(memberId: member?.memberId);
+    } catch (_) {
+      try {
+        await UserBox.syncBalance();
+      } catch (_) {
+        // App startup should continue even if user refresh fails.
+      }
     }
   }
 

@@ -42,18 +42,19 @@ class UserBox {
   }
 
   static Future<Balance?> syncBalance({String? memberId}) async {
-    final id = memberId ?? member?.memberId;
-    if (id == null || id.isEmpty) {
+    final cachedBalance = balance;
+    final id = memberId ?? member?.memberId ?? cachedBalance?.memberId;
+    if (id == null) {
       return null;
     }
 
-    final balance = await Api.getBalance(id);
-    if (balance == null) {
+    final latestBalance = await Api.getBalance(int.parse(id.toString()));
+    if (latestBalance == null) {
       return null;
     }
 
-    await saveBalance(balance);
-    return balance;
+    await saveBalance(latestBalance);
+    return latestBalance;
   }
 
   static Future<void> saveMember(Member member) async {

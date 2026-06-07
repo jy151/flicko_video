@@ -7,10 +7,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/api/model/config_model.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
+import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/tabs/home/controller.dart';
 import 'package:flicko_video/page/tabs/home/widgets/image_style_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -711,8 +713,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
   }
 
   void _handleSubmitSuccess(BuildContext context, AiCreateResponse? result) {
-    // TODO(song): 在这里补充 i2v/t2v 提交成功后的页面跳转逻辑。
-    // 例如：context.go('/your_success_page', extra: result);
+    context.push('/create_result', extra: CreateResultArgs(task: result));
   }
 
   String _formatCreateError(Object error, AppLocalizations l10n) {

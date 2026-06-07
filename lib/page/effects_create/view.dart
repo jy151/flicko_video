@@ -8,6 +8,7 @@ import 'controller.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flicko_video/i18n/i18n.dart';
+import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/effects_all/view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flicko_video/widgets/app_network_image.dart';
@@ -452,8 +453,7 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
   }
 
   void _handleSubmitSuccess(BuildContext context, AiCreateResponse? result) {
-    // TODO(song): 在这里补充提交成功后的页面跳转逻辑。
-    // 例如：context.go('/your_success_page', extra: result);
+    context.push('/create_result', extra: CreateResultArgs(task: result));
   }
 
   String _formatSubmitError(Object error, AppLocalizations l10n) {

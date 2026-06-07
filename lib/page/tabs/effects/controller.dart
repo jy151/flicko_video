@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flicko_video/page/tabs/effects/state.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 class EffectsNotifier extends StateNotifier<EffectsState> {
-  EffectsNotifier() : super(EffectsState());
+  EffectsNotifier() : super(EffectsState(credits: UserBox.credit)) {
+    _watchUserCredit();
+  }
+
+  StreamSubscription<dynamic>? _userBoxSubscription;
 
   void setBannerIndex(int index) {
     state = state.copyWith(currentBannerIndex: index);
@@ -18,11 +24,6 @@ class EffectsNotifier extends StateNotifier<EffectsState> {
   }
 
   Future<void> syncBalance() async {
-    final cachedCredit = UserBox.credit;
-    if (cachedCredit != state.credits) {
-      state = state.copyWith(credits: cachedCredit);
-    }
-
     final balance = await UserBox.syncBalance();
     if (mounted && balance != null) {
       state = state.copyWith(credits: balance.credit ?? 0);
@@ -48,6 +49,25 @@ class EffectsNotifier extends StateNotifier<EffectsState> {
     //   page: nextPage,
     //   categories: [...state.categories, newCategory],
     // );
+  }
+
+  void _watchUserCredit() {
+    _userBoxSubscription = UserBox.box.watch().listen((_) {
+      _applyCreditFromCache();
+    });
+  }
+
+  void _applyCreditFromCache() {
+    final credit = UserBox.credit;
+    if (mounted && credit != state.credits) {
+      state = state.copyWith(credits: credit);
+    }
+  }
+
+  @override
+  void dispose() {
+    _userBoxSubscription?.cancel();
+    super.dispose();
   }
 }
 

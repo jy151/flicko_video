@@ -79,7 +79,7 @@ class Api {
   }
 
   static Future<ApiResponse> submitFeedback({
-    required String memberId,
+    required int memberId,
     required String feedbackContent,
     String? feedbackEmail,
   }) async {
@@ -136,7 +136,7 @@ class Api {
     return await _http.post('/behavior/rept/app', data: data);
   }
 
-  static Future<Balance?> getBalance(String memberId) async {
+  static Future<Balance?> getBalance(int memberId) async {
     final res = await _http.get(
       '/ai/aigc/model/balance',
       params: {'member_id': memberId},
@@ -261,17 +261,20 @@ class Api {
     int? duration,
     int? templateId,
   }) async {
-    final formData = FormData.fromMap({
-      'type': type,
-      'prompt': ?prompt,
-      'image': ?image,
-      'parameters.styleId': ?styleId,
-      'parameters.duration': ?duration,
-      'templateId': ?templateId,
-    });
-    final res = await _http.post('/video/ai/create', data: formData);
+    final res = await _http.post(
+      '/ai/work',
+      data: {
+        'type': type,
+        'prompt': ?prompt,
+        'image': ?image,
+        'parameters': {'styleId': ?styleId, 'duration': ?duration},
+        'templateId': ?templateId,
+      },
+    );
     if (res.isSuccess && res.data is Map<String, dynamic>) {
-      return AiCreateResponse.fromJson(res.data as Map<String, dynamic>);
+      final data = Map<String, dynamic>.from(res.data as Map<String, dynamic>);
+      data['type'] ??= type;
+      return AiCreateResponse.fromJson(data);
     }
     return null;
   }
@@ -281,7 +284,7 @@ class Api {
     required int type,
   }) async {
     final res = await _http.get(
-      '/video/ai/status',
+      '/video/creative/status',
       params: {'prompt_id': promptId, 'type': type},
     );
     if (res.isSuccess && res.data is Map<String, dynamic>) {

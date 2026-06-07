@@ -6,8 +6,10 @@ part 'state.freezed.dart';
 @freezed
 abstract class MeState with _$MeState {
   const factory MeState({
+    @Default('') String name,
+    @Default('') String portrait,
     @Default('') String email,
-    @Default('1') String userId,
+    @Default('') String userId,
     @Default(0) int credits,
     @Default('Diamond SVIP Weekly') String vipPlan,
     @Default('') String vipExpiry,

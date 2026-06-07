@@ -21,7 +21,12 @@ class _MeViewState extends ConsumerState<MeView> {
   @override
   void initState() {
     super.initState();
-    ref.read(meProvider.notifier).init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      ref.read(meProvider.notifier).init();
+    });
   }
 
   @override
@@ -101,31 +106,17 @@ class _MeViewState extends ConsumerState<MeView> {
   }
 
   Widget _buildProfile(MeState state, AppLocalizations l10n) {
+    final profileTitle = state.name.isNotEmpty
+        ? state.name
+        : state.email.isNotEmpty
+        ? state.email
+        : 'guest@flicko.com';
+
     return Row(
       children: [
-        //  跳转进入登录页面
         GestureDetector(
           onTap: () => context.push('/login'),
-          child: Container(
-            width: 60,
-            height: 60,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE53935),
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Text(
-                'f\nAI',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  height: 1.2,
-                ),
-              ),
-            ),
-          ),
+          child: _buildAvatar(state),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -136,7 +127,7 @@ class _MeViewState extends ConsumerState<MeView> {
                 children: [
                   Expanded(
                     child: Text(
-                      state.email,
+                      profileTitle,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
@@ -157,38 +148,72 @@ class _MeViewState extends ConsumerState<MeView> {
               Row(
                 children: [
                   Text(
-                    '${l10n.idLabel}: ${state.userId}',
+                    '${l10n.idLabel}: ${state.userId.isEmpty ? '--' : state.userId}',
                     style: const TextStyle(color: Colors.grey, fontSize: 11),
                   ),
                   const SizedBox(width: 6),
-                  GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: state.userId));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        l10n.copy,
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 10,
+                  if (state.userId.isNotEmpty)
+                    GestureDetector(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: state.userId));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          l10n.copy,
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 10,
+                          ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAvatar(MeState state) {
+    if (state.portrait.isNotEmpty) {
+      return AppNetworkImage(
+        imageUrl: state.portrait,
+        width: 60,
+        height: 60,
+        borderRadius: BorderRadius.circular(30),
+        placeholderColor: const Color(0xFF2A2A4A),
+      );
+    }
+
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: const BoxDecoration(
+        color: Color(0xFFE53935),
+        shape: BoxShape.circle,
+      ),
+      child: const Center(
+        child: Text(
+          'f\nAI',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            height: 1.2,
+          ),
+        ),
+      ),
     );
   }
 

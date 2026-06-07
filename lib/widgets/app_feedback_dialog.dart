@@ -226,9 +226,9 @@ class _AppFeedbackDialogState extends State<AppFeedbackDialog> {
 
     setState(() => _isSubmitting = true);
     final memberId =
-        UserBox.member?.memberId ?? UserBox.balance?.memberId ?? '';
+        UserBox.member?.memberId ?? UserBox.balance?.memberId ?? 0;
     final response = await Api.submitFeedback(
-      memberId: memberId,
+      memberId: int.parse(memberId.toString()),
       feedbackContent: content,
       feedbackEmail: email.isEmpty ? null : email,
     );

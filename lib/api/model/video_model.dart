@@ -150,7 +150,7 @@ class AiCreateResponse {
   final int? batchSize;
   final int? credit;
   final int? finishTime;
-  final int? id;
+  final String? id;
   final String? image;
   final int? jobStatus;
   final String? key;
@@ -161,7 +161,7 @@ class AiCreateResponse {
   final int? queuingTime;
   final int? templateId;
   final bool? terminated;
-  final String? type;
+  final dynamic type;
   final int? workSize;
 
   AiCreateResponse({
@@ -191,7 +191,7 @@ class AiCreateResponse {
 }
 
 @JsonSerializable()
-class AiStatusResponse { 
+class AiStatusResponse {
   final String? status;
   @JsonKey(name: 'video_urls')
   final List<String>? videoUrls;

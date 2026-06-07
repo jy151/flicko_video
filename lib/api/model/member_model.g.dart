@@ -77,7 +77,7 @@ Map<String, dynamic> _$MemberAuditToJson(MemberAudit instance) =>
 
 Balance _$BalanceFromJson(Map<String, dynamic> json) => Balance(
   id: (json['id'] as num?)?.toInt(),
-  memberId: json['member_id'] as String?,
+  memberId: (json['member_id'] as num?)?.toInt(),
   name: json['name'] as String?,
   portrait: json['portrait'] as String?,
   aiPortrait: json['ai_portrait'] as String?,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/api/model/config_model.dart';
 import 'package:flicko_video/api/model/video_model.dart';
@@ -15,13 +17,16 @@ class HomeCreateException implements Exception {
 }
 
 class HomeNotifier extends StateNotifier<HomeState> {
-  HomeNotifier() : super(const HomeState());
+  HomeNotifier() : super(HomeState(credits: UserBox.credit)) {
+    _watchUserCredit();
+  }
+
+  StreamSubscription<dynamic>? _userBoxSubscription;
 
   void init({
     AiModelConfig? cachedConfig,
     required Future<AiModelConfig?> Function() loadConfig,
   }) async {
-    // await syncBalance();
     if (cachedConfig != null) {
       _applyConfig(cachedConfig);
       return;
@@ -41,11 +46,6 @@ class HomeNotifier extends StateNotifier<HomeState> {
   }
 
   Future<void> syncBalance() async {
-    final cachedCredit = UserBox.credit;
-    if (cachedCredit != state.credits) {
-      state = state.copyWith(credits: cachedCredit);
-    }
-
     final balance = await UserBox.syncBalance();
     if (mounted && balance != null) {
       state = state.copyWith(credits: balance.credit ?? 0);
@@ -176,12 +176,42 @@ class HomeNotifier extends StateNotifier<HomeState> {
       if (result == null) {
         throw const HomeCreateException(HomeCreateError.submitFailed);
       }
+      await _syncBalanceAfterCreate();
       return result;
+    } catch (e) {
+      rethrow;
     } finally {
       if (mounted) {
         state = state.copyWith(isSubmitting: false);
       }
     }
+  }
+
+  void _watchUserCredit() {
+    _userBoxSubscription = UserBox.box.watch(key:'balance').listen((_) {
+      _applyCreditFromCache();
+    });
+  }
+
+  void _applyCreditFromCache() {
+    final credit = UserBox.credit;
+    if (mounted && credit != state.credits) {
+      state = state.copyWith(credits: credit);
+    }
+  }
+
+  Future<void> _syncBalanceAfterCreate() async {
+    try {
+      await UserBox.syncBalance();
+    } catch (_) {
+      // The create task already succeeded; balance will refresh on next sync.
+    }
+  }
+
+  @override
+  void dispose() {
+    _userBoxSubscription?.cancel();
+    super.dispose();
   }
 }
 

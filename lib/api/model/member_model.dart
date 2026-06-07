@@ -80,7 +80,7 @@ class MemberAudit {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Balance {
   final int? id;
-  final String? memberId;
+  final int? memberId; 
   final String? name;
   final String? portrait;
   final String? aiPortrait;

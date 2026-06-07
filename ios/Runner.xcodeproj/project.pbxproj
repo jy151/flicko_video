@@ -16,6 +16,10 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		B49A3D88C79985D7C4389072 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2620EDE036B2C37C05033BDD /* Pods_RunnerTests.framework */; };
+		E4BD1B482FD532FF00E37927 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BD1B472FD532FE00E37927 /* AdSupport.framework */; };
+		E4BD1B4A2FD5330700E37927 /* AdServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BD1B492FD5330700E37927 /* AdServices.framework */; };
+		E4BD1B4C2FD5330D00E37927 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BD1B4B2FD5330D00E37927 /* StoreKit.framework */; };
+		E4BD1B4E2FD5331300E37927 /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BD1B4D2FD5331300E37927 /* AppTrackingTransparency.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +70,10 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D1128A95FFD2A6265880B692 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		E43A58192FD4380E00B4E1C8 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		E4BD1B472FD532FE00E37927 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
+		E4BD1B492FD5330700E37927 /* AdServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdServices.framework; path = System/Library/Frameworks/AdServices.framework; sourceTree = SDKROOT; };
+		E4BD1B4B2FD5330D00E37927 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		E4BD1B4D2FD5331300E37927 /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +89,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4BD1B482FD532FF00E37927 /* AdSupport.framework in Frameworks */,
+				E4BD1B4A2FD5330700E37927 /* AdServices.framework in Frameworks */,
+				E4BD1B4C2FD5330D00E37927 /* StoreKit.framework in Frameworks */,
+				E4BD1B4E2FD5331300E37927 /* AppTrackingTransparency.framework in Frameworks */,
 				23A99A17622F33564CDCADDA /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -112,6 +124,10 @@
 		8FB07C83376662CFC919B0D6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E4BD1B4D2FD5331300E37927 /* AppTrackingTransparency.framework */,
+				E4BD1B4B2FD5330D00E37927 /* StoreKit.framework */,
+				E4BD1B492FD5330700E37927 /* AdServices.framework */,
+				E4BD1B472FD532FE00E37927 /* AdSupport.framework */,
 				71CA65B15EEA2ADA4C843339 /* Pods_Runner.framework */,
 				2620EDE036B2C37C05033BDD /* Pods_RunnerTests.framework */,
 			);
@@ -280,9 +296,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -372,9 +392,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

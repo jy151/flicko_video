@@ -1,3 +1,4 @@
+import 'package:flicko_video/hive/auth/auth_box.dart';
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flicko_video/i18n/locale_controller.dart';
 import 'package:flutter/material.dart';
@@ -109,10 +110,7 @@ class SettingView extends ConsumerWidget {
           border: isLast
               ? null
               : const Border(
-                  bottom: BorderSide(
-                    color: Color(0xFF2A2A4A),
-                    width: 0.6,
-                  ),
+                  bottom: BorderSide(color: Color(0xFF2A2A4A), width: 0.6),
                 ),
         ),
         child: Row(
@@ -130,10 +128,7 @@ class SettingView extends ConsumerWidget {
             if (item.subtitle != null) ...[
               Text(
                 item.subtitle!,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
-                ),
+                style: const TextStyle(color: Colors.grey, fontSize: 13),
               ),
               const SizedBox(width: 8),
             ],
@@ -186,11 +181,15 @@ class SettingView extends ConsumerWidget {
     WidgetRef ref,
     AppLocalizations l10n,
   ) async {
-    final currentLanguageCode = ref.read(appLocaleControllerProvider).languageCode;
-    final systemLanguageCode = ref.read(appLocaleControllerProvider).systemLanguageCode;
+    final currentLanguageCode = ref
+        .read(appLocaleControllerProvider)
+        .languageCode;
+    final systemLanguageCode = ref
+        .read(appLocaleControllerProvider)
+        .systemLanguageCode;
     final languages = AppLocale.prioritized(
       currentLanguageCode: currentLanguageCode,
-      systemLanguageCode: systemLanguageCode, 
+      systemLanguageCode: systemLanguageCode,
     );
     final result = await showModalBottomSheet<String>(
       context: context,
@@ -224,10 +223,8 @@ class SettingView extends ConsumerWidget {
                     child: ListView.separated(
                       shrinkWrap: true,
                       itemCount: languages.length,
-                      separatorBuilder: (context, index) => const Divider(
-                        color: Color(0xFF2A2A4A),
-                        height: 1,
-                      ),
+                      separatorBuilder: (context, index) =>
+                          const Divider(color: Color(0xFF2A2A4A), height: 1),
                       itemBuilder: (context, index) {
                         final language = languages[index];
                         return ListTile(
@@ -307,15 +304,7 @@ class SettingView extends ConsumerWidget {
               ),
             ),
             TextButton(
-              onPressed: () {
-                context.pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    backgroundColor: const Color(0xFF1A1A2E),
-                    content: Text(l10n.logoutSuccess),
-                  ),
-                );
-              },
+              onPressed: () => _logout(context, l10n),
               child: Text(
                 l10n.logOut,
                 style: const TextStyle(color: Color(0xFFFF6B6B)),
@@ -324,6 +313,22 @@ class SettingView extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  Future<void> _logout(BuildContext context, AppLocalizations l10n) async {
+    context.pop();
+    final loggedInAsGuest = await AuthBox.logoutAndLoginGuest();
+    if (!context.mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color(0xFF1A1A2E),
+        content: Text(
+          loggedInAsGuest ? l10n.logoutSuccess : l10n.createTaskFailed,
+        ),
+      ),
     );
   }
 }

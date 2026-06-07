@@ -157,7 +157,7 @@ AiCreateResponse _$AiCreateResponseFromJson(Map<String, dynamic> json) =>
       batchSize: (json['batchSize'] as num?)?.toInt(),
       credit: (json['credit'] as num?)?.toInt(),
       finishTime: (json['finishTime'] as num?)?.toInt(),
-      id: (json['id'] as num?)?.toInt(),
+      id: json['id'] as String?,
       image: json['image'] as String?,
       jobStatus: (json['jobStatus'] as num?)?.toInt(),
       key: json['key'] as String?,
@@ -168,7 +168,7 @@ AiCreateResponse _$AiCreateResponseFromJson(Map<String, dynamic> json) =>
       queuingTime: (json['queuingTime'] as num?)?.toInt(),
       templateId: (json['templateId'] as num?)?.toInt(),
       terminated: json['terminated'] as bool?,
-      type: json['type'] as String?,
+      type: json['type'],
       workSize: (json['workSize'] as num?)?.toInt(),
     );
 
