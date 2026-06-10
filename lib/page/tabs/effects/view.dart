@@ -155,7 +155,6 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
                   ref,
                   creativeHome,
                   l10n,
-                  credits: state.credits,
                   skeletonEnabled: showSkeleton,
                 ),
                 const SizedBox(height: 16),
@@ -182,7 +181,6 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
     WidgetRef ref,
     CreativeHome? creativeHome,
     AppLocalizations l10n, {
-    required int credits,
     required bool skeletonEnabled,
   }) {
     if (creativeHome == null) {
@@ -268,7 +266,7 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => context.push('/recharge'),
+                  onTap: () => context.push('/member'),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -281,17 +279,6 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('💎', style: TextStyle(fontSize: 12)),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$credits',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
                         const Text('\u{1F451}', style: TextStyle(fontSize: 12)),
                         const SizedBox(width: 4),
                         Text(

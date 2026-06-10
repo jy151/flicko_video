@@ -1,11 +1,14 @@
+import 'package:flicko_video/app_controller.dart';
 import 'package:flicko_video/hive/auth/auth_box.dart';
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flicko_video/i18n/locale_controller.dart';
+import 'package:flicko_video/gen/assets.gen.dart';
 import 'package:flicko_video/page/web_content/view.dart';
 import 'package:flicko_video/core/legal_urls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'controller.dart';
 import 'state.dart';
@@ -155,6 +158,8 @@ class SettingView extends ConsumerWidget {
         return l10n.termsOfService;
       case SettingItemType.privacyPolicy:
         return l10n.privacyPolicy;
+      case SettingItemType.aboutApp:
+        return l10n.aboutApp;
       case SettingItemType.logout:
         return l10n.logOut;
     }
@@ -181,8 +186,10 @@ class SettingView extends ConsumerWidget {
           title: l10n.privacyPolicy,
           url: privacyPolicyUrl,
         );
+      case SettingItemType.aboutApp:
+        await _showAboutAppDialog(context, l10n);
       case SettingItemType.logout:
-        _showLogoutDialog(context, l10n);
+        _showLogoutDialog(context, ref, l10n);
     }
   }
 
@@ -286,13 +293,68 @@ class SettingView extends ConsumerWidget {
     }
   }
 
+  Future<void> _showAboutAppDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    if (!context.mounted) {
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A2E),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Assets.icon.appLogo.image(width: 72, height: 72),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                l10n.appTitle,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${l10n.version}: ${packageInfo.version} (${packageInfo.buildNumber})',
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(
+                l10n.cancel,
+                style: const TextStyle(color: Color(0xFF6C63FF)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _showLogoutDialog(
     BuildContext context,
+    WidgetRef ref,
     AppLocalizations l10n,
   ) async {
     await showDialog<void>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1A1A2E),
           title: Text(
@@ -305,14 +367,14 @@ class SettingView extends ConsumerWidget {
           ),
           actions: [
             TextButton(
-              onPressed: () => context.pop(),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
                 l10n.cancel,
                 style: const TextStyle(color: Colors.grey),
               ),
             ),
             TextButton(
-              onPressed: () => _logout(context, l10n),
+              onPressed: () => _logout(context, dialogContext, ref, l10n),
               child: Text(
                 l10n.logOut,
                 style: const TextStyle(color: Color(0xFFFF6B6B)),
@@ -324,9 +386,17 @@ class SettingView extends ConsumerWidget {
     );
   }
 
-  Future<void> _logout(BuildContext context, AppLocalizations l10n) async {
-    context.pop();
+  Future<void> _logout(
+    BuildContext context,
+    BuildContext dialogContext,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    Navigator.of(dialogContext).pop();
     final loggedInAsGuest = await AuthBox.logoutAndLoginGuest();
+    if (loggedInAsGuest) {
+      await ref.read(appControllerProvider.notifier).refreshAiModelConfig();
+    }
     if (!context.mounted) {
       return;
     }
@@ -338,5 +408,8 @@ class SettingView extends ConsumerWidget {
         ),
       ),
     );
+    if (loggedInAsGuest) {
+      context.go('/me');
+    }
   }
 }

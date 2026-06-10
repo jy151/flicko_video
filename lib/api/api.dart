@@ -82,6 +82,7 @@ class Api {
     required int memberId,
     required String feedbackContent,
     String? feedbackEmail,
+    String? reportType,
   }) async {
     return await _http.post(
       '/member/feedback',
@@ -89,6 +90,7 @@ class Api {
         'memberId': memberId,
         'feedbackContent': feedbackContent,
         'feedbackEmail': ?feedbackEmail,
+        'report_type': ?reportType,
       },
     );
   }
@@ -98,7 +100,7 @@ class Api {
   static Future<ApiResponse> reportAttribution(
     Map<String, dynamic> data,
   ) async {
-    return await _http.post('/attribution/adjust/client', data: data);
+    return await _http.post('/attribution/adjust/clientios', data: data);
   }
 
   // ==================== Config ====================

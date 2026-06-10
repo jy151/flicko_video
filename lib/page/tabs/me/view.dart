@@ -144,7 +144,14 @@ class _MeViewState extends ConsumerState<MeView> {
         ),
         Row(
           children: [
-            const Text('🎁', style: TextStyle(fontSize: 20)),
+            GestureDetector(
+              onTap: () => context.push('/member'),
+              behavior: HitTestBehavior.opaque,
+              child: const Padding(
+                padding: EdgeInsets.all(4),
+                child: Text('🎁', style: TextStyle(fontSize: 20)),
+              ),
+            ),
             const SizedBox(width: 12),
             GestureDetector(
               onTap: () => context.push('/recharge'),
@@ -206,10 +213,17 @@ class _MeViewState extends ConsumerState<MeView> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
-                    Icons.edit_outlined,
-                    color: Colors.white54,
-                    size: 16,
+                  GestureDetector(
+                    onTap: () => context.push('/login'),
+                    behavior: HitTestBehavior.opaque,
+                    child: const Padding(
+                      padding: EdgeInsets.all(4),
+                      child: Icon(
+                        Icons.edit_outlined,
+                        color: Colors.white54,
+                        size: 16,
+                      ),
+                    ),
                   ),
                 ],
               ),

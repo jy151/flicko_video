@@ -1,6 +1,12 @@
 import 'package:flicko_video/i18n/i18n.dart';
 
-enum SettingItemType { language, termsOfService, privacyPolicy, logout }
+enum SettingItemType {
+  language,
+  termsOfService,
+  privacyPolicy,
+  aboutApp,
+  logout,
+}
 
 class SettingItem {
   final SettingItemType type;
@@ -55,6 +61,7 @@ class SettingState {
         type: SettingItemType.privacyPolicy,
         title: 'Privacy Policy',
       ),
+      const SettingItem(type: SettingItemType.aboutApp, title: 'About App'),
       const SettingItem(
         type: SettingItemType.logout,
         title: 'Log Out',

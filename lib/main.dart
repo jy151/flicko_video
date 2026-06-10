@@ -23,61 +23,69 @@ void main() async {
   initAdjust();
   await initUserAgentClient();
 
-  runApp(const ProviderScope(child: AppView())); 
+  runApp(const ProviderScope(child: AppView()));
 }
 
 void initAdjust() {
   final config = AdjustConfig('ca2d9vldhfcw', AdjustEnvironment.sandbox);
+  config.isAppTrackingTransparencyUsageEnabled = true;
+  config.attConsentWaitingInterval = 30;
 
   config.attributionCallback = (AdjustAttribution attributionChangedData) {
-    print('[Adjust]: Attribution changed!');
+    debugPrint('[Adjust]: Attribution changed!');
 
     if (attributionChangedData.trackerToken != null) {
-      print('[Adjust]: Tracker token: ${attributionChangedData.trackerToken}');
+      debugPrint(
+        '[Adjust]: Tracker token: ${attributionChangedData.trackerToken}',
+      );
     }
     if (attributionChangedData.trackerName != null) {
-      print('[Adjust]: Tracker name: ${attributionChangedData.trackerName}');
+      debugPrint(
+        '[Adjust]: Tracker name: ${attributionChangedData.trackerName}',
+      );
     }
     if (attributionChangedData.campaign != null) {
-      print('[Adjust]: Campaign: ${attributionChangedData.campaign}');
+      debugPrint('[Adjust]: Campaign: ${attributionChangedData.campaign}');
     }
     if (attributionChangedData.network != null) {
-      print('[Adjust]: Network: ${attributionChangedData.network}');
+      debugPrint('[Adjust]: Network: ${attributionChangedData.network}');
     }
     if (attributionChangedData.creative != null) {
-      print('[Adjust]: Creative: ${attributionChangedData.creative}');
+      debugPrint('[Adjust]: Creative: ${attributionChangedData.creative}');
     }
     if (attributionChangedData.adgroup != null) {
-      print('[Adjust]: Adgroup: ${attributionChangedData.adgroup}');
+      debugPrint('[Adjust]: Adgroup: ${attributionChangedData.adgroup}');
     }
     if (attributionChangedData.clickLabel != null) {
-      print('[Adjust]: Click label: ${attributionChangedData.clickLabel}');
+      debugPrint('[Adjust]: Click label: ${attributionChangedData.clickLabel}');
     }
     if (attributionChangedData.fbInstallReferrer != null) {
-      print(
+      debugPrint(
         '[Adjust]: facebook install referrer: ${attributionChangedData.fbInstallReferrer}',
       );
     }
     if (attributionChangedData.jsonResponse != null) {
-      print('[Adjust]: JSON Response: ${attributionChangedData.jsonResponse}');
+      debugPrint(
+        '[Adjust]: JSON Response: ${attributionChangedData.jsonResponse}',
+      );
     }
   };
 
   config.sessionSuccessCallback = (AdjustSessionSuccess sessionSuccessData) {
-    print('[Adjust]: Session recording success!');
+    debugPrint('[Adjust]: Session recording success!');
 
     if (sessionSuccessData.message != null) {
-      print('[Adjust]: Message: ${sessionSuccessData.message}');
+      debugPrint('[Adjust]: Message: ${sessionSuccessData.message}');
     }
     if (sessionSuccessData.timestamp != null) {
-      print('[Adjust]: Timestamp: ${sessionSuccessData.timestamp}');
+      debugPrint('[Adjust]: Timestamp: ${sessionSuccessData.timestamp}');
     }
     if (sessionSuccessData.adid != null) {
-      print('[Adjust]: Adid: ${sessionSuccessData.adid}');
+      debugPrint('[Adjust]: Adid: ${sessionSuccessData.adid}');
       setUserAgentClient(sessionSuccessData.adid);
     }
     if (sessionSuccessData.jsonResponse != null) {
-      print('[Adjust]: JSON response: ${sessionSuccessData.jsonResponse}');
+      debugPrint('[Adjust]: JSON response: ${sessionSuccessData.jsonResponse}');
     }
   };
   Adjust.initSdk(config);

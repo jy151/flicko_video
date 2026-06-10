@@ -97,7 +97,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 16),
-                        _buildHeader(state, l10n),
+                        _buildHeader(context, state, l10n),
                         const SizedBox(height: 16),
                         _buildPromptArea(ref, state, l10n),
                         const SizedBox(height: 12),
@@ -121,7 +121,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
-  Widget _buildHeader(HomeState state, AppLocalizations l10n) {
+  Widget _buildHeader(
+    BuildContext context,
+    HomeState state,
+    AppLocalizations l10n,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -133,15 +137,22 @@ class _HomeViewState extends ConsumerState<HomeView> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        Row(
-          children: [
-            const Text('💎', style: TextStyle(fontSize: 18)),
-            const SizedBox(width: 4),
-            Text(
-              '${state.credits}',
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+        GestureDetector(
+          onTap: () => context.push('/recharge'),
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            child: Row(
+              children: [
+                const Text('💎', style: TextStyle(fontSize: 18)),
+                const SizedBox(width: 4),
+                Text(
+                  '${state.credits}',
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ],
     );

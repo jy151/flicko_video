@@ -1,5 +1,7 @@
+import 'package:flicko_video/app_controller.dart';
 import 'package:flicko_video/hive/auth/auth_box.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show Ref;
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -19,7 +21,9 @@ class LoginResult {
 }
 
 class LoginController extends StateNotifier<LoginState> {
-  LoginController() : super(const LoginState());
+  LoginController(this._ref) : super(const LoginState());
+
+  final Ref _ref;
 
   static const _webClientId =
       '667306979952-1qvcj0qud2v4pmo0a525gtubm7vo013l.apps.googleusercontent.com';
@@ -72,6 +76,7 @@ class LoginController extends StateNotifier<LoginState> {
         return const LoginResult.failure('账号或密码错误，请检查后重试');
       }
 
+      await _refreshAiModelConfig();
       return const LoginResult.success();
     } catch (error) {
       return LoginResult.failure('账号密码登录失败：$error');
@@ -139,6 +144,7 @@ class LoginController extends StateNotifier<LoginState> {
         return const LoginResult.failure('Google 授权成功，但服务端登录失败');
       }
 
+      await _refreshAiModelConfig();
       return const LoginResult.success();
     } on GoogleSignInException catch (error) {
       return LoginResult.failure(_formatGoogleSignInError(error));
@@ -230,6 +236,7 @@ class LoginController extends StateNotifier<LoginState> {
         return const LoginResult.failure('Apple 授权成功，但服务端登录失败');
       }
 
+      await _refreshAiModelConfig();
       return const LoginResult.success();
     } on SignInWithAppleAuthorizationException catch (error) {
       return LoginResult.failure(_formatAppleAuthorizationError(error));
@@ -264,9 +271,13 @@ class LoginController extends StateNotifier<LoginState> {
     }
     return '$reason：${error.message}';
   }
+
+  Future<void> _refreshAiModelConfig() async {
+    await _ref.read(appControllerProvider.notifier).refreshAiModelConfig();
+  }
 }
 
 final loginControllerProvider =
     StateNotifierProvider<LoginController, LoginState>((ref) {
-      return LoginController();
+      return LoginController(ref);
     });

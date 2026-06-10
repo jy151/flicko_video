@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/api/model/config_model.dart';
+import 'package:flicko_video/core/attribution_reporter.dart';
 import 'package:flicko_video/hive/auth/auth_box.dart';
 import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -13,6 +16,7 @@ class AppController extends StateNotifier<AppState> {
   Future<void>? _loginRequest;
   Future<void>? _userSyncRequest;
   Future<AiModelConfig?>? _aiModelConfigRequest;
+  int _aiModelConfigRequestVersion = 0;
 
   /// 初始化应用
   Future<void> init() async {
@@ -22,6 +26,7 @@ class AppController extends StateNotifier<AppState> {
 
   Future<void> _init() async {
     await _ensureLoggedIn();
+    unawaited(AttributionReporter.reportAdjustClient());
     await syncUserData();
     await loadAiModelConfig();
   }
@@ -75,31 +80,41 @@ class AppController extends StateNotifier<AppState> {
       return cachedConfig;
     }
 
+    return _requestAiModelConfig();
+  }
+
+  Future<AiModelConfig?> refreshAiModelConfig() async {
+    return _requestAiModelConfig(forceRefresh: true);
+  }
+
+  Future<AiModelConfig?> _requestAiModelConfig({
+    bool forceRefresh = false,
+  }) async {
     await _ensureLoggedIn();
     final pendingRequest = _aiModelConfigRequest;
-    if (pendingRequest != null) {
+    if (!forceRefresh && pendingRequest != null) {
       return pendingRequest;
     }
 
-    final request = _fetchAiModelConfig();
+    final requestVersion = ++_aiModelConfigRequestVersion;
+    final request = _fetchAiModelConfig(requestVersion);
     _aiModelConfigRequest = request;
     try {
-      final config = await request;
-      if (config == null) {
-        _aiModelConfigRequest = null;
-      }
-      return config;
+      return await request;
     } catch (_) {
+      return null;
+    } finally {
       if (identical(_aiModelConfigRequest, request)) {
         _aiModelConfigRequest = null;
       }
-      return null;
     }
   }
 
-  Future<AiModelConfig?> _fetchAiModelConfig() async {
+  Future<AiModelConfig?> _fetchAiModelConfig(int requestVersion) async {
     final config = await Api.getAllAiModels();
-    if (config != null && mounted) {
+    if (config != null &&
+        mounted &&
+        requestVersion == _aiModelConfigRequestVersion) {
       state = state.copyWith(config: config);
     }
     return config;

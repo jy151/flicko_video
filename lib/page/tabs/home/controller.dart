@@ -32,15 +32,7 @@ class HomeNotifier extends StateNotifier<HomeState> {
 
   StreamSubscription<dynamic>? _userBoxSubscription;
 
-  void init({
-    AiModelConfig? cachedConfig,
-    required Future<AiModelConfig?> Function() loadConfig,
-  }) async {
-    if (cachedConfig != null) {
-      _applyConfig(cachedConfig);
-      return;
-    }
-
+  void init({required Future<AiModelConfig?> Function() loadConfig}) async {
     try {
       state = state.copyWith(loading: true);
       final config = await loadConfig();
@@ -311,8 +303,7 @@ final homeProvider = StateNotifierProvider.autoDispose<HomeNotifier, HomeState>(
   (ref) {
     final notifier = HomeNotifier();
     notifier.init(
-      cachedConfig: ref.read(appControllerProvider).config,
-      loadConfig: ref.read(appControllerProvider.notifier).loadAiModelConfig,
+      loadConfig: ref.read(appControllerProvider.notifier).refreshAiModelConfig,
     );
     return notifier;
   },

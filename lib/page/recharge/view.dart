@@ -1,5 +1,6 @@
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flicko_video/widgets/app_feedback_dialog.dart';
+import 'package:flicko_video/widgets/app_top_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,7 +31,7 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
     ref.listen<RechargeState>(rechargeControllerProvider, (previous, next) {
       final errorMessage = next.errorMessage;
       if (errorMessage != null && errorMessage != previous?.errorMessage) {
-        _showMessage(context, errorMessage);
+        _showMessage(context, errorMessage, isError: true);
       }
 
       final successMessage = next.successMessage;
@@ -327,13 +328,15 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
     await controller.recharge();
   }
 
-  void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: const Color(0xFF1A1A2E),
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
+  void _showMessage(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
+    showAppTopToast(
+      context,
+      message,
+      type: isError ? AppTopToastType.error : AppTopToastType.success,
     );
   }
 }

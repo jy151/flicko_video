@@ -1,6 +1,7 @@
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flicko_video/i18n/i18n.dart';
+import 'package:flicko_video/widgets/app_top_toast.dart';
 import 'package:flutter/material.dart';
 
 Future<bool?> showAppFeedbackDialog(BuildContext context) {
@@ -20,9 +21,21 @@ class AppFeedbackDialog extends StatefulWidget {
 
 class _AppFeedbackDialogState extends State<AppFeedbackDialog> {
   static const _maxLength = 1000;
+  static const _reportTypeValues = [
+    'Membership & Billing',
+    'Sensitive or Pornographic',
+    'Suicide or Self-harm',
+    'Hate or Violence',
+    'Harassment or Bullying',
+    'Fraud or Scam',
+    'Harmful to Minors',
+    'Privacy Invasion',
+    'Other',
+  ];
 
   final _emailController = TextEditingController();
   final _contentController = TextEditingController();
+  String? _reportType;
   var _isSubmitting = false;
 
   @override
@@ -69,6 +82,8 @@ class _AppFeedbackDialogState extends State<AppFeedbackDialog> {
             const SizedBox(height: 18),
             _buildEmailField(l10n),
             const SizedBox(height: 12),
+            _buildReportTypeDropdown(l10n),
+            const SizedBox(height: 12),
             _buildContentField(l10n),
             const SizedBox(height: 6),
             Align(
@@ -107,6 +122,47 @@ class _AppFeedbackDialogState extends State<AppFeedbackDialog> {
       keyboardType: TextInputType.emailAddress,
       style: const TextStyle(color: Colors.white, fontSize: 14),
       decoration: _fieldDecoration(l10n.feedbackEmailHint),
+    );
+  }
+
+  Widget _buildReportTypeDropdown(AppLocalizations l10n) {
+    final labels = l10n.reportTypeLabels;
+
+    return DropdownButtonFormField<String>(
+      initialValue: _reportType,
+      isExpanded: true,
+      dropdownColor: const Color(0xFF1A1A33),
+      icon: Icon(
+        Icons.keyboard_arrow_down_rounded,
+        color: Colors.white.withValues(alpha: 0.58),
+      ),
+      decoration: _fieldDecoration(l10n.reportTypeHint),
+      hint: Text(
+        l10n.reportTypeHint,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.42),
+          fontSize: 14,
+        ),
+      ),
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+      menuMaxHeight: 320,
+      items: List.generate(_reportTypeValues.length, (index) {
+        final value = _reportTypeValues[index];
+        final label = labels.length > index ? labels[index] : value;
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+          ),
+        );
+      }).toList(),
+      onChanged: _isSubmitting
+          ? null
+          : (value) {
+              setState(() => _reportType = value);
+            },
     );
   }
 
@@ -214,23 +270,24 @@ class _AppFeedbackDialogState extends State<AppFeedbackDialog> {
     final l10n = AppLocalizations.of(context);
     final content = _contentController.text.trim();
     final email = _emailController.text.trim();
+    final reportType = _reportType?.trim();
 
     if (content.isEmpty) {
-      _showMessage(l10n.enterFeedbackFirst);
+      _showMessage(l10n.enterFeedbackFirst, isError: true);
       return;
     }
     if (email.isNotEmpty && !_isEmail(email)) {
-      _showMessage(l10n.enterValidEmail);
+      _showMessage(l10n.enterValidEmail, isError: true);
       return;
     }
 
     setState(() => _isSubmitting = true);
-    final memberId =
-        UserBox.member?.memberId ?? UserBox.balance?.memberId ?? 0;
+    final memberId = UserBox.member?.memberId ?? UserBox.balance?.memberId ?? 0;
     final response = await Api.submitFeedback(
       memberId: int.parse(memberId.toString()),
       feedbackContent: content,
       feedbackEmail: email.isEmpty ? null : email,
+      reportType: reportType == null || reportType.isEmpty ? null : reportType,
     );
 
     if (!mounted) return;
@@ -246,6 +303,7 @@ class _AppFeedbackDialogState extends State<AppFeedbackDialog> {
       response.message.isNotEmpty
           ? response.message
           : l10n.feedbackSubmitFailed,
+      isError: true,
     );
   }
 
@@ -253,9 +311,11 @@ class _AppFeedbackDialogState extends State<AppFeedbackDialog> {
     return RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(value);
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+  void _showMessage(String message, {bool isError = false}) {
+    showAppTopToast(
+      context,
+      message,
+      type: isError ? AppTopToastType.error : AppTopToastType.success,
     );
   }
 }

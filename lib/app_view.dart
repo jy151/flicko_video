@@ -51,6 +51,7 @@ class _AppViewState extends ConsumerState<AppView> {
         title: 'FlickoVideo',
         routerConfig: appRouter,
         locale: localeState.locale,
+        debugShowCheckedModeBanner: false,
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: const [
           AppLocalizations.delegate,

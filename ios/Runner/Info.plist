@@ -88,5 +88,7 @@
 	</dict>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Flicko Video needs photo library access to choose images for video generation.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Your permission helps Flicko Video measure ad performance and improve the app experience.</string>
 </dict>
 </plist>

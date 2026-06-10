@@ -30,6 +30,8 @@ class AppLocalizations {
       'chooseLanguage': 'Choose Language',
       'userPrivacy': 'User Privacy',
       'privacyPolicy': 'Privacy Policy',
+      'aboutApp': 'About App',
+      'version': 'Version',
       'logOut': 'Log Out',
       'cancel': 'Cancel',
       'comingSoon': '{title} is coming soon',
@@ -101,6 +103,11 @@ class AppLocalizations {
       'oneTimePayment': 'One-time payment {price}',
       'unlockAllPremiumFeatures': 'Unlock All Premium Features',
       'instantBonus': 'Instant Bonus',
+      'refreshWeekly': 'Refresh Weekly',
+      'unlockAllTemplates': 'Unlock Full Access to All Templates',
+      'skipQueueNoWatermark':
+          'Skip the Queue & Get Videos Faster, No Watermark',
+      'standardMediaBenefits': '5,382+ Standard Images/ 1,346+ Standard Videos',
       'untilPriceGoesUp': '{time} until price goes up',
       'unlockVipService': 'Unlock VIP Service',
       'myCredits': 'My Credits',
@@ -131,6 +138,16 @@ class AppLocalizations {
       'feedbackEmailHint': 'Your email address (optional)',
       'feedbackContentHint':
           "You can write any suggestions here, for example: I'm handsome, I'd like to apply for a discount. But remember to leave your contact information.",
+      'reportTypeHint': 'Select report type (optional)',
+      'reportTypeMembershipBilling': 'Membership & Billing',
+      'reportTypeSensitivePornographic': 'Sensitive or Pornographic',
+      'reportTypeSuicideSelfHarm': 'Suicide or Self-harm',
+      'reportTypeHateViolence': 'Hate or Violence',
+      'reportTypeHarassmentBullying': 'Harassment or Bullying',
+      'reportTypeFraudScam': 'Fraud or Scam',
+      'reportTypeHarmfulMinors': 'Harmful to Minors',
+      'reportTypePrivacyInvasion': 'Privacy Invasion',
+      'reportTypeOther': 'Other',
       'enterFeedbackFirst': 'Please enter your feedback',
       'enterValidEmail': 'Please enter a valid email address',
       'feedbackSubmitted': 'Feedback submitted',
@@ -143,6 +160,8 @@ class AppLocalizations {
       'chooseLanguage': '选择语言',
       'userPrivacy': '用户隐私',
       'privacyPolicy': '隐私政策',
+      'aboutApp': '关于 App',
+      'version': '版本号',
       'logOut': '退出登录',
       'cancel': '取消',
       'comingSoon': '{title} 敬请期待',
@@ -213,6 +232,10 @@ class AppLocalizations {
       'oneTimePayment': '一次性支付 {price}',
       'unlockAllPremiumFeatures': '解锁全部高级功能',
       'instantBonus': '即时奖励',
+      'refreshWeekly': '每周刷新',
+      'unlockAllTemplates': '解锁全部模板访问权限',
+      'skipQueueNoWatermark': '跳过排队，更快生成视频，无水印',
+      'standardMediaBenefits': '5,382+ 标准图片 / 1,346+ 标准视频',
       'untilPriceGoesUp': '{time} 后价格上涨',
       'unlockVipService': '解锁 VIP 服务',
       'myCredits': '我的积分',
@@ -242,6 +265,16 @@ class AppLocalizations {
       'feedbackSubtitle': '我们很想听听你的想法！',
       'feedbackEmailHint': '你的邮箱地址（选填）',
       'feedbackContentHint': '你可以在这里填写任何建议，例如：我很帅，我想申请一个折扣。记得留下你的联系方式。',
+      'reportTypeHint': '选择举报类型（选填）',
+      'reportTypeMembershipBilling': '会员与账单',
+      'reportTypeSensitivePornographic': '敏感或色情内容',
+      'reportTypeSuicideSelfHarm': '自杀或自残',
+      'reportTypeHateViolence': '仇恨或暴力',
+      'reportTypeHarassmentBullying': '骚扰或霸凌',
+      'reportTypeFraudScam': '欺诈或诈骗',
+      'reportTypeHarmfulMinors': '危害未成年人',
+      'reportTypePrivacyInvasion': '侵犯隐私',
+      'reportTypeOther': '其他',
       'enterFeedbackFirst': '请输入反馈内容',
       'enterValidEmail': '请输入正确的邮箱地址',
       'feedbackSubmitted': '反馈已提交',
@@ -254,6 +287,8 @@ class AppLocalizations {
       'chooseLanguage': '選擇語言',
       'userPrivacy': '用戶隱私',
       'privacyPolicy': '隱私政策',
+      'aboutApp': '關於 App',
+      'version': '版本號',
       'logOut': '登出',
       'cancel': '取消',
       'comingSoon': '{title} 即將推出',
@@ -324,6 +359,10 @@ class AppLocalizations {
       'oneTimePayment': '一次性支付 {price}',
       'unlockAllPremiumFeatures': '解鎖全部高級功能',
       'instantBonus': '即時獎勵',
+      'refreshWeekly': '每週刷新',
+      'unlockAllTemplates': '解鎖全部模板存取權限',
+      'skipQueueNoWatermark': '跳過排隊，更快生成影片，無浮水印',
+      'standardMediaBenefits': '5,382+ 標準圖片 / 1,346+ 標準影片',
       'untilPriceGoesUp': '{time} 後價格上漲',
       'unlockVipService': '解鎖 VIP 服務',
       'myCredits': '我的積分',
@@ -353,6 +392,16 @@ class AppLocalizations {
       'feedbackSubtitle': '我們很想聽聽你的想法！',
       'feedbackEmailHint': '你的電子郵件地址（選填）',
       'feedbackContentHint': '你可以在這裡填寫任何建議，例如：我很帥，我想申請一個折扣。記得留下你的聯絡方式。',
+      'reportTypeHint': '選擇檢舉類型（選填）',
+      'reportTypeMembershipBilling': '會員與帳單',
+      'reportTypeSensitivePornographic': '敏感或色情內容',
+      'reportTypeSuicideSelfHarm': '自殺或自殘',
+      'reportTypeHateViolence': '仇恨或暴力',
+      'reportTypeHarassmentBullying': '騷擾或霸凌',
+      'reportTypeFraudScam': '詐欺或詐騙',
+      'reportTypeHarmfulMinors': '危害未成年人',
+      'reportTypePrivacyInvasion': '侵犯隱私',
+      'reportTypeOther': '其他',
       'enterFeedbackFirst': '請輸入回饋內容',
       'enterValidEmail': '請輸入正確的電子郵件地址',
       'feedbackSubmitted': '回饋已提交',
@@ -365,6 +414,8 @@ class AppLocalizations {
       'chooseLanguage': '言語を選択',
       'userPrivacy': 'ユーザープライバシー',
       'privacyPolicy': 'プライバシーポリシー',
+      'aboutApp': 'アプリについて',
+      'version': 'バージョン',
       'logOut': 'ログアウト',
       'cancel': 'キャンセル',
       'comingSoon': '{title} は近日公開予定です',
@@ -435,6 +486,10 @@ class AppLocalizations {
       'oneTimePayment': '一回払い {price}',
       'unlockAllPremiumFeatures': 'すべてのプレミアム機能を解放',
       'instantBonus': '即時ボーナス',
+      'refreshWeekly': '毎週更新',
+      'unlockAllTemplates': 'すべてのテンプレートを利用可能',
+      'skipQueueNoWatermark': '待ち時間を短縮し、高速生成、透かしなし',
+      'standardMediaBenefits': '5,382+ 標準画像 / 1,346+ 標準動画',
       'untilPriceGoesUp': '{time} 後に値上げ',
       'unlockVipService': 'VIP サービスを解放',
       'myCredits': 'マイクレジット',
@@ -464,6 +519,16 @@ class AppLocalizations {
       'feedbackSubtitle': 'ぜひご意見をお聞かせください！',
       'feedbackEmailHint': 'メールアドレス（任意）',
       'feedbackContentHint': 'ご意見やご要望を自由にお書きください。例：割引を申請したいです。連絡先も忘れずにご記入ください。',
+      'reportTypeHint': '報告タイプを選択（任意）',
+      'reportTypeMembershipBilling': '会員・請求',
+      'reportTypeSensitivePornographic': 'センシティブまたはポルノ',
+      'reportTypeSuicideSelfHarm': '自殺または自傷',
+      'reportTypeHateViolence': 'ヘイトまたは暴力',
+      'reportTypeHarassmentBullying': '嫌がらせまたはいじめ',
+      'reportTypeFraudScam': '不正または詐欺',
+      'reportTypeHarmfulMinors': '未成年者への有害行為',
+      'reportTypePrivacyInvasion': 'プライバシー侵害',
+      'reportTypeOther': 'その他',
       'enterFeedbackFirst': 'フィードバックを入力してください',
       'enterValidEmail': '有効なメールアドレスを入力してください',
       'feedbackSubmitted': 'フィードバックを送信しました',
@@ -476,6 +541,8 @@ class AppLocalizations {
       'chooseLanguage': '언어 선택',
       'userPrivacy': '사용자 개인정보',
       'privacyPolicy': '개인정보 처리방침',
+      'aboutApp': '앱 정보',
+      'version': '버전',
       'logOut': '로그아웃',
       'cancel': '취소',
       'comingSoon': '{title} 준비 중입니다',
@@ -546,6 +613,10 @@ class AppLocalizations {
       'oneTimePayment': '일시불 결제 {price}',
       'unlockAllPremiumFeatures': '모든 프리미엄 기능 잠금 해제',
       'instantBonus': '즉시 보너스',
+      'refreshWeekly': '매주 새로고침',
+      'unlockAllTemplates': '모든 템플릿 전체 이용',
+      'skipQueueNoWatermark': '대기열 건너뛰기, 더 빠른 영상 생성, 워터마크 없음',
+      'standardMediaBenefits': '5,382+ 표준 이미지 / 1,346+ 표준 비디오',
       'untilPriceGoesUp': '{time} 후 가격 인상',
       'unlockVipService': 'VIP 서비스 잠금 해제',
       'myCredits': '내 크레딧',
@@ -576,6 +647,16 @@ class AppLocalizations {
       'feedbackEmailHint': '이메일 주소(선택 사항)',
       'feedbackContentHint':
           '여기에 제안 사항을 자유롭게 적어주세요. 예: 할인을 신청하고 싶습니다. 연락처를 남겨주세요.',
+      'reportTypeHint': '신고 유형 선택(선택 사항)',
+      'reportTypeMembershipBilling': '멤버십 및 결제',
+      'reportTypeSensitivePornographic': '민감하거나 음란한 내용',
+      'reportTypeSuicideSelfHarm': '자살 또는 자해',
+      'reportTypeHateViolence': '혐오 또는 폭력',
+      'reportTypeHarassmentBullying': '괴롭힘 또는 따돌림',
+      'reportTypeFraudScam': '사기 또는 스캠',
+      'reportTypeHarmfulMinors': '미성년자에게 유해함',
+      'reportTypePrivacyInvasion': '개인정보 침해',
+      'reportTypeOther': '기타',
       'enterFeedbackFirst': '피드백 내용을 입력해주세요',
       'enterValidEmail': '올바른 이메일 주소를 입력해주세요',
       'feedbackSubmitted': '피드백이 제출되었습니다',
@@ -588,6 +669,8 @@ class AppLocalizations {
       'chooseLanguage': 'Choisir la langue',
       'userPrivacy': 'Confidentialité utilisateur',
       'privacyPolicy': 'Politique de confidentialité',
+      'aboutApp': 'À propos de l’app',
+      'version': 'Version',
       'logOut': 'Se déconnecter',
       'cancel': 'Annuler',
       'comingSoon': '{title} arrive bientôt',
@@ -660,6 +743,12 @@ class AppLocalizations {
       'unlockAllPremiumFeatures':
           'Débloquer toutes les fonctionnalités premium',
       'instantBonus': 'Bonus instantané',
+      'refreshWeekly': 'Actualisation hebdomadaire',
+      'unlockAllTemplates': 'Accès complet à tous les modèles',
+      'skipQueueNoWatermark':
+          'Passez la file, générez plus vite, sans filigrane',
+      'standardMediaBenefits':
+          '5 382+ images standard / 1 346+ vidéos standard',
       'untilPriceGoesUp': '{time} avant l’augmentation du prix',
       'unlockVipService': 'Débloquer le service VIP',
       'myCredits': 'Mes crédits',
@@ -691,6 +780,16 @@ class AppLocalizations {
       'feedbackEmailHint': 'Votre adresse e-mail (facultatif)',
       'feedbackContentHint':
           'Vous pouvez écrire vos suggestions ici. Par exemple : je souhaite demander une réduction. Pensez à laisser vos coordonnées.',
+      'reportTypeHint': 'Sélectionnez un type de signalement (facultatif)',
+      'reportTypeMembershipBilling': 'Abonnement et facturation',
+      'reportTypeSensitivePornographic': 'Sensible ou pornographique',
+      'reportTypeSuicideSelfHarm': 'Suicide ou automutilation',
+      'reportTypeHateViolence': 'Haine ou violence',
+      'reportTypeHarassmentBullying': 'Harcèlement ou intimidation',
+      'reportTypeFraudScam': 'Fraude ou arnaque',
+      'reportTypeHarmfulMinors': 'Nuisible aux mineurs',
+      'reportTypePrivacyInvasion': 'Atteinte à la vie privée',
+      'reportTypeOther': 'Autre',
       'enterFeedbackFirst': 'Veuillez saisir votre feedback',
       'enterValidEmail': 'Veuillez saisir une adresse e-mail valide',
       'feedbackSubmitted': 'Feedback envoyé',
@@ -712,6 +811,8 @@ class AppLocalizations {
   String get chooseLanguage => _text('chooseLanguage');
   String get userPrivacy => _text('userPrivacy');
   String get privacyPolicy => _text('privacyPolicy');
+  String get aboutApp => _text('aboutApp');
+  String get version => _text('version');
   String get logOut => _text('logOut');
   String get cancel => _text('cancel');
   String get logoutConfirmTitle => _text('logoutConfirmTitle');
@@ -780,6 +881,10 @@ class AppLocalizations {
   String get lifetimePlan => _text('lifetimePlan');
   String get unlockAllPremiumFeatures => _text('unlockAllPremiumFeatures');
   String get instantBonus => _text('instantBonus');
+  String get refreshWeekly => _text('refreshWeekly');
+  String get unlockAllTemplates => _text('unlockAllTemplates');
+  String get skipQueueNoWatermark => _text('skipQueueNoWatermark');
+  String get standardMediaBenefits => _text('standardMediaBenefits');
   String get unlockVipService => _text('unlockVipService');
   String get myCredits => _text('myCredits');
   String get recharge => _text('recharge');
@@ -808,6 +913,18 @@ class AppLocalizations {
   String get feedbackSubtitle => _text('feedbackSubtitle');
   String get feedbackEmailHint => _text('feedbackEmailHint');
   String get feedbackContentHint => _text('feedbackContentHint');
+  String get reportTypeHint => _text('reportTypeHint');
+  List<String> get reportTypeLabels => [
+    _text('reportTypeMembershipBilling'),
+    _text('reportTypeSensitivePornographic'),
+    _text('reportTypeSuicideSelfHarm'),
+    _text('reportTypeHateViolence'),
+    _text('reportTypeHarassmentBullying'),
+    _text('reportTypeFraudScam'),
+    _text('reportTypeHarmfulMinors'),
+    _text('reportTypePrivacyInvasion'),
+    _text('reportTypeOther'),
+  ];
   String get enterFeedbackFirst => _text('enterFeedbackFirst');
   String get enterValidEmail => _text('enterValidEmail');
   String get feedbackSubmitted => _text('feedbackSubmitted');
