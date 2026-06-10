@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/api/model/video_model.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-
 
 part 'state.freezed.dart';
 
@@ -15,13 +14,17 @@ abstract class DiscoverState with _$DiscoverState {
     @Default([]) List<Work> items,
     @Default([]) List<ShowcaseCategory> categories,
     @Default(0) int lastId,
+    @Default(0) int credits,
     @Default(true) bool loading,
   }) = _DiscoverState;
 }
 
- class DiscoverNotifier extends StateNotifier<DiscoverState> {
-  DiscoverNotifier() : super(const DiscoverState());
+class DiscoverNotifier extends StateNotifier<DiscoverState> {
+  DiscoverNotifier() : super(DiscoverState(credits: UserBox.credit)) {
+    _watchUserCredit();
+  }
 
+  StreamSubscription<dynamic>? _userBoxSubscription;
 
   Future<bool> loadMore() async {
     final resp = await Api.getShowcaseWorks(lastId: state.lastId);
@@ -38,11 +41,10 @@ abstract class DiscoverState with _$DiscoverState {
     );
     return true;
   }
- 
-  Future<void> refresh() async{
-   state = state.copyWith(lastId: 0,items: []);
-   await loadMore();
- 
+
+  Future<void> refresh() async {
+    state = state.copyWith(lastId: 0, items: [], credits: UserBox.credit);
+    await loadMore();
   }
 
   Future<void> init() async {
@@ -56,14 +58,32 @@ abstract class DiscoverState with _$DiscoverState {
       state = state.copyWith(categories: categories);
     } catch (e) {
       state = state.copyWith(categories: []);
-      
     }
+  }
+
+  void _watchUserCredit() {
+    _userBoxSubscription = UserBox.box.watch().listen((_) {
+      _applyCreditFromCache();
+    });
+  }
+
+  void _applyCreditFromCache() {
+    final credit = UserBox.credit;
+    if (mounted && credit != state.credits) {
+      state = state.copyWith(credits: credit);
+    }
+  }
+
+  @override
+  void dispose() {
+    _userBoxSubscription?.cancel();
+    super.dispose();
   }
 }
 
 final discoverProvider = StateNotifierProvider<DiscoverNotifier, DiscoverState>(
   (ref) {
-    final notifire= DiscoverNotifier();
+    final notifire = DiscoverNotifier();
     notifire.refresh();
     return notifire;
   },

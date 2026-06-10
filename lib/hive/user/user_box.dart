@@ -29,32 +29,30 @@ class UserBox {
     return null;
   }
 
-  static int get credit => balance?.credit ?? 0;
+  static int get credit => member?.credit ?? balance?.credit ?? 0;
 
   static Future<Member?> syncUserInfo() async {
+    return _syncMemberFromApi();
+  }
+
+  static Future<Balance?> syncBalance({String? memberId}) async {
+    final member = await _syncMemberFromApi();
+    if (member == null) {
+      return null;
+    }
+
+    return _balanceFromMember(member);
+  }
+
+  static Future<Member?> _syncMemberFromApi() async {
     final member = await Api.getMember();
     if (member == null) {
       return null;
     }
 
     await saveMember(member);
+    await saveBalance(_balanceFromMember(member));
     return member;
-  }
-
-  static Future<Balance?> syncBalance({String? memberId}) async {
-    final cachedBalance = balance;
-    final id = memberId ?? member?.memberId ?? cachedBalance?.memberId;
-    if (id == null) {
-      return null;
-    }
-
-    final latestBalance = await Api.getBalance(int.parse(id.toString()));
-    if (latestBalance == null) {
-      return null;
-    }
-
-    await saveBalance(latestBalance);
-    return latestBalance;
   }
 
   static Future<void> saveMember(Member member) async {
@@ -63,6 +61,20 @@ class UserBox {
 
   static Future<void> saveBalance(Balance balance) async {
     await box.put(_balanceKey, balance.toJson());
+  }
+
+  static Balance _balanceFromMember(Member member) {
+    final cachedBalance = balance;
+    return Balance(
+      memberId: int.tryParse(member.memberId ?? '') ?? cachedBalance?.memberId,
+      name: member.name ?? cachedBalance?.name,
+      portrait: member.portrait ?? cachedBalance?.portrait,
+      aiPortrait: member.aiPortrait ?? cachedBalance?.aiPortrait,
+      email: member.email ?? cachedBalance?.email,
+      mobile: member.mobile ?? cachedBalance?.mobile,
+      roles: member.roles ?? cachedBalance?.roles,
+      credit: member.credit ?? cachedBalance?.credit,
+    );
   }
 
   static Future<void> clear() async {

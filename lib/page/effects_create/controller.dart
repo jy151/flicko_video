@@ -1,11 +1,19 @@
 import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/api/api.dart';
+import 'package:flicko_video/api/model/member_model.dart';
 import 'package:flicko_video/hive/user/user_box.dart';
+import 'package:flicko_video/utils/member_access.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import 'state.dart';
 
-enum EffectsCreateError { noTemplate, noImage, submitFailed }
+enum EffectsCreateError {
+  noTemplate,
+  noImage,
+  requireMember,
+  insufficientCredits,
+  submitFailed,
+}
 
 class EffectsCreateException implements Exception {
   const EffectsCreateException(this.error);
@@ -54,6 +62,18 @@ class EffectsCreateController extends StateNotifier<EffectsCreateState> {
 
     state = state.copyWith(isLoading: true);
     try {
+      final member = await _syncUserInfoBeforeCreate();
+      if (!isActiveVipMember(member)) {
+        throw const EffectsCreateException(EffectsCreateError.requireMember);
+      }
+
+      final creditCost = state.creditCost(isVip: isActiveVipMember(member));
+      if (UserBox.credit < creditCost) {
+        throw const EffectsCreateException(
+          EffectsCreateError.insufficientCredits,
+        );
+      }
+
       final result = await Api.createAiTask(
         type: 'tpl2v',
         prompt: template?.prompt ?? '',
@@ -72,9 +92,17 @@ class EffectsCreateController extends StateNotifier<EffectsCreateState> {
 
   Future<void> _syncBalanceAfterCreate() async {
     try {
-      await UserBox.syncBalance();
+      await UserBox.syncUserInfo();
     } catch (_) {
       // The create task already succeeded; balance will refresh on next sync.
+    }
+  }
+
+  Future<Member?> _syncUserInfoBeforeCreate() async {
+    try {
+      return await UserBox.syncUserInfo();
+    } catch (_) {
+      throw const EffectsCreateException(EffectsCreateError.submitFailed);
     }
   }
 }

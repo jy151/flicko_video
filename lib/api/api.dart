@@ -182,6 +182,16 @@ class Api {
     return null;
   }
 
+  static Future<ApiResponse> applePay({
+    required String receipt,
+    required String productId,
+  }) async {
+    return await _http.post(
+      '/auth/applePay',
+      data: {'receipt': receipt, 'productId': productId},
+    );
+  }
+
   // ==================== Video ====================
 
   static Future<CreativeHome?> getCreativeHome() async {
@@ -223,7 +233,7 @@ class Api {
   }
 
   static Future<Work?> getVideoWorkDetail(int id) async {
-    final res = await _http.get('/video/work/video/$id');
+    final res = await _http.get('/video/creative/$id');
     if (res.isSuccess && res.data is Map<String, dynamic>) {
       return Work.fromJson(res.data as Map<String, dynamic>);
     }

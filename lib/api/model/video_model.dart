@@ -88,10 +88,12 @@ class Work {
   final int? id;
   final int? hot;
   final int? workCreateTime;
+  final int? jobStatus;
   final String? type;
   final String? mediaType;
   final String? cover;
   final String? video;
+  final String? watermarked;
   final String? image;
   final String? prompt;
   final WorkMember? member;
@@ -101,10 +103,12 @@ class Work {
     this.id,
     this.hot,
     this.workCreateTime,
+    this.jobStatus,
     this.type,
     this.mediaType,
     this.cover,
     this.video,
+    this.watermarked,
     this.image,
     this.prompt,
     this.member,
@@ -150,6 +154,7 @@ class AiCreateResponse {
   final int? batchSize;
   final int? credit;
   final int? finishTime;
+  @JsonKey(fromJson: _stringFromJson)
   final String? id;
   final String? image;
   final int? jobStatus;
@@ -189,6 +194,8 @@ class AiCreateResponse {
 
   Map<String, dynamic> toJson() => _$AiCreateResponseToJson(this);
 }
+
+String? _stringFromJson(dynamic value) => value?.toString();
 
 @JsonSerializable()
 class AiStatusResponse {

@@ -32,6 +32,10 @@ Member _$MemberFromJson(Map<String, dynamic> json) => Member(
   purposeChatTime: json['purposeChatTime'] as String?,
   inviterCode: json['inviterCode'] as String?,
   roles: json['roles'] as String?,
+  credit: (json['credit'] as num?)?.toInt(),
+  isVip: json['isVip'] as bool?,
+  vipLevel: (json['vipLevel'] as num?)?.toInt(),
+  vipEndDate: (json['vipEndDate'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
@@ -60,6 +64,10 @@ Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
   'purposeChatTime': instance.purposeChatTime,
   'inviterCode': instance.inviterCode,
   'roles': instance.roles,
+  'credit': instance.credit,
+  'isVip': instance.isVip,
+  'vipLevel': instance.vipLevel,
+  'vipEndDate': instance.vipEndDate,
 };
 
 MemberAudit _$MemberAuditFromJson(Map<String, dynamic> json) => MemberAudit(

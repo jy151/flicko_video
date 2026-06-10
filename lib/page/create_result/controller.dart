@@ -15,6 +15,19 @@ class CreateResultController extends StateNotifier<CreateResultState> {
   Timer? _pollingTimer;
   var _isPolling = false;
 
+  void setArgs(CreateResultArgs args) {
+    if (args.work != null) {
+      setWork(args.work!);
+      return;
+    }
+
+    if (args.task == null) {
+      return;
+    }
+
+    setTask(args.task);
+  }
+
   void setTask(AiCreateResponse? task) {
     if (_isSameTask(task)) {
       return;
@@ -26,6 +39,34 @@ class CreateResultController extends StateNotifier<CreateResultState> {
     );
     _startProgressTimer();
     _startPolling(task);
+  }
+
+  void setWork(Work work) {
+    if (_isSameWork(work)) {
+      return;
+    }
+
+    final videoUrl = work.video?.trim();
+    final completed =
+        work.jobStatus == 1 && videoUrl != null && videoUrl.isNotEmpty;
+    _pollingTimer?.cancel();
+    _progressTimer?.cancel();
+    _isPolling = false;
+    state = CreateResultState(
+      work: work,
+      progress: completed ? 1 : 0.01,
+      status: completed ? 'completed' : 'running',
+      videoUrl: completed ? videoUrl : null,
+      estimatedWaitSeconds: 120,
+    );
+
+    if (!completed && work.id != null) {
+      _startProgressTimer();
+      _pollWorkDetail(work.id!);
+      _pollingTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+        _pollWorkDetail(work.id!);
+      });
+    }
   }
 
   bool _isSameTask(AiCreateResponse? task) {
@@ -45,9 +86,17 @@ class CreateResultController extends StateNotifier<CreateResultState> {
     return false;
   }
 
+  bool _isSameWork(Work work) {
+    final current = state.work;
+    if (identical(current, work)) {
+      return true;
+    }
+    return current?.id != null && work.id != null && current?.id == work.id;
+  }
+
   void _startProgressTimer() {
     _progressTimer?.cancel();
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 1200), (_) {
+    _progressTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       final progress = state.progress;
       if (progress >= 0.98) {
         return;
@@ -64,85 +113,86 @@ class CreateResultController extends StateNotifier<CreateResultState> {
 
   void _startPolling(AiCreateResponse? task) {
     _pollingTimer?.cancel();
-    final promptId = task?.key;
-    final type = _resolveStatusType(task?.type);
-    if (promptId == null || promptId.isEmpty || type == null) {
+    _isPolling = false;
+    final workId = _resolveWorkId(task?.id);
+    if (workId == null) {
+      _progressTimer?.cancel();
+      state = state.copyWith(
+        status: 'error',
+        errorMessage: 'Video task id is missing',
+      );
       return;
     }
 
-    _pollTaskStatus(promptId: promptId, type: type);
+    _pollWorkDetail(workId);
     _pollingTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      _pollTaskStatus(promptId: promptId, type: type);
+      _pollWorkDetail(workId);
     });
   }
 
-  Future<void> _pollTaskStatus({
-    required String promptId,
-    required int type,
-  }) async {
+  Future<void> _pollWorkDetail(int workId) async {
     if (_isPolling) {
       return;
     }
 
     _isPolling = true;
     try {
-      final result = await Api.getAiTaskStatus(promptId: promptId, type: type);
-      if (!mounted || result == null) {
+      final work = await Api.getVideoWorkDetail(workId);
+      if (!mounted || work == null) {
         return;
       }
 
-      final status = result.status ?? 'unknown';
-      if (status == 'completed') {
-        final videoUrl = result.videoUrls?.isNotEmpty == true
-            ? result.videoUrls!.first
-            : null;
-        if (videoUrl == null || videoUrl.isEmpty) {
-          state = state.copyWith(status: 'unknown');
-          return;
-        }
-
-        _pollingTimer?.cancel();
-        _progressTimer?.cancel();
-        state = state.copyWith(
-          status: status,
-          videoUrl: videoUrl,
-          progress: 1,
-          errorMessage: null,
-        );
-        return;
-      }
-
-      if (status == 'error') {
-        _pollingTimer?.cancel();
-        _progressTimer?.cancel();
-        state = state.copyWith(
-          status: status,
-          errorMessage: 'Video generation failed',
-        );
-        return;
-      }
-
-      state = state.copyWith(
-        status: status,
-        queuePosition: result.queuePosition,
-      );
+      _applyWorkDetail(work);
     } finally {
       _isPolling = false;
     }
   }
 
-  int? _resolveStatusType(dynamic taskType) {
-    if (taskType is int) {
-      return taskType;
+  void _applyWorkDetail(Work work) {
+    final jobStatus = work.jobStatus;
+    if (jobStatus == 1) {
+      final videoUrl = work.video?.trim();
+      if (videoUrl == null || videoUrl.isEmpty) {
+        state = state.copyWith(status: 'running', queuePosition: null);
+        return;
+      }
+
+      _pollingTimer?.cancel();
+      _progressTimer?.cancel();
+      state = state.copyWith(
+        work: work,
+        status: 'completed',
+        videoUrl: videoUrl,
+        progress: 1,
+        errorMessage: null,
+        queuePosition: null,
+      );
+      return;
     }
 
-    final value = taskType?.toString();
-    return switch (value) {
-      'i2v' => 1,
-      't2v' => 2,
-      'tpl2v' => 1,
-      _ => int.tryParse(value ?? ''),
-    };
+    if (jobStatus == 0) {
+      state = state.copyWith(
+        work: work,
+        status: 'running',
+        queuePosition: null,
+      );
+      return;
+    }
+
+    _pollingTimer?.cancel();
+    _progressTimer?.cancel();
+    state = state.copyWith(
+      work: work,
+      status: 'error',
+      errorMessage: 'Video generation failed',
+    );
+  }
+
+  int? _resolveWorkId(String? id) {
+    if (id == null || id.isEmpty) {
+      return null;
+    }
+    return int.tryParse(id);
   }
 
   @override

@@ -11,8 +11,9 @@ abstract class MeState with _$MeState {
     @Default('') String email,
     @Default('') String userId,
     @Default(0) int credits,
-    @Default('Diamond SVIP Weekly') String vipPlan,
+    @Default('暂无会员') String vipPlan,
     @Default('') String vipExpiry,
     @Default([]) List<Work> works,
+    @Default(false) bool worksLoading,
   }) = _MeState;
 }

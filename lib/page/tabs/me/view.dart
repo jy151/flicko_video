@@ -1,11 +1,14 @@
 import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/gen/assets.gen.dart';
+import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/tabs/me/controller.dart';
 
 import 'state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import '../../../widgets/app_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
@@ -18,6 +21,16 @@ class MeView extends ConsumerStatefulWidget {
 }
 
 class _MeViewState extends ConsumerState<MeView> {
+  final RefreshController _refreshController = RefreshController();
+  static final _mockWorks = List.generate(
+    6,
+    (index) => Work(
+      id: index,
+      cover: 'https://example.com/work-$index.jpg',
+      video: 'https://example.com/work-$index.mp4',
+    ),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +43,31 @@ class _MeViewState extends ConsumerState<MeView> {
   }
 
   @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
+    try {
+      await ref.read(meProvider.notifier).reloadWorks();
+      _refreshController.refreshCompleted();
+      _refreshController.loadComplete();
+    } catch (_) {
+      _refreshController.refreshFailed();
+    }
+  }
+
+  Future<void> _onLoading() async {
+    try {
+      await ref.read(meProvider.notifier).reloadWorks();
+      _refreshController.loadComplete();
+    } catch (_) {
+      _refreshController.loadFailed();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final state = ref.watch(meProvider);
     final l10n = AppLocalizations.of(context);
@@ -37,20 +75,51 @@ class _MeViewState extends ConsumerState<MeView> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D1A),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              _buildHeader(context, state, l10n),
-              const SizedBox(height: 20),
-              _buildProfile(state, l10n),
-              const SizedBox(height: 16),
-              _buildVipCard(state, l10n),
-              const SizedBox(height: 24),
-              _buildWorksSection(state, l10n),
-            ],
+        child: SmartRefresher(
+          controller: _refreshController,
+          enablePullDown: true,
+          enablePullUp: true,
+          header: const WaterDropMaterialHeader(
+            color: Color(0xFF6C63FF),
+            backgroundColor: Color(0xFF0D0D1A),
+          ),
+          footer: CustomFooter(
+            builder: (context, mode) {
+              if (mode == LoadStatus.loading) {
+                return const SizedBox(
+                  height: 56,
+                  child: Center(
+                    child: SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFF6C63FF),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox(height: 56);
+            },
+          ),
+          onRefresh: _onRefresh,
+          onLoading: _onLoading,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                _buildHeader(context, state, l10n),
+                const SizedBox(height: 20),
+                _buildProfile(state, l10n),
+                const SizedBox(height: 16),
+                _buildVipCard(state, l10n),
+                const SizedBox(height: 24),
+                _buildWorksSection(state, l10n),
+              ],
+            ),
           ),
         ),
       ),
@@ -218,6 +287,9 @@ class _MeViewState extends ConsumerState<MeView> {
   }
 
   Widget _buildVipCard(MeState state, AppLocalizations l10n) {
+    final vipPlan = state.vipPlan.trim().isEmpty ? '暂无会员' : state.vipPlan;
+    final vipExpiry = state.vipExpiry.trim().isEmpty ? '--' : state.vipExpiry;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -235,7 +307,7 @@ class _MeViewState extends ConsumerState<MeView> {
                   mainAxisAlignment: .spaceBetween,
                   children: [
                     Text(
-                      '${l10n.expirationDate}: ${state.vipExpiry}',
+                      '${l10n.expirationDate}: $vipExpiry',
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                     GestureDetector(
@@ -276,7 +348,7 @@ class _MeViewState extends ConsumerState<MeView> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      state.vipPlan,
+                      vipPlan,
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
@@ -305,11 +377,27 @@ class _MeViewState extends ConsumerState<MeView> {
           ),
         ),
         const SizedBox(height: 14),
-        if (state.works.isEmpty)
+        if (state.worksLoading && state.works.isEmpty)
+          _buildWorksSkeleton()
+        else if (state.works.isEmpty)
           _buildEmptyWorks(l10n)
         else
-          _buildWorkGrid(state),
+          Skeletonizer(
+            containersColor: Colors.white12,
+            enableSwitchAnimation: true,
+            enabled: state.worksLoading,
+            child: _buildWorkGrid(state.works),
+          ),
       ],
+    );
+  }
+
+  Widget _buildWorksSkeleton() {
+    return Skeletonizer(
+      containersColor: Colors.white12,
+      enableSwitchAnimation: true,
+      enabled: true,
+      child: _buildWorkGrid(_mockWorks),
     );
   }
 
@@ -364,7 +452,7 @@ class _MeViewState extends ConsumerState<MeView> {
     );
   }
 
-  Widget _buildWorkGrid(MeState state) {
+  Widget _buildWorkGrid(List<Work> works) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -374,9 +462,9 @@ class _MeViewState extends ConsumerState<MeView> {
         mainAxisSpacing: 8,
         childAspectRatio: 0.85,
       ),
-      itemCount: state.works.length,
+      itemCount: works.length,
       itemBuilder: (context, index) {
-        return _buildWorkCard(state.works[index]);
+        return _buildWorkCard(works[index]);
       },
     );
   }
@@ -384,38 +472,44 @@ class _MeViewState extends ConsumerState<MeView> {
   Widget _buildWorkCard(Work item) {
     final thumbnailUrl = item.cover ?? item.image ?? item.video ?? '';
 
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A1A2E),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          AppNetworkImage(
-            imageUrl: thumbnailUrl,
-            fit: BoxFit.cover,
-            placeholderColor: const Color(0xFF2A2A4A),
-          ),
-          Positioned(
-            left: 6,
-            right: 6,
-            bottom: 6,
-            child: Row(
-              children: [
-                const Icon(Icons.videocam, color: Colors.white70, size: 12),
-                const SizedBox(width: 3),
-                const Text(
-                  '00:05',
-                  style: TextStyle(color: Colors.white70, fontSize: 10),
-                ),
-                const Spacer(),
-                const Icon(Icons.more_horiz, color: Colors.white70, size: 16),
-              ],
+    return GestureDetector(
+      onTap: () {
+        context.push('/create_result', extra: CreateResultArgs(work: item));
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A2E),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            AppNetworkImage(
+              imageUrl: thumbnailUrl,
+              fit: BoxFit.cover,
+              placeholderColor: const Color(0xFF2A2A4A),
             ),
-          ),
-        ],
+            Positioned(
+              left: 6,
+              right: 6,
+              bottom: 6,
+              child: Row(
+                children: [
+                  const Icon(Icons.videocam, color: Colors.white70, size: 12),
+                  const SizedBox(width: 3),
+                  const Text(
+                    '00:05',
+                    style: TextStyle(color: Colors.white70, fontSize: 10),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.more_horiz, color: Colors.white70, size: 16),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

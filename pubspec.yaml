@@ -62,6 +62,8 @@ dependencies:
   flutter_svg: ^2.3.0
   adjust_sdk: ^5.6.2
   package_info_plus: ^10.1.0
+  in_app_purchase: ^3.3.0
+  webview_flutter: ^4.13.1
 
 
 dev_dependencies:
@@ -126,6 +128,7 @@ flutter_gen:
   output: lib/gen/ # Optional (default: lib/gen/)
   # line_length: 80 # Optional
 flutter_icons:
-  android: true
+  android: true 
   ios: true
-  image_path: "assets/icon/logo.png"
+  remove_alpha_ios: true
+  image_path: "assets/icon/app_logo.png"

@@ -17,15 +17,28 @@ class _MemberViewState extends ConsumerState<MemberView> {
   initState() {
     super.initState();
 
-      final controller = ref.read(memberControllerProvider.notifier);
+    final controller = ref.read(memberControllerProvider.notifier);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async =>   await  controller.init());
-  
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) async => await controller.init(),
+    );
   }
-
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<MemberState>(memberControllerProvider, (previous, next) {
+      final errorMessage = next.errorMessage;
+      if (errorMessage != null && errorMessage != previous?.errorMessage) {
+        _showMessage(context, errorMessage);
+      }
+
+      final successMessage = next.successMessage;
+      if (successMessage != null &&
+          successMessage != previous?.successMessage) {
+        _showMessage(context, successMessage);
+      }
+    });
+
     final state = ref.watch(memberControllerProvider);
     final controller = ref.read(memberControllerProvider.notifier);
     final l10n = AppLocalizations.of(context);
@@ -135,24 +148,49 @@ class _MemberViewState extends ConsumerState<MemberView> {
         const Spacer(),
         const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 22),
         const SizedBox(width: 12),
-        const Text('💎', style: TextStyle(fontSize: 18)),
-        const SizedBox(width: 4),
-        const Text('0', style: TextStyle(color: Colors.white, fontSize: 16)),
+        GestureDetector(
+          onTap: () => context.push('/recharge'),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('💎', style: TextStyle(fontSize: 18)),
+              const SizedBox(width: 4),
+              Text(
+                '${state.currentCredits}',
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        TextButton(
+          onPressed: state.isLoading || state.isRestoring
+              ? null
+              : () => _onRestorePurchases(
+                  ref.read(memberControllerProvider.notifier),
+                ),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            disabledForegroundColor: Colors.white54,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            minimumSize: const Size(44, 36),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: state.isRestoring
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text(
+                  '恢复购买',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+        ),
       ],
-    );
-  }
-
-  Widget _buildAvatarPlaceholder() {
-    return Container(
-      width: 170,
-      height: 170,
-      decoration: BoxDecoration(
-        color: const Color(0xFF2F2A28),
-        borderRadius: BorderRadius.circular(85),
-      ),
-      child: const Center(
-        child: Icon(Icons.person, size: 92, color: Colors.white24),
-      ),
     );
   }
 
@@ -161,21 +199,52 @@ class _MemberViewState extends ConsumerState<MemberView> {
     MemberController controller,
     AppLocalizations l10n,
   ) {
-    return SizedBox(
-      height: 164,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(4, 12, 4, 0),
-        itemCount: state.plans.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          final plan = state.plans[index];
-          return SizedBox(
-            width: 132,
-            child: _buildPlanCard(plan, state, controller, l10n),
-          );
-        },
-      ),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            const spacing = 8.0;
+            final itemCount = state.plans.length;
+            final totalSpacing = spacing * (itemCount - 1).clamp(0, 2);
+            final cardWidth = itemCount == 0
+                ? 0.0
+                : (constraints.maxWidth - totalSpacing) / itemCount;
+
+            return SizedBox(
+              height: 164,
+              child: Row(
+                children: [
+                  for (var index = 0; index < itemCount; index++) ...[
+                    SizedBox(
+                      width: cardWidth,
+                      child: _buildPlanCard(
+                        state.plans[index],
+                        state,
+                        controller,
+                        l10n,
+                      ),
+                    ),
+                    if (index != itemCount - 1) const SizedBox(width: spacing),
+                  ],
+                ],
+              ),
+            );
+          },
+        ),
+        if (state.isProductLoading)
+          const Positioned.fill(
+            child: ColoredBox(
+              color: Color(0x66000000),
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFFFFA800),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -188,7 +257,9 @@ class _MemberViewState extends ConsumerState<MemberView> {
     final isSelected = state.selectedPlanId == plan.id;
 
     return GestureDetector(
-      onTap: () => controller.selectPlan(plan.id),
+      onTap: state.isProductLoading
+          ? null
+          : () => controller.selectPlan(plan.id),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -260,18 +331,7 @@ class _MemberViewState extends ConsumerState<MemberView> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                if (isSelected) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    state.countdown,
-                    style: const TextStyle(
-                      color: Color(0xFFFF4D4F),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ] else
-                  const SizedBox(height: 22),
+                const SizedBox(height: 22),
               ],
             ),
           ),
@@ -315,15 +375,6 @@ class _MemberViewState extends ConsumerState<MemberView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              l10n.untilPriceGoesUp(state.countdown),
-              style: const TextStyle(
-                color: Color(0xFFFF4D4F),
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 12),
             Container(
               width: double.infinity,
               height: 54,
@@ -334,7 +385,7 @@ class _MemberViewState extends ConsumerState<MemberView> {
               child: Row(
                 children: [
                   Container(
-                    width: 96,
+                    width: 120,
                     height: double.infinity,
                     decoration: const BoxDecoration(
                       color: Color(0xFF3F7BFF),
@@ -361,9 +412,13 @@ class _MemberViewState extends ConsumerState<MemberView> {
                           topRight: Radius.circular(27),
                           bottomRight: Radius.circular(27),
                         ),
-                        onTap: state.isLoading
+                        onTap:
+                            state.isLoading ||
+                                state.isProductLoading ||
+                                !state.isStoreAvailable ||
+                                state.selectedPlan?.productDetails == null
                             ? null
-                            : () => controller.unlockVipService(),
+                            : () => _onUnlockVipService(controller),
                         child: Center(
                           child: state.isLoading
                               ? const SizedBox(
@@ -397,14 +452,32 @@ class _MemberViewState extends ConsumerState<MemberView> {
 
   String _resolvePlanTitle(MemberPlan plan, AppLocalizations l10n) {
     switch (plan.title) {
+      case 'monthlyPlan':
+        return l10n.monthlyPlan;
       case 'quarterlyPlan':
         return l10n.quarterlyPlan;
       case 'annualPlan':
         return l10n.annualPlan;
-      case 'lifetimePlan':
-        return l10n.lifetimePlan;
       default:
         return plan.title;
     }
+  }
+
+  Future<void> _onUnlockVipService(MemberController controller) async {
+    await controller.unlockVipService();
+  }
+
+  Future<void> _onRestorePurchases(MemberController controller) async {
+    await controller.restorePurchases();
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color(0xFF1A1A2E),
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 }

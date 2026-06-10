@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$MeState {
 
- String get name; String get portrait; String get email; String get userId; int get credits; String get vipPlan; String get vipExpiry; List<Work> get works;
+ String get name; String get portrait; String get email; String get userId; int get credits; String get vipPlan; String get vipExpiry; List<Work> get works; bool get worksLoading;
 /// Create a copy of MeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $MeStateCopyWith<MeState> get copyWith => _$MeStateCopyWithImpl<MeState>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MeState&&(identical(other.name, name) || other.name == name)&&(identical(other.portrait, portrait) || other.portrait == portrait)&&(identical(other.email, email) || other.email == email)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.vipPlan, vipPlan) || other.vipPlan == vipPlan)&&(identical(other.vipExpiry, vipExpiry) || other.vipExpiry == vipExpiry)&&const DeepCollectionEquality().equals(other.works, works));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MeState&&(identical(other.name, name) || other.name == name)&&(identical(other.portrait, portrait) || other.portrait == portrait)&&(identical(other.email, email) || other.email == email)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.vipPlan, vipPlan) || other.vipPlan == vipPlan)&&(identical(other.vipExpiry, vipExpiry) || other.vipExpiry == vipExpiry)&&const DeepCollectionEquality().equals(other.works, works)&&(identical(other.worksLoading, worksLoading) || other.worksLoading == worksLoading));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,portrait,email,userId,credits,vipPlan,vipExpiry,const DeepCollectionEquality().hash(works));
+int get hashCode => Object.hash(runtimeType,name,portrait,email,userId,credits,vipPlan,vipExpiry,const DeepCollectionEquality().hash(works),worksLoading);
 
 @override
 String toString() {
-  return 'MeState(name: $name, portrait: $portrait, email: $email, userId: $userId, credits: $credits, vipPlan: $vipPlan, vipExpiry: $vipExpiry, works: $works)';
+  return 'MeState(name: $name, portrait: $portrait, email: $email, userId: $userId, credits: $credits, vipPlan: $vipPlan, vipExpiry: $vipExpiry, works: $works, worksLoading: $worksLoading)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $MeStateCopyWith<$Res>  {
   factory $MeStateCopyWith(MeState value, $Res Function(MeState) _then) = _$MeStateCopyWithImpl;
 @useResult
 $Res call({
- String name, String portrait, String email, String userId, int credits, String vipPlan, String vipExpiry, List<Work> works
+ String name, String portrait, String email, String userId, int credits, String vipPlan, String vipExpiry, List<Work> works, bool worksLoading
 });
 
 
@@ -62,7 +62,7 @@ class _$MeStateCopyWithImpl<$Res>
 
 /// Create a copy of MeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? portrait = null,Object? email = null,Object? userId = null,Object? credits = null,Object? vipPlan = null,Object? vipExpiry = null,Object? works = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? portrait = null,Object? email = null,Object? userId = null,Object? credits = null,Object? vipPlan = null,Object? vipExpiry = null,Object? works = null,Object? worksLoading = null,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,portrait: null == portrait ? _self.portrait : portrait // ignore: cast_nullable_to_non_nullable
@@ -72,7 +72,8 @@ as String,credits: null == credits ? _self.credits : credits // ignore: cast_nul
 as int,vipPlan: null == vipPlan ? _self.vipPlan : vipPlan // ignore: cast_nullable_to_non_nullable
 as String,vipExpiry: null == vipExpiry ? _self.vipExpiry : vipExpiry // ignore: cast_nullable_to_non_nullable
 as String,works: null == works ? _self.works : works // ignore: cast_nullable_to_non_nullable
-as List<Work>,
+as List<Work>,worksLoading: null == worksLoading ? _self.worksLoading : worksLoading // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String portrait,  String email,  String userId,  int credits,  String vipPlan,  String vipExpiry,  List<Work> works)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String name,  String portrait,  String email,  String userId,  int credits,  String vipPlan,  String vipExpiry,  List<Work> works,  bool worksLoading)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MeState() when $default != null:
-return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits,_that.vipPlan,_that.vipExpiry,_that.works);case _:
+return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits,_that.vipPlan,_that.vipExpiry,_that.works,_that.worksLoading);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String portrait,  String email,  String userId,  int credits,  String vipPlan,  String vipExpiry,  List<Work> works)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String name,  String portrait,  String email,  String userId,  int credits,  String vipPlan,  String vipExpiry,  List<Work> works,  bool worksLoading)  $default,) {final _that = this;
 switch (_that) {
 case _MeState():
-return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits,_that.vipPlan,_that.vipExpiry,_that.works);case _:
+return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits,_that.vipPlan,_that.vipExpiry,_that.works,_that.worksLoading);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String portrait,  String email,  String userId,  int credits,  String vipPlan,  String vipExpiry,  List<Work> works)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String name,  String portrait,  String email,  String userId,  int credits,  String vipPlan,  String vipExpiry,  List<Work> works,  bool worksLoading)?  $default,) {final _that = this;
 switch (_that) {
 case _MeState() when $default != null:
-return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits,_that.vipPlan,_that.vipExpiry,_that.works);case _:
+return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits,_that.vipPlan,_that.vipExpiry,_that.works,_that.worksLoading);case _:
   return null;
 
 }
@@ -213,7 +214,7 @@ return $default(_that.name,_that.portrait,_that.email,_that.userId,_that.credits
 
 
 class _MeState implements MeState {
-  const _MeState({this.name = '', this.portrait = '', this.email = '', this.userId = '', this.credits = 0, this.vipPlan = 'Diamond SVIP Weekly', this.vipExpiry = '', final  List<Work> works = const []}): _works = works;
+  const _MeState({this.name = '', this.portrait = '', this.email = '', this.userId = '', this.credits = 0, this.vipPlan = '暂无会员', this.vipExpiry = '', final  List<Work> works = const [], this.worksLoading = false}): _works = works;
   
 
 @override@JsonKey() final  String name;
@@ -230,6 +231,7 @@ class _MeState implements MeState {
   return EqualUnmodifiableListView(_works);
 }
 
+@override@JsonKey() final  bool worksLoading;
 
 /// Create a copy of MeState
 /// with the given fields replaced by the non-null parameter values.
@@ -241,16 +243,16 @@ _$MeStateCopyWith<_MeState> get copyWith => __$MeStateCopyWithImpl<_MeState>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MeState&&(identical(other.name, name) || other.name == name)&&(identical(other.portrait, portrait) || other.portrait == portrait)&&(identical(other.email, email) || other.email == email)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.vipPlan, vipPlan) || other.vipPlan == vipPlan)&&(identical(other.vipExpiry, vipExpiry) || other.vipExpiry == vipExpiry)&&const DeepCollectionEquality().equals(other._works, _works));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MeState&&(identical(other.name, name) || other.name == name)&&(identical(other.portrait, portrait) || other.portrait == portrait)&&(identical(other.email, email) || other.email == email)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.vipPlan, vipPlan) || other.vipPlan == vipPlan)&&(identical(other.vipExpiry, vipExpiry) || other.vipExpiry == vipExpiry)&&const DeepCollectionEquality().equals(other._works, _works)&&(identical(other.worksLoading, worksLoading) || other.worksLoading == worksLoading));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,portrait,email,userId,credits,vipPlan,vipExpiry,const DeepCollectionEquality().hash(_works));
+int get hashCode => Object.hash(runtimeType,name,portrait,email,userId,credits,vipPlan,vipExpiry,const DeepCollectionEquality().hash(_works),worksLoading);
 
 @override
 String toString() {
-  return 'MeState(name: $name, portrait: $portrait, email: $email, userId: $userId, credits: $credits, vipPlan: $vipPlan, vipExpiry: $vipExpiry, works: $works)';
+  return 'MeState(name: $name, portrait: $portrait, email: $email, userId: $userId, credits: $credits, vipPlan: $vipPlan, vipExpiry: $vipExpiry, works: $works, worksLoading: $worksLoading)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$MeStateCopyWith<$Res> implements $MeStateCopyWith<$Res> {
   factory _$MeStateCopyWith(_MeState value, $Res Function(_MeState) _then) = __$MeStateCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String portrait, String email, String userId, int credits, String vipPlan, String vipExpiry, List<Work> works
+ String name, String portrait, String email, String userId, int credits, String vipPlan, String vipExpiry, List<Work> works, bool worksLoading
 });
 
 
@@ -278,7 +280,7 @@ class __$MeStateCopyWithImpl<$Res>
 
 /// Create a copy of MeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? portrait = null,Object? email = null,Object? userId = null,Object? credits = null,Object? vipPlan = null,Object? vipExpiry = null,Object? works = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? portrait = null,Object? email = null,Object? userId = null,Object? credits = null,Object? vipPlan = null,Object? vipExpiry = null,Object? works = null,Object? worksLoading = null,}) {
   return _then(_MeState(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,portrait: null == portrait ? _self.portrait : portrait // ignore: cast_nullable_to_non_nullable
@@ -288,7 +290,8 @@ as String,credits: null == credits ? _self.credits : credits // ignore: cast_nul
 as int,vipPlan: null == vipPlan ? _self.vipPlan : vipPlan // ignore: cast_nullable_to_non_nullable
 as String,vipExpiry: null == vipExpiry ? _self.vipExpiry : vipExpiry // ignore: cast_nullable_to_non_nullable
 as String,works: null == works ? _self._works : works // ignore: cast_nullable_to_non_nullable
-as List<Work>,
+as List<Work>,worksLoading: null == worksLoading ? _self.worksLoading : worksLoading // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

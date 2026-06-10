@@ -1,7 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flicko_video/api/model/video_model.dart';
+import 'package:flicko_video/hive/user/user_box.dart';
+import 'package:flicko_video/utils/image_data_url.dart';
+import 'package:flicko_video/utils/member_access.dart';
 
 import 'state.dart';
 import 'controller.dart';
@@ -354,6 +356,9 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
     EffectsCreateController controller,
     AppLocalizations l10n,
   ) {
+    final creditCost = state.creditCost(
+      isVip: isActiveVipMember(UserBox.member),
+    );
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -395,7 +400,7 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
                       const Text('💎', style: TextStyle(fontSize: 14)),
                       const SizedBox(width: 4),
                       Text(
-                        '${state.creditCost}',
+                        '$creditCost',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -430,6 +435,9 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
       if (!context.mounted) {
         return;
       }
+      if (_handleSubmitGuardRedirect(context, error)) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: const Color(0xFF1A1A2E),
@@ -448,7 +456,11 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
     final bytes = await image.readAsBytes();
     controller.setSelectedImage(
       path: image.path,
-      base64Image: base64Encode(bytes),
+      base64Image: imageDataUrl(
+        bytes: bytes,
+        path: image.path,
+        mimeType: image.mimeType,
+      ),
     );
   }
 
@@ -456,11 +468,32 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
     context.push('/create_result', extra: CreateResultArgs(task: result));
   }
 
+  bool _handleSubmitGuardRedirect(BuildContext context, Object error) {
+    if (error is! EffectsCreateException) {
+      return false;
+    }
+
+    switch (error.error) {
+      case EffectsCreateError.requireMember:
+        context.push('/member');
+        return true;
+      case EffectsCreateError.insufficientCredits:
+        context.push('/recharge');
+        return true;
+      case EffectsCreateError.noTemplate:
+      case EffectsCreateError.noImage:
+      case EffectsCreateError.submitFailed:
+        return false;
+    }
+  }
+
   String _formatSubmitError(Object error, AppLocalizations l10n) {
     if (error is EffectsCreateException) {
       return switch (error.error) {
         EffectsCreateError.noTemplate => l10n.selectTemplateFirst,
         EffectsCreateError.noImage => l10n.selectImageFirst,
+        EffectsCreateError.requireMember => '请先开通会员',
+        EffectsCreateError.insufficientCredits => '积分不足',
         EffectsCreateError.submitFailed => l10n.templateCreateFailed,
       };
     }

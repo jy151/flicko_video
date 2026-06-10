@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DiscoverState {
 
- List<Work> get items; List<ShowcaseCategory> get categories; int get lastId; bool get loading;
+ List<Work> get items; List<ShowcaseCategory> get categories; int get lastId; int get credits; bool get loading;
 /// Create a copy of DiscoverState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $DiscoverStateCopyWith<DiscoverState> get copyWith => _$DiscoverStateCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverState&&const DeepCollectionEquality().equals(other.items, items)&&const DeepCollectionEquality().equals(other.categories, categories)&&(identical(other.lastId, lastId) || other.lastId == lastId)&&(identical(other.loading, loading) || other.loading == loading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DiscoverState&&const DeepCollectionEquality().equals(other.items, items)&&const DeepCollectionEquality().equals(other.categories, categories)&&(identical(other.lastId, lastId) || other.lastId == lastId)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.loading, loading) || other.loading == loading));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),const DeepCollectionEquality().hash(categories),lastId,loading);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),const DeepCollectionEquality().hash(categories),lastId,credits,loading);
 
 @override
 String toString() {
-  return 'DiscoverState(items: $items, categories: $categories, lastId: $lastId, loading: $loading)';
+  return 'DiscoverState(items: $items, categories: $categories, lastId: $lastId, credits: $credits, loading: $loading)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $DiscoverStateCopyWith<$Res>  {
   factory $DiscoverStateCopyWith(DiscoverState value, $Res Function(DiscoverState) _then) = _$DiscoverStateCopyWithImpl;
 @useResult
 $Res call({
- List<Work> items, List<ShowcaseCategory> categories, int lastId, bool loading
+ List<Work> items, List<ShowcaseCategory> categories, int lastId, int credits, bool loading
 });
 
 
@@ -62,11 +62,12 @@ class _$DiscoverStateCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? categories = null,Object? lastId = null,Object? loading = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? categories = null,Object? lastId = null,Object? credits = null,Object? loading = null,}) {
   return _then(_self.copyWith(
 items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
 as List<Work>,categories: null == categories ? _self.categories : categories // ignore: cast_nullable_to_non_nullable
 as List<ShowcaseCategory>,lastId: null == lastId ? _self.lastId : lastId // ignore: cast_nullable_to_non_nullable
+as int,credits: null == credits ? _self.credits : credits // ignore: cast_nullable_to_non_nullable
 as int,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -153,10 +154,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Work> items,  List<ShowcaseCategory> categories,  int lastId,  bool loading)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Work> items,  List<ShowcaseCategory> categories,  int lastId,  int credits,  bool loading)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DiscoverState() when $default != null:
-return $default(_that.items,_that.categories,_that.lastId,_that.loading);case _:
+return $default(_that.items,_that.categories,_that.lastId,_that.credits,_that.loading);case _:
   return orElse();
 
 }
@@ -174,10 +175,10 @@ return $default(_that.items,_that.categories,_that.lastId,_that.loading);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Work> items,  List<ShowcaseCategory> categories,  int lastId,  bool loading)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Work> items,  List<ShowcaseCategory> categories,  int lastId,  int credits,  bool loading)  $default,) {final _that = this;
 switch (_that) {
 case _DiscoverState():
-return $default(_that.items,_that.categories,_that.lastId,_that.loading);case _:
+return $default(_that.items,_that.categories,_that.lastId,_that.credits,_that.loading);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +195,10 @@ return $default(_that.items,_that.categories,_that.lastId,_that.loading);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Work> items,  List<ShowcaseCategory> categories,  int lastId,  bool loading)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Work> items,  List<ShowcaseCategory> categories,  int lastId,  int credits,  bool loading)?  $default,) {final _that = this;
 switch (_that) {
 case _DiscoverState() when $default != null:
-return $default(_that.items,_that.categories,_that.lastId,_that.loading);case _:
+return $default(_that.items,_that.categories,_that.lastId,_that.credits,_that.loading);case _:
   return null;
 
 }
@@ -209,7 +210,7 @@ return $default(_that.items,_that.categories,_that.lastId,_that.loading);case _:
 
 
 class _DiscoverState implements DiscoverState {
-  const _DiscoverState({final  List<Work> items = const [], final  List<ShowcaseCategory> categories = const [], this.lastId = 0, this.loading = true}): _items = items,_categories = categories;
+  const _DiscoverState({final  List<Work> items = const [], final  List<ShowcaseCategory> categories = const [], this.lastId = 0, this.credits = 0, this.loading = true}): _items = items,_categories = categories;
   
 
  final  List<Work> _items;
@@ -227,6 +228,7 @@ class _DiscoverState implements DiscoverState {
 }
 
 @override@JsonKey() final  int lastId;
+@override@JsonKey() final  int credits;
 @override@JsonKey() final  bool loading;
 
 /// Create a copy of DiscoverState
@@ -239,16 +241,16 @@ _$DiscoverStateCopyWith<_DiscoverState> get copyWith => __$DiscoverStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiscoverState&&const DeepCollectionEquality().equals(other._items, _items)&&const DeepCollectionEquality().equals(other._categories, _categories)&&(identical(other.lastId, lastId) || other.lastId == lastId)&&(identical(other.loading, loading) || other.loading == loading));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DiscoverState&&const DeepCollectionEquality().equals(other._items, _items)&&const DeepCollectionEquality().equals(other._categories, _categories)&&(identical(other.lastId, lastId) || other.lastId == lastId)&&(identical(other.credits, credits) || other.credits == credits)&&(identical(other.loading, loading) || other.loading == loading));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),const DeepCollectionEquality().hash(_categories),lastId,loading);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),const DeepCollectionEquality().hash(_categories),lastId,credits,loading);
 
 @override
 String toString() {
-  return 'DiscoverState(items: $items, categories: $categories, lastId: $lastId, loading: $loading)';
+  return 'DiscoverState(items: $items, categories: $categories, lastId: $lastId, credits: $credits, loading: $loading)';
 }
 
 
@@ -259,7 +261,7 @@ abstract mixin class _$DiscoverStateCopyWith<$Res> implements $DiscoverStateCopy
   factory _$DiscoverStateCopyWith(_DiscoverState value, $Res Function(_DiscoverState) _then) = __$DiscoverStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<Work> items, List<ShowcaseCategory> categories, int lastId, bool loading
+ List<Work> items, List<ShowcaseCategory> categories, int lastId, int credits, bool loading
 });
 
 
@@ -276,11 +278,12 @@ class __$DiscoverStateCopyWithImpl<$Res>
 
 /// Create a copy of DiscoverState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? categories = null,Object? lastId = null,Object? loading = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? categories = null,Object? lastId = null,Object? credits = null,Object? loading = null,}) {
   return _then(_DiscoverState(
 items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
 as List<Work>,categories: null == categories ? _self._categories : categories // ignore: cast_nullable_to_non_nullable
 as List<ShowcaseCategory>,lastId: null == lastId ? _self.lastId : lastId // ignore: cast_nullable_to_non_nullable
+as int,credits: null == credits ? _self.credits : credits // ignore: cast_nullable_to_non_nullable
 as int,loading: null == loading ? _self.loading : loading // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

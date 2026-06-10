@@ -79,6 +79,10 @@ class AppLocalizations {
       'and': 'and',
       'termsOfService': 'Terms of Service',
       'pleaseAgreeToTerms': 'Please agree to the terms first',
+      'termsConsentContent':
+          'Please agree to the Privacy Policy and Terms of Service before signing in.',
+      'agree': 'Agree',
+      'disagree': 'Disagree',
       'uploadImage': 'Upload Image',
       'selectVideoEffects': 'Select Video Effects',
       'submit': 'Submit',
@@ -90,9 +94,10 @@ class AppLocalizations {
       'createTaskFailed': 'Failed to submit generation task',
       'templateCreateSubmitted': 'Template generation task submitted',
       'templateCreateFailed': 'Failed to submit template generation task',
+      'monthlyPlan': 'Monthly Plan',
       'quarterlyPlan': 'Quarterly Plan',
       'annualPlan': 'Annual Plan',
-      'lifetimePlan': 'Lifetime Plan',
+      'lifetimePlan': 'Annual Plan',
       'oneTimePayment': 'One-time payment {price}',
       'unlockAllPremiumFeatures': 'Unlock All Premium Features',
       'instantBonus': 'Instant Bonus',
@@ -107,6 +112,12 @@ class AppLocalizations {
       'createSimilar': 'Create Similar',
       'share': 'Share',
       'report': 'Report',
+      'delete': 'Delete',
+      'deleteVideoTitle': 'Delete video?',
+      'deleteVideoContent': 'This work will be removed from your creations.',
+      'deleteComplete': 'Deleted',
+      'deleteFailed': 'Delete failed',
+      'download': 'Download',
       'downloadWithWatermark': 'Download with Watermark',
       'downloadWithoutWatermark': 'Download without Watermark',
       'downloadingVideo': 'Downloading video',
@@ -181,6 +192,9 @@ class AppLocalizations {
       'and': '和',
       'termsOfService': '服务条款',
       'pleaseAgreeToTerms': '请先同意条款',
+      'termsConsentContent': '继续登录前，请先同意隐私政策和服务条款。',
+      'agree': '同意',
+      'disagree': '不同意',
       'uploadImage': '上传图片',
       'selectVideoEffects': '选择视频特效',
       'submit': '提交',
@@ -192,9 +206,10 @@ class AppLocalizations {
       'createTaskFailed': '生成任务提交失败',
       'templateCreateSubmitted': '模板生成任务已提交',
       'templateCreateFailed': '模板生成任务提交失败',
+      'monthlyPlan': '月度会员',
       'quarterlyPlan': '季度会员',
       'annualPlan': '年度会员',
-      'lifetimePlan': '终身会员',
+      'lifetimePlan': '年度会员',
       'oneTimePayment': '一次性支付 {price}',
       'unlockAllPremiumFeatures': '解锁全部高级功能',
       'instantBonus': '即时奖励',
@@ -209,6 +224,12 @@ class AppLocalizations {
       'createSimilar': '创作同款',
       'share': '分享',
       'report': '举报',
+      'delete': '删除',
+      'deleteVideoTitle': '删除视频？',
+      'deleteVideoContent': '该作品将从你的创作列表中移除。',
+      'deleteComplete': '已删除',
+      'deleteFailed': '删除失败',
+      'download': '下载',
       'downloadWithWatermark': '下载带水印视频',
       'downloadWithoutWatermark': '下载无水印视频',
       'downloadingVideo': '视频下载中',
@@ -282,6 +303,9 @@ class AppLocalizations {
       'and': '和',
       'termsOfService': '服務條款',
       'pleaseAgreeToTerms': '請先同意條款',
+      'termsConsentContent': '繼續登入前，請先同意隱私政策和服務條款。',
+      'agree': '同意',
+      'disagree': '不同意',
       'uploadImage': '上傳圖片',
       'selectVideoEffects': '選擇影片特效',
       'submit': '提交',
@@ -293,9 +317,10 @@ class AppLocalizations {
       'createTaskFailed': '生成任務提交失敗',
       'templateCreateSubmitted': '模板生成任務已提交',
       'templateCreateFailed': '模板生成任務提交失敗',
+      'monthlyPlan': '月度會員',
       'quarterlyPlan': '季度會員',
       'annualPlan': '年度會員',
-      'lifetimePlan': '終身會員',
+      'lifetimePlan': '年度會員',
       'oneTimePayment': '一次性支付 {price}',
       'unlockAllPremiumFeatures': '解鎖全部高級功能',
       'instantBonus': '即時獎勵',
@@ -310,6 +335,12 @@ class AppLocalizations {
       'createSimilar': '創作同款',
       'share': '分享',
       'report': '檢舉',
+      'delete': '刪除',
+      'deleteVideoTitle': '刪除影片？',
+      'deleteVideoContent': '該作品將從你的創作列表中移除。',
+      'deleteComplete': '已刪除',
+      'deleteFailed': '刪除失敗',
+      'download': '下載',
       'downloadWithWatermark': '下載帶浮水印影片',
       'downloadWithoutWatermark': '下載無浮水印影片',
       'downloadingVideo': '影片下載中',
@@ -383,6 +414,9 @@ class AppLocalizations {
       'and': 'と',
       'termsOfService': 'サービス利用規約',
       'pleaseAgreeToTerms': '利用規約に同意してください',
+      'termsConsentContent': 'サインインする前にプライバシーポリシーとサービス利用規約に同意してください。',
+      'agree': '同意する',
+      'disagree': '同意しない',
       'uploadImage': '画像をアップロード',
       'selectVideoEffects': 'ビデオエフェクトを選択',
       'submit': '送信',
@@ -394,9 +428,10 @@ class AppLocalizations {
       'createTaskFailed': '生成タスクの送信に失敗しました',
       'templateCreateSubmitted': 'テンプレート生成タスクを送信しました',
       'templateCreateFailed': 'テンプレート生成タスクの送信に失敗しました',
+      'monthlyPlan': '月額プラン',
       'quarterlyPlan': '四半期プラン',
       'annualPlan': '年間プラン',
-      'lifetimePlan': '永久プラン',
+      'lifetimePlan': '年間プラン',
       'oneTimePayment': '一回払い {price}',
       'unlockAllPremiumFeatures': 'すべてのプレミアム機能を解放',
       'instantBonus': '即時ボーナス',
@@ -411,6 +446,12 @@ class AppLocalizations {
       'createSimilar': '似た動画を作成',
       'share': '共有',
       'report': '報告',
+      'delete': '削除',
+      'deleteVideoTitle': '動画を削除しますか？',
+      'deleteVideoContent': 'この作品は作成リストから削除されます。',
+      'deleteComplete': '削除しました',
+      'deleteFailed': '削除に失敗しました',
+      'download': 'ダウンロード',
       'downloadWithWatermark': '透かし付きでダウンロード',
       'downloadWithoutWatermark': '透かしなしでダウンロード',
       'downloadingVideo': '動画をダウンロード中',
@@ -484,6 +525,9 @@ class AppLocalizations {
       'and': ' 및 ',
       'termsOfService': '서비스 약관',
       'pleaseAgreeToTerms': '약관에 동의해주세요',
+      'termsConsentContent': '로그인하기 전에 개인정보 처리방침과 서비스 약관에 동의해주세요.',
+      'agree': '동의',
+      'disagree': '동의하지 않음',
       'uploadImage': '이미지 업로드',
       'selectVideoEffects': '비디오 효과 선택',
       'submit': '제출',
@@ -495,9 +539,10 @@ class AppLocalizations {
       'createTaskFailed': '생성 작업 제출에 실패했습니다',
       'templateCreateSubmitted': '템플릿 생성 작업이 제출되었습니다',
       'templateCreateFailed': '템플릿 생성 작업 제출에 실패했습니다',
+      'monthlyPlan': '월간 플랜',
       'quarterlyPlan': '분기 플랜',
       'annualPlan': '연간 플랜',
-      'lifetimePlan': '평생 플랜',
+      'lifetimePlan': '연간 플랜',
       'oneTimePayment': '일시불 결제 {price}',
       'unlockAllPremiumFeatures': '모든 프리미엄 기능 잠금 해제',
       'instantBonus': '즉시 보너스',
@@ -512,6 +557,12 @@ class AppLocalizations {
       'createSimilar': '비슷하게 만들기',
       'share': '공유',
       'report': '신고',
+      'delete': '삭제',
+      'deleteVideoTitle': '비디오를 삭제하시겠습니까?',
+      'deleteVideoContent': '이 작품이 내 생성 목록에서 제거됩니다.',
+      'deleteComplete': '삭제되었습니다',
+      'deleteFailed': '삭제 실패',
+      'download': '다운로드',
       'downloadWithWatermark': '워터마크 포함 다운로드',
       'downloadWithoutWatermark': '워터마크 없이 다운로드',
       'downloadingVideo': '비디오 다운로드 중',
@@ -586,6 +637,10 @@ class AppLocalizations {
       'and': ' et ',
       'termsOfService': 'Conditions de service',
       'pleaseAgreeToTerms': 'Veuillez accepter les conditions',
+      'termsConsentContent':
+          'Veuillez accepter la Politique de confidentialité et les Conditions de service avant de vous connecter.',
+      'agree': 'Accepter',
+      'disagree': 'Refuser',
       'uploadImage': 'Télécharger une image',
       'selectVideoEffects': 'Sélectionner les effets vidéo',
       'submit': 'Soumettre',
@@ -597,9 +652,10 @@ class AppLocalizations {
       'createTaskFailed': 'Échec de l’envoi de la tâche de génération',
       'templateCreateSubmitted': 'Tâche de génération du modèle envoyée',
       'templateCreateFailed': 'Échec de l’envoi de la tâche de génération',
+      'monthlyPlan': 'Forfait mensuel',
       'quarterlyPlan': 'Forfait trimestriel',
       'annualPlan': 'Forfait annuel',
-      'lifetimePlan': 'Forfait à vie',
+      'lifetimePlan': 'Forfait annuel',
       'oneTimePayment': 'Paiement unique {price}',
       'unlockAllPremiumFeatures':
           'Débloquer toutes les fonctionnalités premium',
@@ -616,6 +672,12 @@ class AppLocalizations {
       'createSimilar': 'Créer similaire',
       'share': 'Partager',
       'report': 'Signaler',
+      'delete': 'Supprimer',
+      'deleteVideoTitle': 'Supprimer la vidéo ?',
+      'deleteVideoContent': 'Cette création sera retirée de votre liste.',
+      'deleteComplete': 'Supprimé',
+      'deleteFailed': 'Échec de la suppression',
+      'download': 'Télécharger',
       'downloadWithWatermark': 'Télécharger avec filigrane',
       'downloadWithoutWatermark': 'Télécharger sans filigrane',
       'downloadingVideo': 'Téléchargement de la vidéo',
@@ -698,6 +760,9 @@ class AppLocalizations {
   String get and => _text('and');
   String get termsOfService => _text('termsOfService');
   String get pleaseAgreeToTerms => _text('pleaseAgreeToTerms');
+  String get termsConsentContent => _text('termsConsentContent');
+  String get agree => _text('agree');
+  String get disagree => _text('disagree');
   String get uploadImage => _text('uploadImage');
   String get selectVideoEffects => _text('selectVideoEffects');
   String get submit => _text('submit');
@@ -709,6 +774,7 @@ class AppLocalizations {
   String get createTaskFailed => _text('createTaskFailed');
   String get templateCreateSubmitted => _text('templateCreateSubmitted');
   String get templateCreateFailed => _text('templateCreateFailed');
+  String get monthlyPlan => _text('monthlyPlan');
   String get quarterlyPlan => _text('quarterlyPlan');
   String get annualPlan => _text('annualPlan');
   String get lifetimePlan => _text('lifetimePlan');
@@ -724,6 +790,12 @@ class AppLocalizations {
   String get createSimilar => _text('createSimilar');
   String get share => _text('share');
   String get report => _text('report');
+  String get delete => _text('delete');
+  String get deleteVideoTitle => _text('deleteVideoTitle');
+  String get deleteVideoContent => _text('deleteVideoContent');
+  String get deleteComplete => _text('deleteComplete');
+  String get deleteFailed => _text('deleteFailed');
+  String get download => _text('download');
   String get downloadWithWatermark => _text('downloadWithWatermark');
   String get downloadWithoutWatermark => _text('downloadWithoutWatermark');
   String get downloadingVideo => _text('downloadingVideo');

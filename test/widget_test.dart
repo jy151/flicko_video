@@ -1,4 +1,3 @@
-import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/page/create_result/view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +8,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      ProviderScope(
-        child: MaterialApp(
-          home: CreateResultView(task: AiCreateResponse(queuingTime: 120)),
-        ),
-      ),
+      ProviderScope(child: MaterialApp(home: CreateResultView())),
     );
     await tester.pump();
 

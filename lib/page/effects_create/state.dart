@@ -29,7 +29,16 @@ class EffectsCreateState {
     return template?.animation ?? template?.cover ?? template?.video ?? '';
   }
 
-  int get creditCost => selectedTemplate?.source ?? 48;
+  int creditCost({required bool isVip}) {
+    final template = selectedTemplate;
+    if (template == null) {
+      return 48;
+    }
+    if (isVip) {
+      return template.vipScore ?? template.score ?? template.source ?? 48;
+    }
+    return template.score ?? template.source ?? 48;
+  }
 
   EffectsCreateState copyWith({
     String? selectedImagePath,

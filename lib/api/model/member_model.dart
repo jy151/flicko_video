@@ -29,6 +29,10 @@ class Member {
   final String? purposeChatTime;
   final String? inviterCode;
   final String? roles;
+  final int? credit;
+  final bool? isVip;
+  final int? vipLevel;
+  final int? vipEndDate;
 
   Member({
     this.memberId,
@@ -56,6 +60,10 @@ class Member {
     this.purposeChatTime,
     this.inviterCode,
     this.roles,
+    this.credit,
+    this.isVip,
+    this.vipLevel,
+    this.vipEndDate,
   });
 
   factory Member.fromJson(Map<String, dynamic> json) => _$MemberFromJson(json);
@@ -80,7 +88,7 @@ class MemberAudit {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Balance {
   final int? id;
-  final int? memberId; 
+  final int? memberId;
   final String? name;
   final String? portrait;
   final String? aiPortrait;

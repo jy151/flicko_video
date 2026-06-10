@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:core';
 import 'dart:core' as core;
 import 'dart:io';
@@ -10,6 +9,7 @@ import 'package:flicko_video/i18n/app_localizations.dart';
 import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/tabs/home/controller.dart';
 import 'package:flicko_video/page/tabs/home/widgets/image_style_dialog.dart';
+import 'package:flicko_video/utils/image_data_url.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,13 +20,18 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'state.dart';
 
 class HomeView extends ConsumerStatefulWidget {
-  const HomeView({super.key});
+  const HomeView({super.key, this.initialPrompt});
+
+  final String? initialPrompt;
+
   @override
   ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
 class _HomeViewState extends ConsumerState<HomeView> {
   final _imagePicker = ImagePicker();
+  final _promptController = TextEditingController();
+  String? _appliedInitialPrompt;
 
   // Mock 数据，让骨架屏在 loading 时有内容可渲染
   static final _mockAiModels = List.generate(
@@ -45,11 +50,31 @@ class _HomeViewState extends ConsumerState<HomeView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _applyInitialPrompt();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialPrompt != widget.initialPrompt) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _applyInitialPrompt();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _promptController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(homeProvider);
+    _syncPromptController(state);
 
     final l10n = AppLocalizations.of(context);
 
@@ -66,18 +91,26 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
-                  _buildHeader(state, l10n),
-                  const SizedBox(height: 16),
-                  _buildPromptArea(ref, state, l10n),
-                  const SizedBox(height: 12),
-                  _buildModeSelector(ref, state, l10n),
-                  const SizedBox(height: 20),
-                  _buildAiModelSection(ref, state, l10n),
-                  const SizedBox(height: 20),
-                  _buildDurationSection(ref, state, l10n),
-                  const SizedBox(height: 20),
-                  _buildStyleSection(l10n, state),
+                  AbsorbPointer(
+                    absorbing: state.isSubmitting,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 16),
+                        _buildHeader(state, l10n),
+                        const SizedBox(height: 16),
+                        _buildPromptArea(ref, state, l10n),
+                        const SizedBox(height: 12),
+                        _buildModeSelector(ref, state, l10n),
+                        const SizedBox(height: 20),
+                        _buildAiModelSection(ref, state, l10n),
+                        const SizedBox(height: 20),
+                        _buildDurationSection(ref, state, l10n),
+                        const SizedBox(height: 20),
+                        _buildStyleSection(l10n, state),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -160,6 +193,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
             duration: const core.Duration(milliseconds: 220),
             child: TextField(
               key: ValueKey(showImage),
+              controller: _promptController,
+              readOnly: state.isSubmitting,
               onChanged: (text) =>
                   ref.read(homeProvider.notifier).setPromptText(text),
               maxLines: showImage ? 5 : 3,
@@ -678,7 +713,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final bytes = await image.readAsBytes();
     controller.setSelectedImage(
       path: image.path,
-      base64Image: base64Encode(bytes),
+      base64Image: imageDataUrl(
+        bytes: bytes,
+        path: image.path,
+        mimeType: image.mimeType,
+      ),
     );
   }
 
@@ -703,6 +742,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
       if (!context.mounted) {
         return;
       }
+      if (_handleCreateGuardRedirect(context, error)) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: const Color(0xFF1A1A2E),
@@ -716,15 +758,61 @@ class _HomeViewState extends ConsumerState<HomeView> {
     context.push('/create_result', extra: CreateResultArgs(task: result));
   }
 
+  bool _handleCreateGuardRedirect(BuildContext context, Object error) {
+    if (error is! HomeCreateException) {
+      return false;
+    }
+
+    switch (error.error) {
+      case HomeCreateError.requireMember:
+        context.push('/member');
+        return true;
+      case HomeCreateError.insufficientCredits:
+        context.push('/recharge');
+        return true;
+      case HomeCreateError.noImage:
+      case HomeCreateError.noPrompt:
+      case HomeCreateError.noDuration:
+      case HomeCreateError.submitFailed:
+        return false;
+    }
+  }
+
   String _formatCreateError(Object error, AppLocalizations l10n) {
     if (error is HomeCreateException) {
       return switch (error.error) {
         HomeCreateError.noImage => l10n.selectImageFirst,
         HomeCreateError.noPrompt => l10n.enterPromptFirst,
         HomeCreateError.noDuration => l10n.selectDurationFirst,
+        HomeCreateError.requireMember => '请先开通会员',
+        HomeCreateError.insufficientCredits => '积分不足',
         HomeCreateError.submitFailed => l10n.createTaskFailed,
       };
     }
     return error.toString().replaceFirst('Exception: ', '');
+  }
+
+  void _applyInitialPrompt() {
+    final prompt = widget.initialPrompt?.trim();
+    if (!mounted ||
+        prompt == null ||
+        prompt.isEmpty ||
+        prompt == _appliedInitialPrompt) {
+      return;
+    }
+
+    _appliedInitialPrompt = prompt;
+    ref.read(homeProvider.notifier).applyInitialPrompt(prompt);
+  }
+
+  void _syncPromptController(HomeState state) {
+    if (_promptController.text == state.promptText) {
+      return;
+    }
+
+    _promptController.value = TextEditingValue(
+      text: state.promptText,
+      selection: TextSelection.collapsed(offset: state.promptText.length),
+    );
   }
 }

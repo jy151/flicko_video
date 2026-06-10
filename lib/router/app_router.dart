@@ -14,6 +14,7 @@ import 'package:flicko_video/page/member/view.dart';
 import 'package:flicko_video/page/recharge/view.dart';
 import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/create_result/view.dart';
+import 'package:flicko_video/page/web_content/view.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/home',
@@ -26,7 +27,10 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/home',
           pageBuilder: (context, state) {
-            return NoTransitionPage(child: HomeView());
+            final extra = state.extra;
+            return NoTransitionPage(
+              child: HomeView(initialPrompt: extra is String ? extra : null),
+            );
           },
           routes: const [],
         ),
@@ -99,9 +103,19 @@ final appRouter = GoRouter(
       builder: (context, state) {
         final extra = state.extra;
         if (extra is CreateResultArgs) {
-          return CreateResultView(task: extra.task);
+          return CreateResultView(args: extra);
         }
         return const CreateResultView();
+      },
+    ),
+    GoRoute(
+      path: '/web_content',
+      builder: (context, state) {
+        final extra = state.extra;
+        if (extra is WebContentArgs) {
+          return WebContentView(title: extra.title, url: extra.url);
+        }
+        return const WebContentView(title: '', url: 'https://flicko.video/');
       },
     ),
   ],

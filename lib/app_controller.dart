@@ -59,8 +59,7 @@ class AppController extends StateNotifier<AppState> {
     }
 
     try {
-      final member = await UserBox.syncUserInfo();
-      await UserBox.syncBalance(memberId: member?.memberId);
+      await UserBox.syncUserInfo();
     } catch (_) {
       try {
         await UserBox.syncBalance();

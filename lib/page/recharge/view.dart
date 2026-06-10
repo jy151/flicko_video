@@ -16,7 +16,30 @@ class RechargeView extends ConsumerStatefulWidget {
 
 class _RechargeViewState extends ConsumerState<RechargeView> {
   @override
+  void initState() {
+    super.initState();
+
+    final controller = ref.read(rechargeControllerProvider.notifier);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) async => await controller.init(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.listen<RechargeState>(rechargeControllerProvider, (previous, next) {
+      final errorMessage = next.errorMessage;
+      if (errorMessage != null && errorMessage != previous?.errorMessage) {
+        _showMessage(context, errorMessage);
+      }
+
+      final successMessage = next.successMessage;
+      if (successMessage != null &&
+          successMessage != previous?.successMessage) {
+        _showMessage(context, successMessage);
+      }
+    });
+
     final state = ref.watch(rechargeControllerProvider);
     final controller = ref.read(rechargeControllerProvider.notifier);
     final l10n = AppLocalizations.of(context);
@@ -114,31 +137,51 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
     RechargeState state,
     RechargeController controller,
   ) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.5,
-      ),
-      itemCount: state.packages.length,
-      itemBuilder: (context, index) {
-        final pkg = state.packages[index];
-        final isSelected = pkg.id == state.selectedPackageId;
-        return _buildPackageCard(pkg, isSelected, controller);
-      },
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.5,
+          ),
+          itemCount: state.packages.length,
+          itemBuilder: (context, index) {
+            final pkg = state.packages[index];
+            final isSelected = pkg.id == state.selectedPackageId;
+            return _buildPackageCard(pkg, isSelected, state, controller);
+          },
+        ),
+        if (state.isProductLoading)
+          const Positioned.fill(
+            child: ColoredBox(
+              color: Color(0x660D0D1A),
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFFFF4081),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
   Widget _buildPackageCard(
     RechargePackage pkg,
     bool isSelected,
+    RechargeState state,
     RechargeController controller,
   ) {
     return GestureDetector(
-      onTap: () => controller.selectPackage(pkg.id),
+      onTap: state.isProductLoading
+          ? null
+          : () => controller.selectPackage(pkg.id),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -242,9 +285,13 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
           width: double.infinity,
           height: 52,
           child: ElevatedButton(
-            onPressed: state.isLoading || state.selectedPackageId == null
+            onPressed:
+                state.isLoading ||
+                    state.isProductLoading ||
+                    !state.isStoreAvailable ||
+                    state.selectedPackage?.productDetails == null
                 ? null
-                : () => controller.recharge(),
+                : () => _onRecharge(controller),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFF4081),
               foregroundColor: Colors.white,
@@ -272,6 +319,20 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
                   ),
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _onRecharge(RechargeController controller) async {
+    await controller.recharge();
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color(0xFF1A1A2E),
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

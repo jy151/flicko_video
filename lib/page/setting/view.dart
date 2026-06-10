@@ -1,6 +1,8 @@
 import 'package:flicko_video/hive/auth/auth_box.dart';
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flicko_video/i18n/locale_controller.dart';
+import 'package:flicko_video/page/web_content/view.dart';
+import 'package:flicko_video/core/legal_urls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -149,8 +151,8 @@ class SettingView extends ConsumerWidget {
     switch (type) {
       case SettingItemType.language:
         return l10n.language;
-      case SettingItemType.userPrivacy:
-        return l10n.userPrivacy;
+      case SettingItemType.termsOfService:
+        return l10n.termsOfService;
       case SettingItemType.privacyPolicy:
         return l10n.privacyPolicy;
       case SettingItemType.logout:
@@ -167,13 +169,32 @@ class SettingView extends ConsumerWidget {
     switch (item.type) {
       case SettingItemType.language:
         await _showLanguageSheet(context, ref, l10n);
-      case SettingItemType.userPrivacy:
-        _showComingSoon(context, l10n.userPrivacy, l10n);
+      case SettingItemType.termsOfService:
+        _openWebContent(
+          context,
+          title: l10n.termsOfService,
+          url: termsOfServiceUrl,
+        );
       case SettingItemType.privacyPolicy:
-        _showComingSoon(context, l10n.privacyPolicy, l10n);
+        _openWebContent(
+          context,
+          title: l10n.privacyPolicy,
+          url: privacyPolicyUrl,
+        );
       case SettingItemType.logout:
         _showLogoutDialog(context, l10n);
     }
+  }
+
+  void _openWebContent(
+    BuildContext context, {
+    required String title,
+    required String url,
+  }) {
+    context.push(
+      '/web_content',
+      extra: WebContentArgs(title: title, url: url),
+    );
   }
 
   Future<void> _showLanguageSheet(
@@ -263,19 +284,6 @@ class SettingView extends ConsumerWidget {
       await ref.read(appLocaleControllerProvider.notifier).updateLocale(result);
       await ref.read(settingControllerProvider.notifier).updateLanguage(result);
     }
-  }
-
-  void _showComingSoon(
-    BuildContext context,
-    String title,
-    AppLocalizations l10n,
-  ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: const Color(0xFF1A1A2E),
-        content: Text(l10n.comingSoon(title)),
-      ),
-    );
   }
 
   Future<void> _showLogoutDialog(

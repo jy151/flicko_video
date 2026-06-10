@@ -1,11 +1,6 @@
 import 'package:flicko_video/i18n/i18n.dart';
 
-enum SettingItemType {
-  language,
-  userPrivacy,
-  privacyPolicy,
-  logout,
-}
+enum SettingItemType { language, termsOfService, privacyPolicy, logout }
 
 class SettingItem {
   final SettingItemType type;
@@ -25,10 +20,7 @@ class SettingState {
   final String currentLanguageCode;
   final List<SettingItem> items;
 
-  const SettingState({
-    required this.currentLanguageCode,
-    required this.items,
-  });
+  const SettingState({required this.currentLanguageCode, required this.items});
 
   factory SettingState.initial(String languageCode) {
     final locale = AppLocale.fromCode(languageCode);
@@ -56,8 +48,8 @@ class SettingState {
         subtitle: locale.nativeName,
       ),
       const SettingItem(
-        type: SettingItemType.userPrivacy,
-        title: 'User Privacy',
+        type: SettingItemType.termsOfService,
+        title: 'Terms of Service',
       ),
       const SettingItem(
         type: SettingItemType.privacyPolicy,

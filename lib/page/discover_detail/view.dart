@@ -224,7 +224,7 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
           borderRadius: BorderRadius.circular(24),
         ),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: _createSimilar,
           style: ElevatedButton.styleFrom(
             elevation: 0,
             foregroundColor: Colors.white,
@@ -432,6 +432,15 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
     );
   }
 
+  void _createSimilar() {
+    final prompt = work.prompt?.trim();
+    if (prompt == null || prompt.isEmpty) {
+      context.go('/home');
+      return;
+    }
+    context.go('/home', extra: prompt);
+  }
+
   void _showMoreSheet() {
     final l10n = AppLocalizations.of(context);
 
@@ -513,31 +522,18 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
   }
 
   Widget _buildDownloadGroup(AppLocalizations l10n, BuildContext sheetContext) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFF46506C),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        children: [
-          _buildDownloadRow(
-            l10n.downloadWithWatermark,
-            Icons.download,
-            onTap: () {
-              Navigator.of(sheetContext).pop();
-              _downloadVideo(withoutWatermark: false);
-            },
-          ),
-          Divider(height: 1, color: Colors.white.withValues(alpha: 0.2)),
-          _buildDownloadRow(
-            l10n.downloadWithoutWatermark,
-            Icons.diamond,
-            onTap: () {
-              Navigator.of(sheetContext).pop();
-              _downloadVideo(withoutWatermark: true);
-            },
-          ),
-        ],
+      child: _buildDownloadRow(
+        l10n.download,
+        Icons.download,
+        onTap: () {
+          Navigator.of(sheetContext).pop();
+          _downloadVideo();
+        },
       ),
     );
   }
@@ -589,10 +585,7 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
   }
 
   Future<void> _shareVideo() async {
-    final filePath = await _downloadVideo(
-      withoutWatermark: false,
-      showSuccessMessage: false,
-    );
+    final filePath = await _downloadVideo(showSuccessMessage: false);
     if (filePath == null || !mounted) return;
 
     final box = context.findRenderObject() as RenderBox?;
@@ -608,10 +601,7 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
     );
   }
 
-  Future<String?> _downloadVideo({
-    required bool withoutWatermark,
-    bool showSuccessMessage = true,
-  }) async {
+  Future<String?> _downloadVideo({bool showSuccessMessage = true}) async {
     final l10n = AppLocalizations.of(context);
     final videoUrl = work.video;
     if (videoUrl == null || videoUrl.isEmpty) {
@@ -629,7 +619,7 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
     _showDownloadDialog();
 
     try {
-      final filePath = await _buildDownloadPath(withoutWatermark);
+      final filePath = await _buildDownloadPath();
       await Dio().download(
         videoUrl,
         filePath,
@@ -660,11 +650,10 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
     }
   }
 
-  Future<String> _buildDownloadPath(bool withoutWatermark) async {
+  Future<String> _buildDownloadPath() async {
     final directory = await getApplicationDocumentsDirectory();
-    final suffix = withoutWatermark ? 'clean' : 'watermark';
     final id = work.id ?? DateTime.now().millisecondsSinceEpoch;
-    final path = '${directory.path}/flicko_${id}_$suffix.mp4';
+    final path = '${directory.path}/flicko_$id.mp4';
     await File(path).parent.create(recursive: true);
     return path;
   }
