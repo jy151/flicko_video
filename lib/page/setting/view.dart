@@ -6,6 +6,7 @@ import 'package:flicko_video/gen/assets.gen.dart';
 import 'package:flicko_video/page/web_content/view.dart';
 import 'package:flicko_video/core/legal_urls.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -160,6 +161,8 @@ class SettingView extends ConsumerWidget {
         return l10n.privacyPolicy;
       case SettingItemType.aboutApp:
         return l10n.aboutApp;
+      case SettingItemType.deleteAccount:
+        return l10n.deleteAccount;
       case SettingItemType.logout:
         return l10n.logOut;
     }
@@ -188,6 +191,8 @@ class SettingView extends ConsumerWidget {
         );
       case SettingItemType.aboutApp:
         await _showAboutAppDialog(context, l10n);
+      case SettingItemType.deleteAccount:
+        context.push('/delete_account');
       case SettingItemType.logout:
         _showLogoutDialog(context, ref, l10n);
     }
@@ -393,9 +398,15 @@ class SettingView extends ConsumerWidget {
     AppLocalizations l10n,
   ) async {
     Navigator.of(dialogContext).pop();
-    final loggedInAsGuest = await AuthBox.logoutAndLoginGuest();
-    if (loggedInAsGuest) {
-      await ref.read(appControllerProvider.notifier).refreshAiModelConfig();
+    var loggedInAsGuest = false;
+    await EasyLoading.show();
+    try {
+      loggedInAsGuest = await AuthBox.logoutAndLoginGuest();
+      if (loggedInAsGuest) {
+        await ref.read(appControllerProvider.notifier).refreshAiModelConfig();
+      }
+    } finally {
+      await EasyLoading.dismiss();
     }
     if (!context.mounted) {
       return;

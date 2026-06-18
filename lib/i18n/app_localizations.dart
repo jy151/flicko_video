@@ -25,6 +25,7 @@ class AppLocalizations {
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
       'appTitle': 'FlickoVideo',
+      'enterApp': 'Enter App',
       'settings': 'Settings',
       'language': 'Language',
       'chooseLanguage': 'Choose Language',
@@ -34,10 +35,23 @@ class AppLocalizations {
       'version': 'Version',
       'logOut': 'Log Out',
       'cancel': 'Cancel',
+      'retry': 'Retry',
       'comingSoon': '{title} is coming soon',
       'logoutConfirmTitle': 'Log Out',
       'logoutConfirmContent': 'Are you sure you want to log out?',
       'logoutSuccess': 'Logged out successfully',
+      'deleteAccount': 'Delete Account',
+      'confirmDeleteAccount': 'Confirm Deletion',
+      'deleteAccountReadAgreementHint':
+          'Please read the account deletion agreement before confirming.',
+      'deleteAccountAgreementLoadFailed':
+          'Failed to load the account deletion agreement.',
+      'deleteAccountConfirmTitle': 'Delete account?',
+      'deleteAccountConfirmContent':
+          'After deletion, your account data may not be recoverable. Are you sure you want to continue?',
+      'deleteAccountSuccess':
+          'Account deleted. You have been signed in as a guest.',
+      'deleteAccountFailed': 'Failed to delete account',
       'me': 'Me',
       'copy': 'Copy',
       'pullUpToLoadMore': 'Pull up to load more',
@@ -83,6 +97,8 @@ class AppLocalizations {
       'pleaseAgreeToTerms': 'Please agree to the terms first',
       'termsConsentContent':
           'Please agree to the Privacy Policy and Terms of Service before signing in.',
+      'readAndAgreeToTerms':
+          'Please carefully read and agree to the Privacy Policy and Terms of Service above first.',
       'agree': 'Agree',
       'disagree': 'Disagree',
       'uploadImage': 'Upload Image',
@@ -100,7 +116,7 @@ class AppLocalizations {
       'quarterlyPlan': 'Quarterly Plan',
       'annualPlan': 'Annual Plan',
       'lifetimePlan': 'Annual Plan',
-      'oneTimePayment': 'One-time payment {price}',
+      'oneTimePayment': 'Subscription {price}',
       'unlockAllPremiumFeatures': 'Unlock All Premium Features',
       'instantBonus': 'Instant Bonus',
       'refreshWeekly': 'Refresh Weekly',
@@ -113,12 +129,19 @@ class AppLocalizations {
       'myCredits': 'My Credits',
       'recharge': 'Recharge',
       'moreCreditFeatures': 'More credit features are coming soon, stay tuned.',
+      'creditPurchaseSummary': '{credits} credits • {price}',
+      'creditPurchaseDisclosure':
+          'Credits are a one-time consumable purchase and can be used to generate videos in FlickoVideo.',
+      'termsOfUseEula': 'Terms of Use (EULA)',
       'viewDetails': 'View Details',
       'prompt': 'Prompt',
       'creationTime': 'Creation Time',
       'createSimilar': 'Create Similar',
       'share': 'Share',
       'report': 'Report',
+      'blockUser': 'Block User',
+      'blockUserSuccess': 'User blocked',
+      'blockUserFailed': 'Failed to block user',
       'delete': 'Delete',
       'deleteVideoTitle': 'Delete video?',
       'deleteVideoContent': 'This work will be removed from your creations.',
@@ -155,6 +178,7 @@ class AppLocalizations {
     },
     'zh-Hans': {
       'appTitle': 'FlickoVideo',
+      'enterApp': '进入 App',
       'settings': '设置',
       'language': '语言',
       'chooseLanguage': '选择语言',
@@ -164,10 +188,19 @@ class AppLocalizations {
       'version': '版本号',
       'logOut': '退出登录',
       'cancel': '取消',
+      'retry': '重试',
       'comingSoon': '{title} 敬请期待',
       'logoutConfirmTitle': '退出登录',
       'logoutConfirmContent': '确定要退出登录吗？',
       'logoutSuccess': '已成功退出登录',
+      'deleteAccount': '注销账号',
+      'confirmDeleteAccount': '确认注销',
+      'deleteAccountReadAgreementHint': '请先阅读账号注销协议，再确认注销账号。',
+      'deleteAccountAgreementLoadFailed': '账号注销协议加载失败',
+      'deleteAccountConfirmTitle': '确认注销账号？',
+      'deleteAccountConfirmContent': '注销后，账号相关数据可能无法恢复。确定要继续吗？',
+      'deleteAccountSuccess': '账号已注销，已为你重新登录游客账号',
+      'deleteAccountFailed': '注销账号失败',
       'me': '我的',
       'copy': '复制',
       'pullUpToLoadMore': '上拉加载更多',
@@ -212,6 +245,7 @@ class AppLocalizations {
       'termsOfService': '服务条款',
       'pleaseAgreeToTerms': '请先同意条款',
       'termsConsentContent': '继续登录前，请先同意隐私政策和服务条款。',
+      'readAndAgreeToTerms': '请先仔细阅读并同意以上隐私政策和服务条款。',
       'agree': '同意',
       'disagree': '不同意',
       'uploadImage': '上传图片',
@@ -229,7 +263,7 @@ class AppLocalizations {
       'quarterlyPlan': '季度会员',
       'annualPlan': '年度会员',
       'lifetimePlan': '年度会员',
-      'oneTimePayment': '一次性支付 {price}',
+      'oneTimePayment': '订阅价格 {price}',
       'unlockAllPremiumFeatures': '解锁全部高级功能',
       'instantBonus': '即时奖励',
       'refreshWeekly': '每周刷新',
@@ -241,12 +275,18 @@ class AppLocalizations {
       'myCredits': '我的积分',
       'recharge': '充值',
       'moreCreditFeatures': '更多积分功能即将上线，敬请期待。',
+      'creditPurchaseSummary': '{credits} 积分 • {price}',
+      'creditPurchaseDisclosure': '积分为一次性消耗型购买，可用于在 FlickoVideo 中生成视频。',
+      'termsOfUseEula': '使用条款 (EULA)',
       'viewDetails': '查看详情',
       'prompt': '提示词',
       'creationTime': '创建时间',
       'createSimilar': '创作同款',
       'share': '分享',
       'report': '举报',
+      'blockUser': '屏蔽用户',
+      'blockUserSuccess': '屏蔽成功',
+      'blockUserFailed': '屏蔽失败',
       'delete': '删除',
       'deleteVideoTitle': '删除视频？',
       'deleteVideoContent': '该作品将从你的创作列表中移除。',
@@ -282,6 +322,7 @@ class AppLocalizations {
     },
     'zh-Hant': {
       'appTitle': 'FlickoVideo',
+      'enterApp': '進入 App',
       'settings': '設定',
       'language': '語言',
       'chooseLanguage': '選擇語言',
@@ -291,10 +332,19 @@ class AppLocalizations {
       'version': '版本號',
       'logOut': '登出',
       'cancel': '取消',
+      'retry': '重試',
       'comingSoon': '{title} 即將推出',
       'logoutConfirmTitle': '登出',
       'logoutConfirmContent': '確定要登出嗎？',
       'logoutSuccess': '已成功登出',
+      'deleteAccount': '註銷帳號',
+      'confirmDeleteAccount': '確認註銷',
+      'deleteAccountReadAgreementHint': '請先閱讀帳號註銷協議，再確認註銷帳號。',
+      'deleteAccountAgreementLoadFailed': '帳號註銷協議載入失敗',
+      'deleteAccountConfirmTitle': '確認註銷帳號？',
+      'deleteAccountConfirmContent': '註銷後，帳號相關資料可能無法恢復。確定要繼續嗎？',
+      'deleteAccountSuccess': '帳號已註銷，已為你重新登入遊客帳號',
+      'deleteAccountFailed': '註銷帳號失敗',
       'me': '我的',
       'copy': '複製',
       'pullUpToLoadMore': '上拉載入更多',
@@ -339,6 +389,7 @@ class AppLocalizations {
       'termsOfService': '服務條款',
       'pleaseAgreeToTerms': '請先同意條款',
       'termsConsentContent': '繼續登入前，請先同意隱私政策和服務條款。',
+      'readAndAgreeToTerms': '請先仔細閱讀並同意以上隱私政策和服務條款。',
       'agree': '同意',
       'disagree': '不同意',
       'uploadImage': '上傳圖片',
@@ -356,7 +407,7 @@ class AppLocalizations {
       'quarterlyPlan': '季度會員',
       'annualPlan': '年度會員',
       'lifetimePlan': '年度會員',
-      'oneTimePayment': '一次性支付 {price}',
+      'oneTimePayment': '訂閱價格 {price}',
       'unlockAllPremiumFeatures': '解鎖全部高級功能',
       'instantBonus': '即時獎勵',
       'refreshWeekly': '每週刷新',
@@ -368,12 +419,18 @@ class AppLocalizations {
       'myCredits': '我的積分',
       'recharge': '充值',
       'moreCreditFeatures': '更多積分功能即將上線，敬請期待。',
+      'creditPurchaseSummary': '{credits} 積分 • {price}',
+      'creditPurchaseDisclosure': '積分為一次性消耗型購買，可用於在 FlickoVideo 中生成影片。',
+      'termsOfUseEula': '使用條款 (EULA)',
       'viewDetails': '查看詳情',
       'prompt': '提示詞',
       'creationTime': '建立時間',
       'createSimilar': '創作同款',
       'share': '分享',
       'report': '檢舉',
+      'blockUser': '封鎖用戶',
+      'blockUserSuccess': '已封鎖',
+      'blockUserFailed': '封鎖失敗',
       'delete': '刪除',
       'deleteVideoTitle': '刪除影片？',
       'deleteVideoContent': '該作品將從你的創作列表中移除。',
@@ -409,6 +466,7 @@ class AppLocalizations {
     },
     'ja': {
       'appTitle': 'FlickoVideo',
+      'enterApp': 'アプリを開く',
       'settings': '設定',
       'language': '言語',
       'chooseLanguage': '言語を選択',
@@ -418,10 +476,19 @@ class AppLocalizations {
       'version': 'バージョン',
       'logOut': 'ログアウト',
       'cancel': 'キャンセル',
+      'retry': '再試行',
       'comingSoon': '{title} は近日公開予定です',
       'logoutConfirmTitle': 'ログアウト',
       'logoutConfirmContent': 'ログアウトしてもよろしいですか？',
       'logoutSuccess': 'ログアウトしました',
+      'deleteAccount': 'アカウントを削除',
+      'confirmDeleteAccount': '削除を確認',
+      'deleteAccountReadAgreementHint': 'アカウント削除規約を読んでから確認してください。',
+      'deleteAccountAgreementLoadFailed': 'アカウント削除規約を読み込めませんでした。',
+      'deleteAccountConfirmTitle': 'アカウントを削除しますか？',
+      'deleteAccountConfirmContent': '削除後、アカウント関連データは復元できない場合があります。続行しますか？',
+      'deleteAccountSuccess': 'アカウントを削除しました。ゲストとしてサインインしました。',
+      'deleteAccountFailed': 'アカウントの削除に失敗しました',
       'me': 'マイ',
       'copy': 'コピー',
       'pullUpToLoadMore': '上にスワイプしてさらに読み込む',
@@ -466,6 +533,7 @@ class AppLocalizations {
       'termsOfService': 'サービス利用規約',
       'pleaseAgreeToTerms': '利用規約に同意してください',
       'termsConsentContent': 'サインインする前にプライバシーポリシーとサービス利用規約に同意してください。',
+      'readAndAgreeToTerms': '上記のプライバシーポリシーとサービス利用規約をよく読み、同意してください。',
       'agree': '同意する',
       'disagree': '同意しない',
       'uploadImage': '画像をアップロード',
@@ -483,7 +551,7 @@ class AppLocalizations {
       'quarterlyPlan': '四半期プラン',
       'annualPlan': '年間プラン',
       'lifetimePlan': '年間プラン',
-      'oneTimePayment': '一回払い {price}',
+      'oneTimePayment': 'サブスクリプション {price}',
       'unlockAllPremiumFeatures': 'すべてのプレミアム機能を解放',
       'instantBonus': '即時ボーナス',
       'refreshWeekly': '毎週更新',
@@ -495,12 +563,18 @@ class AppLocalizations {
       'myCredits': 'マイクレジット',
       'recharge': 'チャージ',
       'moreCreditFeatures': 'クレジット機能は近日公開予定です。',
+      'creditPurchaseSummary': '{credits} クレジット • {price}',
+      'creditPurchaseDisclosure': 'クレジットは一回限りの消耗型購入で、FlickoVideo で動画生成に使用できます。',
+      'termsOfUseEula': '利用規約 (EULA)',
       'viewDetails': '詳細を見る',
       'prompt': 'プロンプト',
       'creationTime': '作成日時',
       'createSimilar': '似た動画を作成',
       'share': '共有',
       'report': '報告',
+      'blockUser': 'ユーザーをブロック',
+      'blockUserSuccess': 'ユーザーをブロックしました',
+      'blockUserFailed': 'ユーザーをブロックできませんでした',
       'delete': '削除',
       'deleteVideoTitle': '動画を削除しますか？',
       'deleteVideoContent': 'この作品は作成リストから削除されます。',
@@ -536,6 +610,7 @@ class AppLocalizations {
     },
     'ko': {
       'appTitle': 'FlickoVideo',
+      'enterApp': '앱 시작하기',
       'settings': '설정',
       'language': '언어',
       'chooseLanguage': '언어 선택',
@@ -545,10 +620,20 @@ class AppLocalizations {
       'version': '버전',
       'logOut': '로그아웃',
       'cancel': '취소',
+      'retry': '다시 시도',
       'comingSoon': '{title} 준비 중입니다',
       'logoutConfirmTitle': '로그아웃',
       'logoutConfirmContent': '로그아웃하시겠습니까?',
       'logoutSuccess': '로그아웃되었습니다',
+      'deleteAccount': '계정 삭제',
+      'confirmDeleteAccount': '삭제 확인',
+      'deleteAccountReadAgreementHint': '계정 삭제 약관을 읽은 후 확인해주세요.',
+      'deleteAccountAgreementLoadFailed': '계정 삭제 약관을 불러오지 못했습니다.',
+      'deleteAccountConfirmTitle': '계정을 삭제하시겠습니까?',
+      'deleteAccountConfirmContent':
+          '삭제 후 계정 관련 데이터는 복구되지 않을 수 있습니다. 계속하시겠습니까?',
+      'deleteAccountSuccess': '계정이 삭제되었습니다. 게스트로 다시 로그인되었습니다.',
+      'deleteAccountFailed': '계정 삭제 실패',
       'me': '내 정보',
       'copy': '복사',
       'pullUpToLoadMore': '위로 당겨 더 불러오기',
@@ -593,6 +678,7 @@ class AppLocalizations {
       'termsOfService': '서비스 약관',
       'pleaseAgreeToTerms': '약관에 동의해주세요',
       'termsConsentContent': '로그인하기 전에 개인정보 처리방침과 서비스 약관에 동의해주세요.',
+      'readAndAgreeToTerms': '위 개인정보 처리방침 및 서비스 약관을 자세히 읽고 동의해주세요.',
       'agree': '동의',
       'disagree': '동의하지 않음',
       'uploadImage': '이미지 업로드',
@@ -610,7 +696,7 @@ class AppLocalizations {
       'quarterlyPlan': '분기 플랜',
       'annualPlan': '연간 플랜',
       'lifetimePlan': '연간 플랜',
-      'oneTimePayment': '일시불 결제 {price}',
+      'oneTimePayment': '구독 {price}',
       'unlockAllPremiumFeatures': '모든 프리미엄 기능 잠금 해제',
       'instantBonus': '즉시 보너스',
       'refreshWeekly': '매주 새로고침',
@@ -622,12 +708,19 @@ class AppLocalizations {
       'myCredits': '내 크레딧',
       'recharge': '충전',
       'moreCreditFeatures': '더 많은 크레딧 기능이 곧 출시됩니다.',
+      'creditPurchaseSummary': '{credits} 크레딧 • {price}',
+      'creditPurchaseDisclosure':
+          '크레딧은 일회성 소모성 구매이며 FlickoVideo에서 비디오 생성에 사용할 수 있습니다.',
+      'termsOfUseEula': '이용 약관 (EULA)',
       'viewDetails': '상세 보기',
       'prompt': '프롬프트',
       'creationTime': '생성 시간',
       'createSimilar': '비슷하게 만들기',
       'share': '공유',
       'report': '신고',
+      'blockUser': '사용자 차단',
+      'blockUserSuccess': '사용자가 차단되었습니다',
+      'blockUserFailed': '사용자 차단 실패',
       'delete': '삭제',
       'deleteVideoTitle': '비디오를 삭제하시겠습니까?',
       'deleteVideoContent': '이 작품이 내 생성 목록에서 제거됩니다.',
@@ -664,6 +757,7 @@ class AppLocalizations {
     },
     'fr': {
       'appTitle': 'FlickoVideo',
+      'enterApp': 'Entrer dans l’app',
       'settings': 'Paramètres',
       'language': 'Langue',
       'chooseLanguage': 'Choisir la langue',
@@ -673,10 +767,23 @@ class AppLocalizations {
       'version': 'Version',
       'logOut': 'Se déconnecter',
       'cancel': 'Annuler',
+      'retry': 'Réessayer',
       'comingSoon': '{title} arrive bientôt',
       'logoutConfirmTitle': 'Se déconnecter',
       'logoutConfirmContent': 'Voulez-vous vraiment vous déconnecter ?',
       'logoutSuccess': 'Déconnexion réussie',
+      'deleteAccount': 'Supprimer le compte',
+      'confirmDeleteAccount': 'Confirmer la suppression',
+      'deleteAccountReadAgreementHint':
+          'Veuillez lire l’accord de suppression du compte avant de confirmer.',
+      'deleteAccountAgreementLoadFailed':
+          'Impossible de charger l’accord de suppression du compte.',
+      'deleteAccountConfirmTitle': 'Supprimer le compte ?',
+      'deleteAccountConfirmContent':
+          'Après suppression, les données du compte peuvent être irrécupérables. Voulez-vous continuer ?',
+      'deleteAccountSuccess':
+          'Compte supprimé. Vous êtes connecté en tant qu’invité.',
+      'deleteAccountFailed': 'Échec de la suppression du compte',
       'me': 'Moi',
       'copy': 'Copier',
       'pullUpToLoadMore': 'Tirez vers le haut pour charger plus',
@@ -722,6 +829,8 @@ class AppLocalizations {
       'pleaseAgreeToTerms': 'Veuillez accepter les conditions',
       'termsConsentContent':
           'Veuillez accepter la Politique de confidentialité et les Conditions de service avant de vous connecter.',
+      'readAndAgreeToTerms':
+          'Veuillez lire attentivement et accepter la Politique de confidentialité et les Conditions de service ci-dessus.',
       'agree': 'Accepter',
       'disagree': 'Refuser',
       'uploadImage': 'Télécharger une image',
@@ -739,7 +848,7 @@ class AppLocalizations {
       'quarterlyPlan': 'Forfait trimestriel',
       'annualPlan': 'Forfait annuel',
       'lifetimePlan': 'Forfait annuel',
-      'oneTimePayment': 'Paiement unique {price}',
+      'oneTimePayment': 'Abonnement {price}',
       'unlockAllPremiumFeatures':
           'Débloquer toutes les fonctionnalités premium',
       'instantBonus': 'Bonus instantané',
@@ -755,12 +864,19 @@ class AppLocalizations {
       'recharge': 'Recharger',
       'moreCreditFeatures':
           'Plus de fonctionnalités de crédit arrivent bientôt.',
+      'creditPurchaseSummary': '{credits} crédits • {price}',
+      'creditPurchaseDisclosure':
+          'Les crédits sont un achat consommable unique et peuvent être utilisés pour générer des vidéos dans FlickoVideo.',
+      'termsOfUseEula': 'Conditions d’utilisation (EULA)',
       'viewDetails': 'Voir les détails',
       'prompt': 'Prompt',
       'creationTime': 'Date de création',
       'createSimilar': 'Créer similaire',
       'share': 'Partager',
       'report': 'Signaler',
+      'blockUser': 'Bloquer l’utilisateur',
+      'blockUserSuccess': 'Utilisateur bloqué',
+      'blockUserFailed': 'Échec du blocage',
       'delete': 'Supprimer',
       'deleteVideoTitle': 'Supprimer la vidéo ?',
       'deleteVideoContent': 'Cette création sera retirée de votre liste.',
@@ -806,6 +922,7 @@ class AppLocalizations {
   }
 
   String get appTitle => _text('appTitle');
+  String get enterApp => _text('enterApp');
   String get settings => _text('settings');
   String get language => _text('language');
   String get chooseLanguage => _text('chooseLanguage');
@@ -815,9 +932,21 @@ class AppLocalizations {
   String get version => _text('version');
   String get logOut => _text('logOut');
   String get cancel => _text('cancel');
+  String get retry => _text('retry');
   String get logoutConfirmTitle => _text('logoutConfirmTitle');
   String get logoutConfirmContent => _text('logoutConfirmContent');
   String get logoutSuccess => _text('logoutSuccess');
+  String get deleteAccount => _text('deleteAccount');
+  String get confirmDeleteAccount => _text('confirmDeleteAccount');
+  String get deleteAccountReadAgreementHint =>
+      _text('deleteAccountReadAgreementHint');
+  String get deleteAccountAgreementLoadFailed =>
+      _text('deleteAccountAgreementLoadFailed');
+  String get deleteAccountConfirmTitle => _text('deleteAccountConfirmTitle');
+  String get deleteAccountConfirmContent =>
+      _text('deleteAccountConfirmContent');
+  String get deleteAccountSuccess => _text('deleteAccountSuccess');
+  String get deleteAccountFailed => _text('deleteAccountFailed');
   String get me => _text('me');
   String get copy => _text('copy');
   String get pullUpToLoadMore => _text('pullUpToLoadMore');
@@ -862,6 +991,7 @@ class AppLocalizations {
   String get termsOfService => _text('termsOfService');
   String get pleaseAgreeToTerms => _text('pleaseAgreeToTerms');
   String get termsConsentContent => _text('termsConsentContent');
+  String get readAndAgreeToTerms => _text('readAndAgreeToTerms');
   String get agree => _text('agree');
   String get disagree => _text('disagree');
   String get uploadImage => _text('uploadImage');
@@ -889,12 +1019,17 @@ class AppLocalizations {
   String get myCredits => _text('myCredits');
   String get recharge => _text('recharge');
   String get moreCreditFeatures => _text('moreCreditFeatures');
+  String get creditPurchaseDisclosure => _text('creditPurchaseDisclosure');
+  String get termsOfUseEula => _text('termsOfUseEula');
   String get viewDetails => _text('viewDetails');
   String get prompt => _text('prompt');
   String get creationTime => _text('creationTime');
   String get createSimilar => _text('createSimilar');
   String get share => _text('share');
   String get report => _text('report');
+  String get blockUser => _text('blockUser');
+  String get blockUserSuccess => _text('blockUserSuccess');
+  String get blockUserFailed => _text('blockUserFailed');
   String get delete => _text('delete');
   String get deleteVideoTitle => _text('deleteVideoTitle');
   String get deleteVideoContent => _text('deleteVideoContent');
@@ -935,6 +1070,10 @@ class AppLocalizations {
 
   String oneTimePayment(String price) =>
       _text('oneTimePayment').replaceAll('{price}', price);
+
+  String creditPurchaseSummary(String credits, String price) => _text(
+    'creditPurchaseSummary',
+  ).replaceAll('{credits}', credits).replaceAll('{price}', price);
 
   String untilPriceGoesUp(String time) =>
       _text('untilPriceGoesUp').replaceAll('{time}', time);

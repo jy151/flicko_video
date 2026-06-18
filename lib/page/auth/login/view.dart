@@ -1,12 +1,10 @@
 import 'state.dart';
 import 'controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flicko_video/core/legal_urls.dart';
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flicko_video/gen/assets.gen.dart';
-import 'package:flicko_video/page/web_content/view.dart';
+import 'package:flicko_video/widgets/terms_agreement_checkbox.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 class LoginView extends ConsumerWidget {
   const LoginView({super.key});
@@ -33,14 +31,19 @@ class LoginView extends ConsumerWidget {
               _buildEmailField(controller, l10n),
               const SizedBox(height: 16),
               _buildPasswordField(context, state, controller, l10n),
-              const SizedBox(height: 24),
+              const SizedBox(height: 18),
+              TermsAgreementCheckbox(
+                agreed: state.agreedToTerms,
+                onChanged: controller.setAgreedToTerms,
+              ),
+              const SizedBox(height: 8),
+              _buildTermsRequiredHint(state, l10n),
+              const SizedBox(height: 16),
               _buildSignInButton(context, state, controller, l10n),
               const SizedBox(height: 16),
               _buildGoogleSignInButton(context, state, controller, l10n),
               const SizedBox(height: 12),
               _buildAppleSignInButton(context, state, controller, l10n),
-              const SizedBox(height: 20),
-              _buildTermsCheckbox(context, state, controller, l10n),
               const SizedBox(height: 40),
             ],
           ),
@@ -148,8 +151,12 @@ class LoginView extends ConsumerWidget {
             ? null
             : () => _onSignIn(context, state, controller, l10n),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2196F3),
+          backgroundColor: state.agreedToTerms
+              ? const Color(0xFF2196F3)
+              : const Color(0xFF315F8F),
           foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFF315F8F),
+          disabledForegroundColor: Colors.white70,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(26),
           ),
@@ -211,88 +218,17 @@ class LoginView extends ConsumerWidget {
     );
   }
 
-  Widget _buildTermsCheckbox(
-    BuildContext context,
-    LoginState state,
-    LoginController controller,
-    AppLocalizations l10n,
-  ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 24,
-          height: 24,
-          child: Checkbox(
-            value: state.agreedToTerms,
-            onChanged: (value) => controller.setAgreedToTerms(value ?? false),
-            shape: const CircleBorder(),
-            side: const BorderSide(color: Colors.white54, width: 1.5),
-            activeColor: const Color(0xFF6C63FF),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: RichText(
-            text: TextSpan(
-              style: const TextStyle(color: Colors.white70, fontSize: 13),
-              children: [
-                TextSpan(text: l10n.agreeToThe),
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.baseline,
-                  baseline: TextBaseline.alphabetic,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => _openWebContent(
-                      context,
-                      title: l10n.privacyPolicy,
-                      url: privacyPolicyUrl,
-                    ),
-                    child: Text(
-                      l10n.privacyPolicy,
-                      style: const TextStyle(
-                        color: Color(0xFF4f6dd9),
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-                TextSpan(text: l10n.and),
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.baseline,
-                  baseline: TextBaseline.alphabetic,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () => _openWebContent(
-                      context,
-                      title: l10n.termsOfService,
-                      url: termsOfServiceUrl,
-                    ),
-                    child: Text(
-                      l10n.termsOfService,
-                      style: const TextStyle(
-                        color: Color(0xFF4f6dd9),
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildTermsRequiredHint(LoginState state, AppLocalizations l10n) {
+    if (state.agreedToTerms) {
+      return const SizedBox.shrink();
+    }
 
-  void _openWebContent(
-    BuildContext context, {
-    required String title,
-    required String url,
-  }) {
-    context.push(
-      '/web_content',
-      extra: WebContentArgs(title: title, url: url),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        l10n.readAndAgreeToTerms,
+        style: const TextStyle(color: Color(0xFFFFC56D), fontSize: 12),
+      ),
     );
   }
 
@@ -353,10 +289,14 @@ class LoginView extends ConsumerWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFF1A1A1A),
+          disabledForegroundColor: Colors.white54,
           shape: RoundedRectangleBorder(
+            side: const BorderSide(color: Colors.white, width: 1.4),
             borderRadius: BorderRadius.circular(26),
           ),
           elevation: 0,
+          shadowColor: Colors.transparent,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -465,58 +405,12 @@ class LoginView extends ConsumerWidget {
       return true;
     }
 
-    final accepted = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1A1A2E),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            l10n.pleaseAgreeToTerms,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          content: Text(
-            l10n.termsConsentContent,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              height: 1.4,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(
-                l10n.disagree,
-                style: const TextStyle(color: Colors.white60),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(
-                l10n.agree,
-                style: const TextStyle(
-                  color: Color(0xFF6C63FF),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: const Color(0xFF1A1A2E),
+        content: Text(l10n.readAndAgreeToTerms),
+      ),
     );
-
-    if (accepted != true) {
-      return false;
-    }
-
-    controller.setAgreedToTerms(true);
-    return true;
+    return false;
   }
 }

@@ -2,6 +2,7 @@ import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/gen/assets.gen.dart';
 import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/tabs/me/controller.dart';
+import 'package:flicko_video/utils/paywall_navigation.dart';
 
 import 'state.dart';
 import 'package:flutter/material.dart';
@@ -145,7 +146,7 @@ class _MeViewState extends ConsumerState<MeView> {
         Row(
           children: [
             GestureDetector(
-              onTap: () => context.push('/member'),
+              onTap: () => _openMemberOrWebPay(context),
               behavior: HitTestBehavior.opaque,
               child: const Padding(
                 padding: EdgeInsets.all(4),
@@ -154,7 +155,7 @@ class _MeViewState extends ConsumerState<MeView> {
             ),
             const SizedBox(width: 12),
             GestureDetector(
-              onTap: () => context.push('/recharge'),
+              onTap: () => openRechargePage(context),
               child: Row(
                 children: [
                   const Text('💎', style: TextStyle(fontSize: 16)),
@@ -325,7 +326,7 @@ class _MeViewState extends ConsumerState<MeView> {
                       style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                     GestureDetector(
-                      onTap: () => context.push('/member'),
+                      onTap: () => _openMemberOrWebPay(context),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -526,5 +527,9 @@ class _MeViewState extends ConsumerState<MeView> {
         ),
       ),
     );
+  }
+
+  void _openMemberOrWebPay(BuildContext context) {
+    openMemberPage(context);
   }
 }

@@ -10,6 +10,7 @@ import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/tabs/home/controller.dart';
 import 'package:flicko_video/page/tabs/home/widgets/image_style_dialog.dart';
 import 'package:flicko_video/utils/image_data_url.dart';
+import 'package:flicko_video/utils/paywall_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -138,7 +139,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         ),
         GestureDetector(
-          onTap: () => context.push('/recharge'),
+          onTap: () => openRechargePage(context),
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
@@ -776,10 +777,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     switch (error.error) {
       case HomeCreateError.requireMember:
-        context.push('/member');
+        openMemberPage(context);
         return true;
       case HomeCreateError.insufficientCredits:
-        context.push('/recharge');
+        openRechargePage(context);
         return true;
       case HomeCreateError.noImage:
       case HomeCreateError.noPrompt:
@@ -797,7 +798,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
         HomeCreateError.noDuration => l10n.selectDurationFirst,
         HomeCreateError.requireMember => '请先开通会员',
         HomeCreateError.insufficientCredits => '积分不足',
-        HomeCreateError.submitFailed => l10n.createTaskFailed,
+        HomeCreateError.submitFailed =>
+          error.message?.trim().isNotEmpty == true
+              ? error.message!.trim()
+              : l10n.createTaskFailed,
       };
     }
     return error.toString().replaceFirst('Exception: ', '');

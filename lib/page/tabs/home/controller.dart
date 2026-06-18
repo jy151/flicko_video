@@ -20,9 +20,10 @@ enum HomeCreateError {
 }
 
 class HomeCreateException implements Exception {
-  const HomeCreateException(this.error);
+  const HomeCreateException(this.error, {this.message});
 
   final HomeCreateError error;
+  final String? message;
 }
 
 class HomeNotifier extends StateNotifier<HomeState> {
@@ -187,18 +188,25 @@ class HomeNotifier extends StateNotifier<HomeState> {
         throw const HomeCreateException(HomeCreateError.insufficientCredits);
       }
 
-      final result = await Api.createAiTask(
-        type: isImageToVideo ? 'i2v' : 't2v',
-        prompt: prompt.isEmpty ? null : prompt,
-        image: isImageToVideo ? state.selectedImageBase64 : null,
-        styleId: state.selectImageStyle?.id,
-        duration: duration,
-      );
-      if (result == null) {
-        throw const HomeCreateException(HomeCreateError.submitFailed);
+      try {
+        final result = await Api.createAiTask(
+          type: isImageToVideo ? 'i2v' : 't2v',
+          prompt: prompt.isEmpty ? null : prompt,
+          image: isImageToVideo ? state.selectedImageBase64 : null,
+          styleId: state.selectImageStyle?.id,
+          duration: duration,
+        );
+        if (result == null) {
+          throw const HomeCreateException(HomeCreateError.submitFailed);
+        }
+        await _syncBalanceAfterCreate();
+        return result;
+      } on ApiException catch (error) {
+        throw HomeCreateException(
+          HomeCreateError.submitFailed,
+          message: error.message,
+        );
       }
-      await _syncBalanceAfterCreate();
-      return result;
     } catch (e) {
       rethrow;
     } finally {

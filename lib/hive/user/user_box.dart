@@ -1,5 +1,6 @@
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/api/model/member_model.dart';
+import 'package:flicko_video/utils/screen_protection_service.dart';
 import 'package:hive/hive.dart';
 
 class UserBox {
@@ -11,6 +12,7 @@ class UserBox {
 
   static Future<void> init() async {
     await Hive.openBox<dynamic>(name);
+    await _syncScreenProtection();
   }
 
   static Member? get member {
@@ -30,6 +32,10 @@ class UserBox {
   }
 
   static int get credit => member?.credit ?? balance?.credit ?? 0;
+
+  static bool get shouldUseWebPay {
+    return _isNormalAudit(member?.audit) || _isNormalAudit(balance?.audit);
+  }
 
   static Future<Member?> syncUserInfo() async {
     return _syncMemberFromApi();
@@ -57,10 +63,12 @@ class UserBox {
 
   static Future<void> saveMember(Member member) async {
     await box.put(_memberKey, member.toJson());
+    await _syncScreenProtection();
   }
 
   static Future<void> saveBalance(Balance balance) async {
     await box.put(_balanceKey, balance.toJson());
+    await _syncScreenProtection();
   }
 
   static Balance _balanceFromMember(Member member) {
@@ -74,10 +82,20 @@ class UserBox {
       mobile: member.mobile ?? cachedBalance?.mobile,
       roles: member.roles ?? cachedBalance?.roles,
       credit: member.credit ?? cachedBalance?.credit,
+      audit: member.audit ?? cachedBalance?.audit,
     );
+  }
+
+  static bool _isNormalAudit(String? audit) {
+    return audit?.trim().toUpperCase() == 'NORMAL';
   }
 
   static Future<void> clear() async {
     await box.clear();
+    await _syncScreenProtection();
+  }
+
+  static Future<void> _syncScreenProtection() async {
+    await ScreenProtectionService.setEnabled(shouldUseWebPay);
   }
 }

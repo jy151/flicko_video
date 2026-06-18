@@ -1,6 +1,7 @@
 import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
 import 'package:flicko_video/page/discover_detail/state.dart';
+import 'package:flicko_video/utils/paywall_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -112,7 +113,7 @@ class _DiscoverViewState extends ConsumerState<DiscoverView> {
                 ),
               ),
               GestureDetector(
-                onTap: () => context.push('/recharge'),
+                onTap: () => openRechargePage(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,

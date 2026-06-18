@@ -3,25 +3,28 @@ import 'dart:io';
 import 'package:chewie/chewie.dart';
 import 'package:dio/dio.dart';
 import 'package:flicko_video/api/model/video_model.dart';
+import 'package:flicko_video/hive/blocked/blocked_work_box.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
+import 'package:flicko_video/page/tabs/discover/state.dart';
 import 'package:flicko_video/widgets/app_feedback_dialog.dart';
 import 'package:flicko_video/widgets/app_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
 
-class DiscoverDetailView extends StatefulWidget {
+class DiscoverDetailView extends ConsumerStatefulWidget {
   const DiscoverDetailView({super.key, required this.work});
 
   final Work work;
 
   @override
-  State<DiscoverDetailView> createState() => _DiscoverDetailViewState();
+  ConsumerState<DiscoverDetailView> createState() => _DiscoverDetailViewState();
 }
 
-class _DiscoverDetailViewState extends State<DiscoverDetailView> {
+class _DiscoverDetailViewState extends ConsumerState<DiscoverDetailView> {
   VideoPlayerController? _videoController;
   ChewieController? _chewieController;
   CancelToken? _downloadCancelToken;
@@ -480,6 +483,16 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
                   },
                 ),
                 const SizedBox(height: 10),
+                _buildSheetAction(
+                  l10n.blockUser,
+                  Icons.block,
+                  isDestructive: true,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _blockWork();
+                  },
+                ),
+                const SizedBox(height: 10),
                 _buildDownloadGroup(l10n, context),
                 const SizedBox(height: 10),
                 _buildCancelAction(context, l10n),
@@ -495,6 +508,7 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
     String title,
     IconData icon, {
     required VoidCallback onTap,
+    bool isDestructive = false,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -503,7 +517,9 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
         height: 46,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF46506C),
+          color: isDestructive
+              ? const Color(0xFF5A3342)
+              : const Color(0xFF46506C),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -514,7 +530,11 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ),
-            Icon(icon, color: Colors.white, size: 22),
+            Icon(
+              icon,
+              color: isDestructive ? const Color(0xFFFFB3C0) : Colors.white,
+              size: 22,
+            ),
           ],
         ),
       ),
@@ -599,6 +619,24 @@ class _DiscoverDetailViewState extends State<DiscoverDetailView> {
             : box.localToGlobal(Offset.zero) & box.size,
       ),
     );
+  }
+
+  Future<void> _blockWork() async {
+    final workId = work.id;
+    final l10n = AppLocalizations.of(context);
+    if (workId == null) {
+      _showMessage(l10n.blockUserFailed);
+      return;
+    }
+
+    await BlockedWorkBox.add(workId);
+    ref.read(discoverProvider.notifier).removeBlockedWork(workId);
+    if (!mounted) {
+      return;
+    }
+
+    _showMessage(l10n.blockUserSuccess);
+    context.pop();
   }
 
   Future<String?> _downloadVideo({bool showSuccessMessage = true}) async {

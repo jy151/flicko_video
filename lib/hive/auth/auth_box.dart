@@ -60,6 +60,16 @@ class AuthBox {
     return login(source: 'guest');
   }
 
+  static Future<bool> deleteAccountAndLoginGuest() async {
+    final res = await Api.deleteAccount();
+    if (!res.isSuccess) {
+      return false;
+    }
+
+    await clear();
+    return login(source: 'guest');
+  }
+
   static Future<void> clear() async {
     await box.clear();
     await UserBox.clear();

@@ -48,6 +48,10 @@ class Api {
     return res;
   }
 
+  static Future<ApiResponse> deleteAccount() async {
+    return await _http.get('/auth/del');
+  }
+
   static Future<AuthCheckResponse?> checkToken() async {
     final res = await _http.get('/auth/check');
     if (res.isSuccess && res.data is Map<String, dynamic>) {
@@ -288,6 +292,9 @@ class Api {
       data['type'] ??= type;
       return AiCreateResponse.fromJson(data);
     }
+    if (!res.isSuccess) {
+      throw ApiException(res.message);
+    }
     return null;
   }
 
@@ -336,5 +343,16 @@ class Api {
           .toList();
     }
     return [];
+  }
+}
+
+class ApiException implements Exception {
+  const ApiException(this.message);
+
+  final String message;
+
+  @override
+  String toString() {
+    return message.isEmpty ? 'ApiException' : message;
   }
 }

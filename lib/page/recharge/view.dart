@@ -1,4 +1,6 @@
+import 'package:flicko_video/core/legal_urls.dart';
 import 'package:flicko_video/i18n/i18n.dart';
+import 'package:flicko_video/page/web_content/view.dart';
 import 'package:flicko_video/widgets/app_feedback_dialog.dart';
 import 'package:flicko_video/widgets/app_top_toast.dart';
 import 'package:flutter/material.dart';
@@ -282,45 +284,146 @@ class _RechargeViewState extends ConsumerState<RechargeView> {
       top: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-        child: SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
-            onPressed:
-                state.isLoading ||
-                    state.isProductLoading ||
-                    !state.isStoreAvailable ||
-                    state.selectedPackage?.productDetails == null
-                ? null
-                : () => _onRecharge(controller),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF4081),
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: const Color(0xFF3A3A4A),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(26),
-              ),
-              elevation: 0,
-            ),
-            child: state.isLoading
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : Text(
-                    l10n.recharge,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed:
+                    state.isLoading ||
+                        state.isProductLoading ||
+                        !state.isStoreAvailable ||
+                        state.selectedPackage?.productDetails == null
+                    ? null
+                    : () => _onRecharge(controller),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF4081),
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: const Color(0xFF3A3A4A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26),
                   ),
-          ),
+                  elevation: 0,
+                ),
+                child: state.isLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        l10n.recharge,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            _buildPurchaseDisclosure(context, state, l10n),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPurchaseDisclosure(
+    BuildContext context,
+    RechargeState state,
+    AppLocalizations l10n,
+  ) {
+    final selectedPackage = state.selectedPackage;
+    final summary = selectedPackage == null
+        ? null
+        : l10n.creditPurchaseSummary(
+            '${selectedPackage.diamonds}',
+            selectedPackage.price,
+          );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (summary != null) ...[
+          Text(
+            summary,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFFE6E6E6),
+              fontSize: 11,
+              height: 1.25,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+        ],
+        Text(
+          l10n.creditPurchaseDisclosure,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Color(0xFF9A9A9A),
+            fontSize: 10,
+            height: 1.25,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 4,
+          children: [
+            TextButton(
+              onPressed: () => _openWebContent(
+                context,
+                title: l10n.privacyPolicy,
+                url: privacyPolicyUrl,
+              ),
+              style: _legalLinkButtonStyle(),
+              child: Text(l10n.privacyPolicy),
+            ),
+            const Text(
+              '•',
+              style: TextStyle(color: Color(0xFF6F6F6F), fontSize: 10),
+            ),
+            TextButton(
+              onPressed: () => _openWebContent(
+                context,
+                title: l10n.termsOfService,
+                url: appleStandardEulaUrl,
+              ),
+              style: _legalLinkButtonStyle(),
+              child: Text(l10n.termsOfUseEula),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  ButtonStyle _legalLinkButtonStyle() {
+    return TextButton.styleFrom(
+      foregroundColor: const Color(0xFF7DA2FF),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      minimumSize: const Size(0, 24),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+      textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+    );
+  }
+
+  void _openWebContent(
+    BuildContext context, {
+    required String title,
+    required String url,
+  }) {
+    context.push(
+      '/web_content',
+      extra: WebContentArgs(title: title, url: url),
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:flicko_video/api/model/video_model.dart';
 import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flicko_video/utils/image_data_url.dart';
 import 'package:flicko_video/utils/member_access.dart';
+import 'package:flicko_video/utils/paywall_navigation.dart';
 
 import 'state.dart';
 import 'controller.dart';
@@ -475,10 +476,10 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
 
     switch (error.error) {
       case EffectsCreateError.requireMember:
-        context.push('/member');
+        openMemberPage(context);
         return true;
       case EffectsCreateError.insufficientCredits:
-        context.push('/recharge');
+        openRechargePage(context);
         return true;
       case EffectsCreateError.noTemplate:
       case EffectsCreateError.noImage:
@@ -494,7 +495,10 @@ class _EffectsCreateViewState extends ConsumerState<EffectsCreateView> {
         EffectsCreateError.noImage => l10n.selectImageFirst,
         EffectsCreateError.requireMember => '请先开通会员',
         EffectsCreateError.insufficientCredits => '积分不足',
-        EffectsCreateError.submitFailed => l10n.templateCreateFailed,
+        EffectsCreateError.submitFailed =>
+          error.message?.trim().isNotEmpty == true
+              ? error.message!.trim()
+              : l10n.templateCreateFailed,
       };
     }
     return error.toString().replaceFirst('Exception: ', '');

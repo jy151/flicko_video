@@ -1,8 +1,11 @@
 import 'state.dart';
 import 'controller.dart';
+import 'package:flicko_video/core/legal_urls.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flicko_video/i18n/i18n.dart';
+import 'package:flicko_video/page/web_content/view.dart';
+import 'package:flicko_video/utils/paywall_navigation.dart';
 import 'package:flicko_video/widgets/app_feedback_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -217,7 +220,7 @@ class _MemberViewState extends ConsumerState<MemberView> {
         ),
         const SizedBox(width: 12),
         GestureDetector(
-          onTap: () => context.push('/recharge'),
+          onTap: () => openRechargePage(context),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -537,9 +540,119 @@ class _MemberViewState extends ConsumerState<MemberView> {
                 ],
               ),
             ),
+            const SizedBox(height: 10),
+            _buildSubscriptionDisclosure(context, state, l10n),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSubscriptionDisclosure(
+    BuildContext context,
+    MemberState state,
+    AppLocalizations l10n,
+  ) {
+    final selectedPlan = state.selectedPlan;
+    final title = selectedPlan == null
+        ? l10n.vip
+        : _resolvePlanTitle(selectedPlan, l10n);
+    final period = _subscriptionPeriodForPlan(selectedPlan);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$title • $period • ${state.paymentAmount}',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Color(0xFFE6E6E6),
+            fontSize: 11,
+            height: 1.25,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Auto-renews until canceled. Manage or cancel in your Apple ID subscriptions.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color(0xFF9A9A9A),
+            fontSize: 10,
+            height: 1.25,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 4,
+          children: [
+            TextButton(
+              onPressed: () => _openWebContent(
+                context,
+                title: l10n.privacyPolicy,
+                url: privacyPolicyUrl,
+              ),
+              style: _legalLinkButtonStyle(),
+              child: Text(l10n.privacyPolicy),
+            ),
+            const Text(
+              '•',
+              style: TextStyle(color: Color(0xFF6F6F6F), fontSize: 10),
+            ),
+            TextButton(
+              onPressed: () => _openWebContent(
+                context,
+                title: l10n.termsOfService,
+                url: appleStandardEulaUrl,
+              ),
+              style: _legalLinkButtonStyle(),
+              child: const Text('Terms of Use (EULA)'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  ButtonStyle _legalLinkButtonStyle() {
+    return TextButton.styleFrom(
+      foregroundColor: const Color(0xFF7DA2FF),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      minimumSize: const Size(0, 24),
+      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
+      textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+    );
+  }
+
+  String _subscriptionPeriodForPlan(MemberPlan? plan) {
+    final planText = '${plan?.id ?? ''} ${plan?.title ?? ''}'.toLowerCase();
+    if (planText.contains('annual') ||
+        planText.contains('year') ||
+        planText.contains('年度')) {
+      return '1 year';
+    }
+    if (planText.contains('quarter') ||
+        planText.contains('季度') ||
+        planText.contains('季')) {
+      return '3 months';
+    }
+    if (planText.contains('week') || planText.contains('周')) {
+      return '1 week';
+    }
+    return '1 month';
+  }
+
+  void _openWebContent(
+    BuildContext context, {
+    required String title,
+    required String url,
+  }) {
+    context.push(
+      '/web_content',
+      extra: WebContentArgs(title: title, url: url),
     );
   }
 

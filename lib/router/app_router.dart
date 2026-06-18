@@ -1,6 +1,10 @@
 import 'package:go_router/go_router.dart';
+import 'package:flicko_video/hive/app/app_box.dart';
+import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flicko_video/page/discover_detail/state.dart';
 import 'package:flicko_video/page/discover_detail/view.dart';
+import 'package:flicko_video/page/delete_account/view.dart';
+import 'package:flicko_video/page/initial/view.dart';
 import 'package:flicko_video/page/tabs/view.dart';
 import 'package:flicko_video/page/setting/view.dart';
 import 'package:flicko_video/page/tabs/me/view.dart';
@@ -17,8 +21,9 @@ import 'package:flicko_video/page/create_result/view.dart';
 import 'package:flicko_video/page/web_content/view.dart';
 
 final appRouter = GoRouter(
-  initialLocation: '/home',
+  initialLocation: AppBox.isFirstLaunch ? '/initial' : '/home',
   routes: [
+    GoRoute(path: '/initial', builder: (context, state) => const InitialView()),
     ShellRoute(
       builder: (context, state, child) {
         return TabView(child: child);
@@ -57,6 +62,10 @@ final appRouter = GoRouter(
     GoRoute(path: '/setting', builder: (context, state) => SettingView()),
     GoRoute(path: '/login', builder: (context, state) => LoginView()),
     GoRoute(
+      path: '/delete_account',
+      builder: (context, state) => const DeleteAccountView(),
+    ),
+    GoRoute(
       path: '/discover_detail',
       builder: (context, state) {
         final extra = state.extra;
@@ -79,7 +88,12 @@ final appRouter = GoRouter(
         return const EffectsCreateView(templates: []);
       },
     ),
-    GoRoute(path: '/member', builder: (context, state) => const MemberView()),
+    GoRoute(
+      path: '/member',
+      redirect: (context, state) =>
+          UserBox.shouldUseWebPay ? '/web_member' : null,
+      builder: (context, state) => const MemberView(),
+    ),
     GoRoute(
       path: '/effects_all',
       builder: (context, state) {
@@ -96,6 +110,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/recharge',
+      redirect: (context, state) =>
+          UserBox.shouldUseWebPay ? '/web_recharge' : null,
       builder: (context, state) => const RechargeView(),
     ),
     GoRoute(
@@ -113,9 +129,45 @@ final appRouter = GoRouter(
       builder: (context, state) {
         final extra = state.extra;
         if (extra is WebContentArgs) {
-          return WebContentView(title: extra.title, url: extra.url);
+          return WebContentView(
+            title: extra.title,
+            url: extra.url,
+            showAppBar: extra.showAppBar,
+            preferCloseOnBack: extra.preferCloseOnBack,
+            localEntry: extra.localEntry,
+          );
         }
-        return const WebContentView(title: '', url: 'https://flicko.video/');
+        return const WebContentView(title: '');
+      },
+    ),
+    GoRoute(
+      path: '/web_pay',
+      builder: (context, state) {
+        return const WebContentView(
+          title: '',
+          showAppBar: false,
+          localEntry: 'member',
+        );
+      },
+    ),
+    GoRoute(
+      path: '/web_member',
+      builder: (context, state) {
+        return const WebContentView(
+          title: '',
+          showAppBar: false,
+          localEntry: 'member',
+        );
+      },
+    ),
+    GoRoute(
+      path: '/web_recharge',
+      builder: (context, state) {
+        return const WebContentView(
+          title: '',
+          showAppBar: false,
+          localEntry: 'recharge',
+        );
       },
     ),
   ],

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/api/model/video_model.dart';
+import 'package:flicko_video/hive/blocked/blocked_work_box.dart';
 import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -34,10 +35,11 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
     if (resp.isEmpty) {
       return false;
     }
+    final visibleWorks = _filterBlockedWorks(resp);
     final lastId = resp.last.id;
     state = state.copyWith(
       lastId: lastId ?? 0,
-      items: [...state.items, ...resp],
+      items: [...state.items, ...visibleWorks],
     );
     return true;
   }
@@ -45,6 +47,22 @@ class DiscoverNotifier extends StateNotifier<DiscoverState> {
   Future<void> refresh() async {
     state = state.copyWith(lastId: 0, items: [], credits: UserBox.credit);
     await loadMore();
+  }
+
+  void removeBlockedWork(int workId) {
+    state = state.copyWith(
+      items: state.items.where((item) => item.id != workId).toList(),
+    );
+  }
+
+  List<Work> _filterBlockedWorks(List<Work> works) {
+    final blockedWorkIds = BlockedWorkBox.workIds;
+    if (blockedWorkIds.isEmpty) {
+      return works;
+    }
+    return works
+        .where((work) => work.id == null || !blockedWorkIds.contains(work.id))
+        .toList(growable: false);
   }
 
   Future<void> init() async {

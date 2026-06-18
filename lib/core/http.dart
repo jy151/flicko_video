@@ -10,7 +10,7 @@ class Http {
   Http._internal() {
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'https://bridgecode.flicko.video/api/v1/',
+        baseUrl: 'https://polenetrendshops.com/api/v1/',
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 15),
         responseType: ResponseType.json,
@@ -40,6 +40,7 @@ class Http {
   }
 
   String? _userAgentClient;
+  Future<bool>? _guestLoginRequest;
 
   /// 格式: {guid}/{platform}/{version}
   void setUserAgentClient(String? client) => _userAgentClient = client;
@@ -55,6 +56,7 @@ class Http {
   }) async {
     return _request(
       () => _dio.get(path, queryParameters: params, cancelToken: cancelToken),
+      path: path,
     );
   }
 
@@ -71,6 +73,7 @@ class Http {
         queryParameters: params,
         cancelToken: cancelToken,
       ),
+      path: path,
     );
   }
 
@@ -87,6 +90,7 @@ class Http {
         queryParameters: params,
         cancelToken: cancelToken,
       ),
+      path: path,
     );
   }
 
@@ -103,6 +107,7 @@ class Http {
         queryParameters: params,
         cancelToken: cancelToken,
       ),
+      path: path,
     );
   }
 
@@ -119,27 +124,53 @@ class Http {
         cancelToken: cancelToken,
         onSendProgress: onSendProgress,
       ),
+      path: path,
     );
   }
 
-  Future<ApiResponse> _request(Future<Response> Function() request) async {
+  Future<ApiResponse> _request(
+    Future<Response> Function() request, {
+    required String path,
+  }) async {
     try {
       final response = await request();
       final map = response.data as Map<String, dynamic>?;
       if (map == null) {
         return ApiResponse(code: -1, message: 'Empty response');
       }
-      return ApiResponse.fromJson(map);
+      final apiResponse = ApiResponse.fromJson(map);
+      if (apiResponse.isUnauthorized && !_isAuthRequest(path)) {
+        await _loginAsGuestAfterUnauthorized();
+      }
+      return apiResponse;
     } on DioException catch (e) {
       final data = e.response?.data;
       if (data is Map<String, dynamic>) {
-        return ApiResponse.fromJson(data);
+        final apiResponse = ApiResponse.fromJson(data);
+        if (apiResponse.isUnauthorized && !_isAuthRequest(path)) {
+          await _loginAsGuestAfterUnauthorized();
+        }
+        return apiResponse;
+      }
+      if (e.response?.statusCode == 401 && !_isAuthRequest(path)) {
+        await _loginAsGuestAfterUnauthorized();
       }
       return ApiResponse(
         code: e.response?.statusCode ?? -1,
         message: e.message ?? 'Network error',
       );
     }
+  }
+
+  Future<void> _loginAsGuestAfterUnauthorized() async {
+    _guestLoginRequest ??= AuthBox.clear()
+        .then((_) => AuthBox.login(source: 'guest'))
+        .whenComplete(() => _guestLoginRequest = null);
+    await _guestLoginRequest;
+  }
+
+  bool _isAuthRequest(String path) {
+    return path.startsWith('/auth/');
   }
 }
 
@@ -161,4 +192,6 @@ class ApiResponse {
   }
 
   bool get isSuccess => code == 200 || code == 1 || code == 0;
+
+  bool get isUnauthorized => code == 401;
 }

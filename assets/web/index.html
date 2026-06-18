@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,viewport-fit=cover">
+<title>VIP & Recharge</title>
+<script src="./jquery.min.js"></script>
+<script src="./webview.js"></script>
+<script src="./vconsole.min.js"></script> 
+<script>
+  // VConsole will be exported to `window.VConsole` by default.
+  var vConsole = new window.VConsole();
+  window.addEventListener('DOMContentLoaded', function() {
+    if (window.vConsole && window.vConsole.showSwitch) {
+      window.vConsole.showSwitch();
+      window.vConsole.setSwitchPosition(
+        Math.max(12, window.innerWidth - 74),
+        Math.max(60, window.innerHeight - 138)
+      );
+    }
+  });
+</script>
+<script>
+    var _zIndex = 40000;
+    function nextZIndex() { return ++_zIndex; }
+
+    // 允许App端通过桥接传入状态栏高度: window.setStatusBarHeight(px)
+    window.setStatusBarHeight = function(px) {
+        document.documentElement.style.setProperty('--safe-top', px + 'px');
+    };
+    // 允许App端传入底部安全区高度
+    window.setSafeAreaBottom = function(px) {
+        document.documentElement.style.setProperty('--safe-bottom', px + 'px');
+    };
+</script>
+<style>
+:root {
+  --safe-top: 48px;
+  --safe-bottom: 20px;
+  --safe-left: 0px;
+  --safe-right: 0px;
+}
+@supports (padding-top: env(safe-area-inset-top)) {
+  :root {
+    --safe-top: max(48px, env(safe-area-inset-top));
+    --safe-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #fff; background: #000; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+#app-container { width: 100%; max-width: 585px; margin: 0 auto; background: #1a1a2e; position: relative; min-height: 100vh; min-height: 100dvh; padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
+#__vconsole,
+#__vconsole * {
+  z-index: 2147483647 !important;
+}
+#__vconsole .vc-switch {
+  right: 12px !important;
+  bottom: calc(82px + var(--safe-bottom)) !important;
+}
+
+/* Toast */
+.toast { position: fixed; top: calc(20px + var(--safe-top)); left: 50%; transform: translateX(-50%) translateY(-100px); background-color: white; color: #333; padding: 12px 20px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 99999999; opacity: 0; transition: all 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; min-width: min(280px, 85vw); max-width: 90vw; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success { border-left: 4px solid #4caf50; }
+.toast.error { border-left: 4px solid #f44336; }
+.toast.warning { border-left: 4px solid #ff9800; }
+.toast.info { border-left: 4px solid #2196f3; }
+
+/* ========== 充值弹窗 ========== */
+.recharge-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; display: none; }
+.recharge-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d0d0d; z-index: 3001; display: none; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: var(--safe-top); }
+.recharge-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; }
+.recharge-close { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; color: #fff; }
+.credits-display { padding: 0 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+.credits-info { display: flex; flex-direction: column; gap: 4px; }
+.credits-label { font-size: 14px; color: #999; }
+.credits-value { font-size: clamp(24px, 7vw, 32px); font-weight: 700; color: #fff; }
+.diamond-icon-large { width: 80px; height: 80px; }
+.diamond-icon-large::before { content: '💎'; font-size: clamp(48px, 12vw, 64px); }
+.packages-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 16px; margin-bottom: 24px; }
+.package-item { background: #1a1a2e; border-radius: 12px; padding: 16px 10px; text-align: center; cursor: pointer; border: 2px solid transparent; position: relative; transition: all 0.3s; -webkit-tap-highlight-color: transparent; }
+.package-item:hover { background: #252542; }
+.package-item.selected { border-color: #a855f7; background: linear-gradient(135deg, rgba(168,85,247,0.15), rgba(79,70,229,0.15)); }
+.package-badge { position: absolute; top: -1px; right: -1px; padding: 4px 10px; border-radius: 0 10px 0 10px; font-size: 10px; font-weight: 700; }
+.package-badge.popular { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; }
+.package-badge.ultimate { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; }
+.package-amount { font-size: clamp(20px, 5.5vw, 28px); font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 8px; word-break: keep-all; }
+.package-amount .diamond::before { content: '💎'; font-size: clamp(16px, 4vw, 22px); }
+.package-bonus { font-size: clamp(10px, 2.8vw, 12px); color: #888; margin-bottom: 8px; }
+.package-bonus .gift { color: #f472b6; }
+.package-price { font-size: clamp(12px, 3.2vw, 14px); color: #fff; font-weight: 600; }
+.recharge-tip { text-align: center; color: #666; font-size: 12px; padding: 0 16px 120px; }
+.recharge-bottom { position: fixed; bottom: 0; left: 0; width: 100%; padding: 16px 16px calc(16px + var(--safe-bottom)); background: #0d0d0d; border-top: 1px solid #1a1a1a; }
+.recharge-btn { width: 100%; height: 50px; border-radius: 25px; background: linear-gradient(135deg, #f43f5e, #ec4899); border: none; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 12px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.recharge-links { text-align: center; font-size: 12px; }
+.recharge-links a { color: #888; text-decoration: underline; }
+.recharge-links span { color: #666; margin: 0 4px; }
+
+/* ========== VIP弹窗 ========== */
+.vip-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; display: none; }
+.vip-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 5001; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 160px; padding-top: var(--safe-top); box-sizing: border-box; }
+.vip-header { position: relative; height: clamp(320px, 70vh, 480px); overflow: hidden; }
+.vip-bg-image { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; z-index: inherit; }
+.vip-header-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.95) 100%); z-index: inherit; }
+.vip-close { position: absolute; top: 12px; left: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 40px; color: #fff; z-index: 10; -webkit-tap-highlight-color: transparent; }
+.vip-top-right { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; gap: 0px; z-index: 10; }
+.vip-credits { display: flex; align-items: center; gap: 4px; font-size: 14px; color: #fff; }
+.vip-credits-diamond::before { content: '💎'; font-size: 20px; color: yellow; }
+.vip-plans { display: flex; justify-content: center; gap: 8px; padding: 0 12px; margin-top: -50px; position: relative; z-index: 1; }
+.vip-plan-item { flex: 1; min-width: 0; min-height: 130px; background: rgba(30,30,50,0.8); border-radius: 12px; padding: 14px 6px; text-align: center; cursor: pointer; border: 2px solid transparent; position: relative; transition: all 0.3s; -webkit-tap-highlight-color: transparent; }
+.vip-plan-item:hover { background: rgba(40,40,60,0.9); }
+.vip-plan-item.selected { border-color: #f59e0b; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(217,119,6,0.15)); }
+.vip-plan-name { font-size: clamp(12px, 3.5vw, 16px); color: #f59e0b; font-weight: 600; margin-bottom: 8px; }
+.vip-plan-price { margin-bottom: 6px; }
+.vip-plan-price-amount { font-size: clamp(18px, 5vw, 24px); font-weight: 700; color: #fff; }
+.vip-plan-price-unit { font-size: clamp(10px, 2.8vw, 12px); color: #888; }
+.vip-plan-credits { font-size: clamp(13px, 3.5vw, 16px); color: #888; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.vip-plan-credits .diamond::before { content: '💎'; font-size: 11px; }
+.vip-plan-timer { font-size: 11px; color: #ef4444; margin-top: 6px; }
+.plan-badge { position: absolute; top: -15px; left: -2px; border-radius: 20px 20px 20px 0; padding: 3px 5px; font-size: clamp(9px, 2.5vw, 12px); font-weight: 700; white-space: nowrap; z-index: 1; }
+.plan-badge--save { background: linear-gradient(135deg, #f7971e, #ffd200); color: #fff; }
+.vip-onetime { text-align: center; font-size: 13px; color: #888; margin: 16px 0 12px; position: relative; z-index: 1; }
+.vip-features-title { font-size: 18px; font-weight: 700; color: #f59e0b; text-align: center; margin-bottom: 16px; position: relative; z-index: 1; }
+.vip-features-list { padding: 0 16px; margin-bottom: 35px; overflow-y: auto; max-height: none; scrollbar-width: none; position: relative; z-index: 1; }
+.vip-features-list::-webkit-scrollbar { display: none; }
+.vip-feature-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: clamp(12px, 3.5vw, 14px); color: #ddd; }
+.vip-feature-item::before { content: '✓'; color: #22c55e; font-weight: 700; font-size: 16px; }
+.vip-feature-item .diamond::before { content: '💎'; font-size: 12px; }
+.vip-bottom { position: fixed; bottom: 0; left: 0; width: 100%; padding: 10px 16px calc(10px + var(--safe-bottom)); background: #0a0a0a; border-top: 1px solid #1a1a1a; z-index: 9999999; box-sizing: border-box; }
+.vip-countdown { text-align: center; font-size: 13px; color: #f59e0b; margin-bottom: 10px; }
+.vip-countdown-time { color: #ef4444; font-weight: 600; }
+.vip-buy-btn { width: 100%; height: 52px; border-radius: 26px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #000; font-size: clamp(14px, 3.8vw, 16px); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.vip-buy-price { position: absolute; left: 0; top: 0; bottom: 0; width: clamp(90px, 25vw, 110px); background: linear-gradient(135deg, #3b82f6, #1d4ed8); display: flex; align-items: center; justify-content: center; font-size: clamp(13px, 3.5vw, 15px); font-weight: 700; color: #fff; }
+.vip-buy-text { margin-left: clamp(20px, 8vw, 40px); }
+.vip-links { text-align: center; font-size: 12px; margin-top: 10px; }
+.vip-links a { color: #888; text-decoration: underline; }
+.vip-links span { color: #666; margin: 0 4px; }
+.vip-compare { display: flex; gap: 8px; margin: 16px 12px 0; position: relative; z-index: 1; }
+.vip-compare-col { flex: 1; border-radius: 12px; overflow: hidden; min-width: 0; }
+.vip-compare-col.our { background: #f5f0e8; color: #1a1a2e; }
+.vip-compare-col.other { background: #2a2a3e; color: #aaaacc; }
+.vip-compare-header { padding: 10px 8px; font-weight: bold; font-size: clamp(11px, 3vw, 13px); text-align: center; border-bottom: 1px solid rgba(0,0,0,0.1); }
+.vip-compare-col.our .vip-compare-header { background: #f0e8d0; }
+.vip-compare-col.other .vip-compare-header { background: #1e1e30; color: #ccccee; }
+.vip-compare-item { padding: 8px 8px; font-size: clamp(10px, 2.8vw, 12px); text-align: center; border-bottom: 1px solid rgba(0,0,0,0.06); line-height: 1.4; }
+
+/* ========== 小屏适配 ========== */
+@media screen and (max-width: 360px) {
+  .packages-grid { gap: 8px; padding: 0 10px; }
+  .package-item { padding: 12px 6px; }
+  .package-badge { padding: 3px 6px; font-size: 9px; }
+  .vip-plans { gap: 6px; padding: 0 8px; }
+  .vip-plan-item { padding: 12px 4px; min-height: 120px; }
+  .vip-features-list { padding: 0 12px; }
+  .vip-compare { margin: 16px 8px 0; gap: 6px; }
+  .credits-display { padding: 0 10px 20px; }
+  .recharge-bottom { padding: 12px 10px calc(12px + var(--safe-bottom)); }
+  .vip-bottom { padding: 8px 10px calc(8px + var(--safe-bottom)); }
+}
+
+/* ========== 大屏居中(平板/桌面预览) ========== */
+@media screen and (min-width: 586px) {
+  .recharge-overlay,
+  .recharge-popup,
+  .vip-overlay,
+  .vip-popup,
+  .vip-bg-image,
+  .vip-header-overlay { left: 50%; transform: translateX(-50%); max-width: 585px; }
+  .recharge-bottom,
+  .vip-bottom { left: 50%; transform: translateX(-50%); max-width: 585px; }
+}
+
+/* ========== 横屏提示优化 ========== */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .vip-header { height: 250px; }
+  .vip-plans { margin-top: -30px; }
+  .vip-popup { padding-bottom: 140px; }
+  .recharge-tip { padding-bottom: 100px; }
+}
+
+/* ========== 反馈按钮 ========== */
+.feedback-btn { font-size: 18px; color: #ccc; cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 4px 8px; border-radius: 6px;}
+</style>
+</head>
+<body>
+<div id="app-container">
+
+    <!-- ==================== 充值弹窗 ==================== -->
+    <div class="recharge-overlay" id="rechargeOverlay" onclick="hideRechargePopup()"></div>
+    <div class="recharge-popup" id="rechargePopup">
+        <div class="recharge-header">
+            <div class="recharge-close" onclick="hideRechargePopup()">×</div>
+            <div class="feedback-btn" onclick="showFeedbackPopup()">💬</div>
+        </div>
+        <div class="credits-display">
+            <div class="credits-info">
+                <div class="credits-label">My Credits</div>
+                <div class="credits-value balance">0</div>
+            </div>
+            <div class="diamond-icon-large"></div>
+        </div>
+        <div class="packages-grid">
+            <div class="package-item" onclick="selectPackage(this)" data-type="4" data-price="19.90" data-amount="650">
+                <div class="package-amount">650 <span class="diamond"></span></div>
+                <div class="package-bonus">500 + <span class="gift">150 Gift</span></div>
+                <div class="package-price">US$ 19.90</div>
+            </div>        
+            <div class="package-item selected" onclick="selectPackage(this)" data-type="6" data-price="36.00" data-amount="1300">
+                <div class="package-amount">1,300 <span class="diamond"></span></div>
+                <div class="package-bonus">1,000 + <span class="gift">300 Gift</span></div>
+                <div class="package-price">US$ 36.00</div>
+            </div>
+            <div class="package-item" onclick="selectPackage(this)" data-type="5" data-price="59.90" data-amount="2200">
+                <div class="package-amount">2,200 <span class="diamond"></span></div>
+                <div class="package-bonus">1,700 + <span class="gift">500 Gift</span></div>
+                <div class="package-price">US$ 59.90</div>
+            </div>
+            <div class="package-item" onclick="selectPackage(this)" data-type="7" data-price="90.00" data-amount="3800">
+                <div class="package-badge popular">💚 Best Popular</div>
+                <div class="package-amount">3,800 <span class="diamond"></span></div>
+                <div class="package-bonus">2,500 + <span class="gift">1,300 Gift</span></div>
+                <div class="package-price">US$ 90.00</div>
+            </div>
+            <div class="package-item" onclick="selectPackage(this)" data-type="8" data-price="139.00" data-amount="6000">
+                <div class="package-amount">6,000 <span class="diamond"></span></div>
+                <div class="package-bonus">3,750 + <span class="gift">2,250 Gift</span></div>
+                <div class="package-price">US$ 139.00</div>
+            </div>
+            <div class="package-item" onclick="selectPackage(this)" data-type="9" data-price="270.00" data-amount="14000">
+                <div class="package-badge ultimate">👑 Ultimate</div>
+                <div class="package-amount">14,000 <span class="diamond"></span></div>
+                <div class="package-bonus">8,000 + <span class="gift">6,000 Gift</span></div>
+                <div class="package-price">US$ 270.00</div>
+            </div>
+        </div>
+        <div class="recharge-tip">More credit features are coming soon, stay tuned.</div>
+        <div class="recharge-bottom">
+            <button class="recharge-btn" onclick="doPayment('package-item')">Recharge</button>
+        </div>
+    </div>
+
+    <!-- ==================== VIP弹窗 ==================== -->
+    <div class="vip-overlay" id="vipOverlay" onclick="hideVipPopup()"></div>
+    <div id="vipPopup" style="display:none">
+        <div class="vip-popup" id="vippopup1">
+            <div class="vip-header">
+                <img class="vip-bg-image" src="https://cdn.ss-img.com/video/template/emojicheck.jpg" alt="VIP">
+                <div class="vip-header-overlay"></div>
+                <div class="vip-close" onclick="hideVipPopup()">×</div>
+                <div class="vip-top-right">
+                    <div class="vip-unsubscribe" id="subToggleBtn" onclick="handleUnsubscribe()">Unsubscribe</div>
+                    <div class="feedback-btn" onclick="showFeedbackPopup()">💬</div>
+                    <div class="vip-credits">
+                        <span class="vip-credits-diamond" onclick="showCredit()"></span>
+                        <span class="balance" onclick="showCredit()">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="vip-plans">
+                
+                <div class="vip-plan-item" onclick="selectVipPlan(this)" data-price="15.00" data-type="1" data-amount="100" data-typename="Starter" data-payment="Auto-renews weekly/ US$ 15.00" data-bonus="100" data-refresh="90">
+                    <div class="vip-plan-name">Starter</div>
+                    <div class="vip-plan-price"><span class="vip-plan-price-amount">US$2.14</span><span class="vip-plan-price-unit">/day</span></div>
+                    <div class="vip-plan-credits">100 <span class="diamond"></span></div>
+                    <div class="vip-plan-timer"></div>
+                </div>
+                <div class="vip-plan-item selected" onclick="selectVipPlan(this)" data-price="39.99" data-type="2" data-amount="500" data-typename="Pro" data-payment="Auto-renews monthly/ US$ 39.99" data-bonus="50" data-refresh="80">
+                    <div class="vip-plan-name">Pro</div>
+                    <div class="vip-plan-price"><span class="vip-plan-price-amount">US$1.33</span><span class="vip-plan-price-unit">/day</span></div>
+                    <div class="vip-plan-credits">100 <span class="diamond"></span></div>
+                    <div class="vip-plan-timer"></div>
+                </div>
+                <div class="vip-plan-item" onclick="selectVipPlan(this)" data-price="99.99" data-type="3" data-amount="2000" data-typename="Quarterly" data-payment="Auto-renews Quarterly/ US$ 99.99" data-bonus="2000" data-refresh="70">
+                    <div class="vip-plan-name">Quarterly</div>
+                    <div class="vip-plan-price"><span class="vip-plan-price-amount">US$1.11</span><span class="vip-plan-price-unit">/day</span></div>
+                    <div class="vip-plan-credits">2000 <span class="diamond"></span></div>
+                    <div class="vip-plan-timer"></div>
+                </div>
+            </div>
+            <div class="vip-onetime" id="vipPaymentText">One-time payment US$ 39.99</div>
+            <div class="vip-features-title">Unlock All Premium Features</div>
+            <div class="vip-features-list">
+                <div class="vip-feature-item">Instant Bonus: <span id="featureBonus">500</span> <span class="diamond"></span></div>
+                <div class="vip-feature-item">
+                    Enjoy <span id="featureRefresh">80</span>% OFF on all generations
+                </div>
+                <div class="vip-feature-item">Unlock Full Access to All Templates</div>
+                <div class="vip-feature-item">Skip the Queue & Get Videos Faster, No Watermark</div>
+                <div class="vip-feature-item">5,382+ Standard Images / 1,346+ Standard Videos</div>
+                <div class="vip-feature-item">Generate Videos with Audio</div>
+            </div>
+            <div class="vip-compare">
+                <div class="vip-compare-col our">
+                    <div class="vip-compare-header">Our App's Features<br>(Everything You Need)</div>
+                    <div class="vip-compare-item">1,000+ Viral Templates<br><small>(200+ Updated Weekly)</small></div>
+                    <div class="vip-compare-item">Cinematic & Photorealistic Quality</div>
+                    <div class="vip-compare-item">Unrestricted AI & NSFW Supported</div>
+                    <div class="vip-compare-item">Private Mode & Encrypted Data</div>
+                    <div class="vip-compare-item">All-in-One Top AI Models</div>
+                    <div class="vip-compare-item">Up to 15s Duration in HD (1080P)</div>
+                    <div class="vip-compare-item">Lightning-Fast Generation</div>
+                    <div class="vip-compare-item">Generate Videos with Audio</div>
+                </div>
+                <div class="vip-compare-col other">
+                    <div class="vip-compare-header">Other Apps</div>
+                    <div class="vip-compare-item">50 Limited & Outdated Library</div>
+                    <div class="vip-compare-item">Cartoonish & Blurry Outputs</div>
+                    <div class="vip-compare-item">Strict Censorship & Heavy Filtering</div>
+                    <div class="vip-compare-item">Public Gallery</div>
+                    <div class="vip-compare-item">Single Model Limitation</div>
+                    <div class="vip-compare-item">Short Clips (3-5s) & Low Res (360P)</div>
+                    <div class="vip-compare-item">Long Wait Times & Queues</div>
+                    <div class="vip-compare-item">Generate Videos without Audio</div>
+                </div>
+            </div>
+        </div>
+        <div class="vip-bottom" id="vipBottom">
+            <div class="vip-countdown">
+                <span class="vip-countdown-time" id="vipCountdown">10:00</span> until price goes up
+            </div>
+            <button class="vip-buy-btn" onclick="doPayment('vip-plan-item')">
+                <div class="vip-buy-price" id="vipBuyPrice">US$39.99</div>
+                <span class="vip-buy-text" id="vipBuyText">Subscribe Now</span>
+            </button>
+        </div>
+    </div>
+
+</div>
+<script>
+    async function handleUnsubscribe() {
+        const modal = document.createElement('div');
+        modal.id = 'unsubscribeModal';
+        modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(45,26,62,0.7);z-index:9999999;display:flex;align-items:center;justify-content:center;';
+        
+        modal.innerHTML = `
+            <div style="background:#fdf6ff;border-radius:20px;padding:28px 24px;width:88%;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(182,110,240,0.2);">
+                <div style="font-size:48px;margin-bottom:12px;">😢</div>
+                <div style="font-size:18px;font-weight:700;color:#2d1a3e;margin-bottom:8px;">
+                    Are you sure you want to leave?
+                </div>
+                <div style="font-size:13px;color:#9b7ab0;line-height:1.8;margin-bottom:20px;">
+                    If you cancel now, you will <strong style="color:#e880b8;">immediately lose</strong> access to:
+                </div>
+                <div style="text-align:left;background:#f5eeff;border-radius:12px;padding:14px 16px;margin-bottom:20px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:#2d1a3e;">
+                        <span style="color:#b66ef0;">✓</span> Unlimited access to all templates
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:#2d1a3e;">
+                        <span style="color:#b66ef0;">✓</span> 💎 Credits refreshed every billing cycle
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;color:#2d1a3e;">
+                        <span style="color:#b66ef0;">✓</span> Skip queue & no watermark
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#2d1a3e;">
+                        <span style="color:#b66ef0;">✓</span> Priority generation speed
+                    </div>
+                </div>
+                <div style="font-size:12px;color:#b8a0c8;margin-bottom:20px;">
+                    Your subscription remains active until the end of the current billing period.
+                </div>
+                <button onclick="document.getElementById('unsubscribeModal').remove()"
+                    style="width:100%;padding:14px;background:linear-gradient(135deg,#e880b8,#b66ef0);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">
+                    Keep My VIP 👑
+                </button>
+                <button onclick="confirmUnsubscribe()"
+                    style="width:100%;padding:12px;background:none;color:#b8a0c8;border:1px solid rgba(182,110,240,0.2);border-radius:12px;font-size:13px;cursor:pointer;">
+                    Cancel Subscription
+                </button>
+            </div>
+        `;
+        
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.remove();
+        });
+        
+        document.body.appendChild(modal);
+    }
+
+    async function confirmUnsubscribe() {
+        const modal = document.getElementById('unsubscribeModal');
+        if (modal) modal.remove();
+
+        try {
+            const res = await fetch('{:url("unsubscribe")}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                showToast('Subscription cancelled. Your VIP remains active until the billing period ends.', 'success', 4000);
+            } else {
+                showToast(data.message || 'Cancellation failed, please try again.', 'error');
+            }
+        } catch (e) {
+            showToast('Network error, please try again.', 'error');
+        }
+    }
+</script>
+<script>
+
+// =============================================
+// 接口地址
+// =============================================
+var API_BASE         = '/api/v1';
+var API_CREATE_ORDER = API_BASE + '/ai/aigc/model/order/sub';
+var API_CHECK_ORDER  = API_BASE + '/ai/aigc/model/order/check';
+var API_GET_CREDIT   = API_BASE + '/ai/aigc/model/balance';
+var API_FEEDBACK     = API_BASE + '/member/feedback';
+
+// =============================================
+// 全局用户数据（从App桥接获取）
+// =============================================
+var appUser = {
+    memberId: '',
+    token: '',
+    isVip: false,
+    email: '',
+    source: ''
+};
+
+// =============================================
+// 判断是否需要登录（统一判断函数）
+// =============================================
+function needLogin() {
+    return !appUser.token || appUser.source === 'guest';
+}
+
+// 统一拉起登录（使用 showLogin，showLoginDialog 无人监听不生效）
+function triggerLogin() {
+    if (WebViewBridge.isAvailable()) {
+        WebViewBridge.showLogin();
+    }
+}
+
+// =============================================
+// 页面加载时从App获取用户信息
+// =============================================
+$(document).ready(function() {
+    if (WebViewBridge.isAvailable()) {
+        WebViewBridge.setAccountInfoHandler(function(data) {
+            
+            appUser.memberId = data.memberId || '';
+            appUser.token    = data.token || '';
+            appUser.isVip    = !!data.isVip;
+            appUser.email    = data.email || '';
+            appUser.source   = data.source || '';
+            // [改动] 不再拦截页面，让用户可以浏览套餐
+            // 有token才请求余额，没有token显示0即可
+            if (appUser.token && appUser.source !== 'guest') {
+                fetchBalance();
+            }
+            // 根据VIP状态更新按钮
+            if (appUser.isVip) {
+                $('#vipBuyText').text('Extend VIP Service');
+            }
+        });
+        WebViewBridge.getAccountInfo();
+        WebViewBridge.setH5Status(1);
+    }
+});
+
+// 请求余额
+function fetchBalance() {
+    var url = API_GET_CREDIT + '?member_id=' + appUser.memberId;
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'authorization': appUser.token
+        },
+        mode: 'cors'
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(res) {
+        if (res.code === 0 && res.data) {
+            if(res.data.audit == "NORMAL"){
+                document.querySelector('.vip-bg-image').src = 'https://di0zkvm1hiv8i.cloudfront.net/2026MarMon/909995029759.webp';
+            }
+            var bal = res.data.credit || res.data.points || 0;
+            $('.balance').text(bal);
+        }
+    })
+    .catch(function(e) {
+    });
+}
+
+// 通用请求头（带token）
+function getAuthHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'authorization': appUser.token,
+        'User-Agent-Language': 'EN'
+    };
+}
+
+// ── Toast ──
+function showToast(msg, type, dur) {
+    type = type || 'success'; dur = dur || 3000;
+    var icons = { success:'✓', error:'✗', warning:'⚠', info:'ℹ' };
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.style.zIndex = '999999999';
+    t.innerHTML = '<div class="toast-icon">' + icons[type] + '</div><div>' + msg + '</div>';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.classList.add('show'); }, 10);
+    setTimeout(function(){ t.classList.remove('show'); setTimeout(function(){ document.body.removeChild(t); }, 300); }, dur);
+}
+//showToast('Please select a package!', 'error');
+// ── 充值弹窗 ──
+window.showCredit = function() {
+    // [改动] 不拦截登录，让页面正常展示，只在有token时刷新余额
+    if (!needLogin()) {
+        fetchBalance();
+    }
+    var o = document.getElementById('rechargeOverlay'), p = document.getElementById('rechargePopup');
+    o.style.zIndex = nextZIndex(); p.style.zIndex = nextZIndex();
+    o.style.display = 'block'; p.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+};
+
+// ── VIP弹窗 ──
+window.showSubscribe = function(type) {
+    // [改动] 不拦截登录，让页面正常展示，只在有token时刷新余额
+    if (!needLogin()) {
+        fetchBalance();
+    }
+    var o = document.getElementById('vipOverlay'), p = document.getElementById('vipPopup'),
+        p1 = document.getElementById('vippopup1'), b = document.getElementById('vipBottom');
+    o.style.zIndex = nextZIndex(); p.style.zIndex = nextZIndex();
+    p1.style.zIndex = nextZIndex(); b.style.zIndex = nextZIndex();
+    o.style.display = 'block'; p.style.display = 'block'; p1.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    startCountdown();
+};
+document.addEventListener('DOMContentLoaded', function() {
+    var entry = new URLSearchParams(window.location.search).get('entry');
+    if (entry === 'recharge') {
+        window.showCredit();
+    } else {
+        window.showSubscribe(1);
+    }
+});
+
+window.gotoBack = function() {
+    if (WebViewBridge.isAvailable()) {
+        WebViewBridge.closeActivity();
+    }
+};
+
+function hideRechargePopup() {
+    if (WebViewBridge.isAvailable()) {
+        WebViewBridge.closeActivity();
+    }
+}
+
+function hideVipPopup() {
+    if (countdownInterval) clearInterval(countdownInterval);
+    if (WebViewBridge.isAvailable()) {
+        WebViewBridge.closeActivity();
+    }
+}
+
+function selectPackage(el) {
+    document.querySelectorAll('.package-item').forEach(function(i){ i.classList.remove('selected'); });
+    el.classList.add('selected');
+}
+
+// ── VIP倒计时 ──
+var countdownInterval, countdownSeconds = 600;
+
+function selectVipPlan(el) {
+    document.querySelectorAll('.vip-plan-item').forEach(function(i){
+        i.classList.remove('selected');
+        var t = i.querySelector('.vip-plan-timer'); if (t) t.textContent = '';
+    });
+    el.classList.add('selected');
+    document.getElementById('vipBuyPrice').textContent = 'US$' + parseFloat(el.dataset.price).toFixed(2);
+    document.getElementById('vipPaymentText').textContent = el.dataset.payment;
+    document.getElementById('featureBonus').textContent = el.dataset.bonus;
+    document.getElementById('featureRefresh').textContent = el.dataset.refresh;
+    var timer = el.querySelector('.vip-plan-timer');
+    if (timer) {
+        var m = Math.floor(countdownSeconds / 60), s = countdownSeconds % 60;
+        timer.textContent = ' ' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+}
+
+function startCountdown() {
+    updateCountdown();
+    countdownInterval = setInterval(function(){
+        countdownSeconds--;
+        if (countdownSeconds <= 0) countdownSeconds = 571;
+        updateCountdown();
+    }, 1000);
+}
+
+function updateCountdown() {
+    var m = Math.floor(countdownSeconds / 60), s = countdownSeconds % 60;
+    var str = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    document.getElementById('vipCountdown').textContent = str;
+    var sel = document.querySelector('.vip-plan-item.selected');
+    if (sel) { var t = sel.querySelector('.vip-plan-timer'); if (t) t.textContent = ' ' + str; }
+}
+
+// ══════════════════════════════════════════
+// 核心支付：只在这里拦截登录
+// ══════════════════════════════════════════
+function doPayment(class_id) {
+    console.log('doPayment called:', class_id);
+    
+    // [改动] 唯一拉起登录的地方：点击充值/购买按钮时
+    if (needLogin()) {
+        triggerLogin();
+        return;
+    }
+
+    var sel = $("." + class_id + ".selected");
+    if (!sel.length) { showToast('Please select a package!', 'error'); return; }
+    var product_id = sel.attr("data-type");
+    console.log('product_id:', product_id);
+
+    $.ajax({
+        url: API_CREATE_ORDER,
+        type: 'POST',
+        data: 'product_id=' + product_id + '&pay_type=1',
+        headers: {
+            'authorization': appUser.token
+        },
+        success: function(result) {
+            if (typeof result === 'string') result = JSON.parse(result);
+            
+            if (result.code == 3 || result.code == 200) {
+                var orderId = result.od || (result.data && result.data.order_id);
+                var p_url = result.url;
+                //const payUrl = `https://www.primedesignworks.com/simple-payment1.php?order_id=${orderId}`;
+                var payUrl = p_url+"?order_id="+orderId;
+                //var payUrl = 'https://www.primedesignworks.com/app_pay.php?order_id=' + orderId;
+                console.log('支付URL:', payUrl);
+                localStorage.setItem('pending_order_id', orderId);
+                if (WebViewBridge.isAvailable()) {
+                    WebViewBridge.openPrivacy(payUrl);
+                } else {
+                    window.open(payUrl, '_blank');
+                }
+                document.addEventListener('visibilitychange', function h() {
+                    if (document.visibilityState === 'visible') {
+                        checkOrderStatus();
+                        document.removeEventListener('visibilitychange', h);
+                    }
+                });
+            } else if (result.code == 1 || result.code == 401) {
+                showToast('Please login first', 'warning');
+                triggerLogin();
+            } else {
+                showToast(result.msg || 'Order failed', 'error');
+            }
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            console.error('支付失败:', {
+                status: xhr && xhr.status,
+                responseText: xhr && xhr.responseText,
+                textStatus: textStatus,
+                errorThrown: errorThrown
+            });
+            showToast('Network error' + (xhr && xhr.status ? ' (' + xhr.status + ')' : ''), 'error');
+        }
+    });
+}
+
+// 检查订单状态（独立函数）
+function checkOrderStatus() {
+    var orderId = localStorage.getItem('pending_order_id');
+    if (!orderId) return;
+    
+    var url = API_CHECK_ORDER + '?order_id=' + orderId;
+    fetch(url, {
+        method: 'GET',
+        headers: { 'authorization': appUser.token },
+        mode: 'cors'
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(cr) {
+        console.log('订单状态:', JSON.stringify(cr));
+        if (cr.code == 1 || cr.code == 200) {
+            localStorage.removeItem('pending_order_id');
+            fetchBalance();
+            if (cr.type_m && cr.type_m !== '') {
+                showVipSuccessModal(cr.type_m, cr.points);
+            } else {
+                showCongratsModal(cr.points || 0);
+            }
+        }
+    })
+    .catch(function() {});
+}
+
+// ── 成功弹窗 ──
+function showVipSuccessModal(planName, points) {
+    var m = document.createElement('div'); m.id = 'vipSuccessModal';
+    m.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:999999999;display:flex;align-items:center;justify-content:center;';
+    m.innerHTML = '<div style="background:linear-gradient(160deg,#1a1a2e,#2a1a2e);border-radius:20px;padding:28px 24px;text-align:center;width:min(320px,85vw);max-width:360px;border:1px solid rgba(200,100,255,0.2);">' +
+        '<div style="font-size:52px;margin-bottom:8px;">👑</div><div style="color:#fff;font-size:22px;font-weight:bold;">Welcome to VIP!</div>' +
+        '<div style="color:#cc66ff;font-size:14px;font-weight:bold;margin-bottom:20px;">' + planName + '</div>' +
+        '<div style="border-top:1px solid rgba(255,255,255,0.08);margin-bottom:20px;"></div>' +
+        '<div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin-bottom:16px;"><div style="color:#aaa;font-size:12px;margin-bottom:6px;">Instant Bonus</div><div style="display:flex;align-items:center;justify-content:center;gap:8px;"><span style="font-size:24px;">💎</span><span style="color:#cc66ff;font-size:28px;font-weight:bold;">+ '+points+'</span></div></div>' +
+        '<div style="text-align:left;margin-bottom:24px;"><div style="color:#ccc;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">✅ Unlock Full Access</div><div style="color:#ccc;font-size:13px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">✅ No Watermark</div><div style="color:#ccc;font-size:13px;padding:6px 0;">✅ Weekly Credits Refresh</div></div>' +
+        '<button onclick="document.getElementById(\'vipSuccessModal\').remove()" style="width:100%;padding:14px 0;background:linear-gradient(90deg,#cc44ff,#ff4488);color:#fff;border:none;border-radius:30px;font-size:16px;font-weight:bold;cursor:pointer;">Start Exploring</button></div>';
+    m.addEventListener('click',function(e){if(e.target===m) m.remove();});
+    document.body.appendChild(m);
+}
+
+function showCongratsModal(points) {
+    var m = document.createElement('div'); m.id = 'congratsModal';
+    m.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:999999999;display:flex;align-items:center;justify-content:center;';
+    m.innerHTML = '<div style="background:#2a2020;border-radius:16px;padding:28px 24px;text-align:center;width:min(320px,85vw);">' +
+        '<div style="color:#fff;font-size:22px;font-weight:bold;margin-bottom:12px;">Congratulations</div>' +
+        '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;"><span style="font-size:28px;">💎</span><span style="color:#cc66ff;font-size:32px;font-weight:bold;">+ '+points+'</span></div>' +
+        '<div style="color:#aaa;font-size:13px;margin-bottom:24px;">More credit features are coming soon.</div>' +
+        '<button onclick="document.getElementById(\'congratsModal\').remove()" style="width:100%;padding:14px 0;background:linear-gradient(90deg,#cc44ff,#ff4488);color:#fff;border:none;border-radius:30px;font-size:16px;font-weight:bold;cursor:pointer;">Get Credits</button></div>';
+    m.addEventListener('click',function(e){if(e.target===m) m.remove();});
+    document.body.appendChild(m);
+}
+
+// ── 反馈弹窗 ──
+function showFeedbackPopup() {
+    var modal = document.createElement('div');
+    modal.id = 'feedbackModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = '<div style="background:#1a1a2e;border-radius:16px;padding:24px;width:90%;max-width:400px;box-sizing:border-box;">' +
+        '<div style="color:#fff;font-size:18px;font-weight:bold;margin-bottom:6px;">Feedback</div>' +
+        '<div style="color:#aaa;font-size:13px;margin-bottom:16px;">We\'d love to hear your thoughts!</div>' +
+        '<input id="feedbackEmail" type="email" placeholder="Your email address (optional)" style="width:100%;background:#0a0a0a;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:14px;padding:12px;box-sizing:border-box;outline:none;margin-bottom:10px;"/>' +
+        '<textarea id="feedbackText" maxlength="1000" oninput="document.getElementById(\'feedbackCount\').textContent=this.value.length" placeholder="You can write any suggestions here, for example: I\'m handsome, I\'d like to apply for a discount. But remember to leave your contact information." style="width:100%;height:120px;background:#0a0a0a;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:14px;padding:12px;box-sizing:border-box;resize:none;outline:none;font-family:inherit;"></textarea>' +
+        '<div style="text-align:right;color:#aaa;font-size:12px;margin-top:4px;"><span id="feedbackCount">0</span>/1000</div>' +
+        '<div style="display:flex;gap:10px;margin-top:12px;">' +
+        '<button onclick="document.getElementById(\'feedbackModal\').remove()" style="flex:1;padding:12px;background:rgba(255,255,255,0.08);color:#aaa;border:none;border-radius:10px;font-size:14px;cursor:pointer;">Cancel</button>' +
+        '<button onclick="submitFeedback()" style="flex:2;padding:12px;background:linear-gradient(90deg,#cc44ff,#ff4488);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">Submit</button>' +
+        '</div></div>';
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.remove();
+    });
+    document.body.appendChild(modal);
+}
+
+function submitFeedback() {
+    var text = document.getElementById('feedbackText').value.trim();
+    var em = document.getElementById('feedbackEmail').value.trim();
+    if (!text) { showToast('Please enter your feedback', 'warning'); return; }
+
+    $.ajax({
+        url: API_FEEDBACK,
+        type: 'POST',
+        contentType: 'application/json',
+        headers: { 'authorization': appUser.token },
+        data: JSON.stringify({
+            memberId: appUser.memberId,
+            feedbackEmail: em,
+            feedbackContent: text
+        }),
+        success: function(res) {
+            if (typeof res === 'string') res = JSON.parse(res);
+            if (res.code == 0 || res.code == 200 || res.code == 1) {
+                document.getElementById('feedbackModal').remove();
+                showToast('Thank you for your feedback!', 'success');
+            } else {
+                showToast(res.msg || 'Submit failed', 'error');
+            }
+        },
+        error: function() {
+            showToast('Submit failed, please try again', 'error');
+        }
+    });
+}
+</script>
+</body>
+</html>

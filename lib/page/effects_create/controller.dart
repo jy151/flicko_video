@@ -16,9 +16,10 @@ enum EffectsCreateError {
 }
 
 class EffectsCreateException implements Exception {
-  const EffectsCreateException(this.error);
+  const EffectsCreateException(this.error, {this.message});
 
   final EffectsCreateError error;
+  final String? message;
 }
 
 class EffectsCreateController extends StateNotifier<EffectsCreateState> {
@@ -74,17 +75,24 @@ class EffectsCreateController extends StateNotifier<EffectsCreateState> {
         );
       }
 
-      final result = await Api.createAiTask(
-        type: 'tpl2v',
-        prompt: template?.prompt ?? '',
-        image: state.selectedImageBase64,
-        templateId: templateId,
-      );
-      if (result == null) {
-        throw const EffectsCreateException(EffectsCreateError.submitFailed);
+      try {
+        final result = await Api.createAiTask(
+          type: 'tpl2v',
+          prompt: template?.prompt ?? '',
+          image: state.selectedImageBase64,
+          templateId: templateId,
+        );
+        if (result == null) {
+          throw const EffectsCreateException(EffectsCreateError.submitFailed);
+        }
+        await _syncBalanceAfterCreate();
+        return result;
+      } on ApiException catch (error) {
+        throw EffectsCreateException(
+          EffectsCreateError.submitFailed,
+          message: error.message,
+        );
       }
-      await _syncBalanceAfterCreate();
-      return result;
     } finally {
       state = state.copyWith(isLoading: false);
     }

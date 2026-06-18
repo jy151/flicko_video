@@ -5,6 +5,7 @@ enum SettingItemType {
   termsOfService,
   privacyPolicy,
   aboutApp,
+  deleteAccount,
   logout,
 }
 
@@ -62,6 +63,11 @@ class SettingState {
         title: 'Privacy Policy',
       ),
       const SettingItem(type: SettingItemType.aboutApp, title: 'About App'),
+      const SettingItem(
+        type: SettingItemType.deleteAccount,
+        title: 'Delete Account',
+        isDestructive: true,
+      ),
       const SettingItem(
         type: SettingItemType.logout,
         title: 'Log Out',

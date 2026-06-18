@@ -1,8 +1,10 @@
 import 'package:flicko_video/app_controller.dart';
+import 'package:flicko_video/hive/app/app_box.dart';
 import 'package:flicko_video/i18n/i18n.dart';
 import 'package:flicko_video/i18n/locale_controller.dart';
 import 'package:flicko_video/router/app_router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pull_to_refresh_flutter3/pull_to_refresh_flutter3.dart';
@@ -18,9 +20,11 @@ class _AppViewState extends ConsumerState<AppView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref.read(appControllerProvider.notifier).init();
-    });
+    if (!AppBox.isFirstLaunch) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await ref.read(appControllerProvider.notifier).init();
+      });
+    }
   }
 
   @override
@@ -50,6 +54,7 @@ class _AppViewState extends ConsumerState<AppView> {
       child: MaterialApp.router(
         title: 'FlickoVideo',
         routerConfig: appRouter,
+        builder: EasyLoading.init(),
         locale: localeState.locale,
         debugShowCheckedModeBanner: false,
         supportedLocales: AppLocalizations.supportedLocales,

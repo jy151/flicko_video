@@ -25,6 +25,9 @@ class AppController extends StateNotifier<AppState> {
   }
 
   Future<void> _init() async {
+
+
+    
     await _ensureLoggedIn();
     unawaited(AttributionReporter.reportAdjustClient());
     await syncUserData();
