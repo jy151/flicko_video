@@ -31,6 +31,24 @@ class MeNotifier extends StateNotifier<MeState> {
 
   Future<void> reloadWorks() => _loadWorks();
 
+  Future<bool> deleteWork(int workId) async {
+    try {
+      final res = await Api.deleteWork(workId);
+      // if (!res.isSuccess) {
+      //   return false;
+      // }
+
+      if (mounted) {
+        state = state.copyWith(
+          works: state.works.where((work) => work.id != workId).toList(),
+        );
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   void _applyUserBox({bool reloadWorksOnUserChange = true}) {
     final member = UserBox.member;
     final balance = UserBox.balance;

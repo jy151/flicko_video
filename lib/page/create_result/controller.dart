@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/api/model/video_model.dart';
+import 'package:flicko_video/utils/work_status_messages.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import 'state.dart';
@@ -43,6 +44,20 @@ class CreateResultController extends StateNotifier<CreateResultState> {
 
   void setWork(Work work) {
     if (_isSameWork(work)) {
+      return;
+    }
+
+    if (work.jobStatus == 3) {
+      _pollingTimer?.cancel();
+      _progressTimer?.cancel();
+      _isPolling = false;
+      state = CreateResultState(
+        work: work,
+        progress: 1,
+        status: 'error',
+        errorMessage: generationFailedRefundedMessage,
+        estimatedWaitSeconds: 120,
+      );
       return;
     }
 
@@ -184,7 +199,9 @@ class CreateResultController extends StateNotifier<CreateResultState> {
     state = state.copyWith(
       work: work,
       status: 'error',
-      errorMessage: 'Video generation failed',
+      errorMessage: jobStatus == 3
+          ? generationFailedRefundedMessage
+          : 'Video generation failed',
     );
   }
 

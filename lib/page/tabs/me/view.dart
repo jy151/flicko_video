@@ -3,6 +3,7 @@ import 'package:flicko_video/gen/assets.gen.dart';
 import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/tabs/me/controller.dart';
 import 'package:flicko_video/utils/paywall_navigation.dart';
+import 'package:flicko_video/utils/work_status_messages.dart';
 
 import 'state.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class MeView extends ConsumerStatefulWidget {
 
 class _MeViewState extends ConsumerState<MeView> {
   final RefreshController _refreshController = RefreshController();
+  final Set<int> _deletingWorkIds = <int>{};
   static final _mockWorks = List.generate(
     6,
     (index) => Work(
@@ -486,6 +488,10 @@ class _MeViewState extends ConsumerState<MeView> {
 
   Widget _buildWorkCard(Work item) {
     final thumbnailUrl = item.cover ?? item.image ?? item.video ?? '';
+    final isFailed = item.jobStatus == 3;
+    final isLoading = !isFailed && (item.video?.trim().isEmpty ?? true);
+    final workId = item.id;
+    final isDeleting = workId != null && _deletingWorkIds.contains(workId);
 
     return GestureDetector(
       onTap: () {
@@ -501,31 +507,178 @@ class _MeViewState extends ConsumerState<MeView> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            AppNetworkImage(
-              imageUrl: thumbnailUrl,
-              fit: BoxFit.cover,
-              placeholderColor: const Color(0xFF2A2A4A),
-            ),
-            Positioned(
-              left: 6,
-              right: 6,
-              bottom: 6,
-              child: Row(
-                children: [
-                  const Icon(Icons.videocam, color: Colors.white70, size: 12),
-                  const SizedBox(width: 3),
-                  const Text(
-                    '00:05',
-                    style: TextStyle(color: Colors.white70, fontSize: 10),
+            Builder(
+              builder: (context) {
+                if (isFailed) {
+                  return const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          color: Color(0xFFFF6B6B),
+                          size: 22,
+                        ),
+                        Center(
+                          child: Text(
+                            generationFailedRefundedMessage,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 8,
+                              height: 1.25,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                if (item.video != null && item.video!.isNotEmpty) {
+                  return AppNetworkImage(
+                    imageUrl: thumbnailUrl,
+                    fit: BoxFit.cover,
+                    placeholderColor: const Color(0xFF2A2A4A),
+                  );
+                }
+                // 加载
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
                   ),
-                  const Spacer(),
-                  const Icon(Icons.more_horiz, color: Colors.white70, size: 16),
-                ],
-              ),
+                );
+              },
             ),
+
+            if (!isLoading)
+              Positioned(
+                left: 6,
+                right: 6,
+                bottom: 6,
+                child: Row(
+                  children: [
+                    if (!isFailed) ...[
+                      const Icon(
+                        Icons.videocam,
+                        color: Colors.white70,
+                        size: 12,
+                      ),
+                      const SizedBox(width: 3),
+                      const Text(
+                        '00:05',
+                        style: TextStyle(color: Colors.white70, fontSize: 10),
+                      ),
+                    ],
+                    const Spacer(),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: workId == null || isDeleting
+                          ? null
+                          : () => _confirmDeleteWork(item),
+                      child: SizedBox(
+                        width: 28,
+                        height: 28,
+                        child: Center(
+                          child: isDeleting
+                              ? const SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white70,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.white70,
+                                  size: 16,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _confirmDeleteWork(Work item) async {
+    final workId = item.id;
+    if (workId == null || _deletingWorkIds.contains(workId)) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF252939),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          title: Text(
+            l10n.deleteVideoTitle,
+            style: const TextStyle(color: Colors.white, fontSize: 17),
+          ),
+          content: Text(
+            l10n.deleteVideoContent,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                l10n.delete,
+                style: const TextStyle(color: Color(0xFFFF5C75)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await _deleteWork(workId);
+    }
+  }
+
+  Future<void> _deleteWork(int workId) async {
+    if (_deletingWorkIds.contains(workId)) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    setState(() => _deletingWorkIds.add(workId));
+    try {
+      final success = await ref.read(meProvider.notifier).deleteWork(workId);
+      if (!mounted) {
+        return;
+      }
+      _showMessage(success ? l10n.deleteComplete : l10n.deleteFailed);
+    } finally {
+      if (mounted) {
+        setState(() => _deletingWorkIds.remove(workId));
+      }
+    }
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
 

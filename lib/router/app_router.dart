@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
+import 'package:flicko_video/core/payment_urls.dart';
 import 'package:flicko_video/hive/app/app_box.dart';
 import 'package:flicko_video/hive/user/user_box.dart';
 import 'package:flicko_video/page/discover_detail/state.dart';
 import 'package:flicko_video/page/discover_detail/view.dart';
 import 'package:flicko_video/page/delete_account/view.dart';
+import 'package:flicko_video/page/external_payment/view.dart';
 import 'package:flicko_video/page/initial/view.dart';
 import 'package:flicko_video/page/tabs/view.dart';
 import 'package:flicko_video/page/setting/view.dart';
@@ -15,10 +17,13 @@ import 'package:flicko_video/page/tabs/discover/view.dart';
 import 'package:flicko_video/page/effects_all/view.dart';
 import 'package:flicko_video/page/effects_create/view.dart';
 import 'package:flicko_video/page/member/view.dart';
+import 'package:flicko_video/page/order_result/view.dart';
 import 'package:flicko_video/page/recharge/view.dart';
 import 'package:flicko_video/page/create_result/state.dart';
 import 'package:flicko_video/page/create_result/view.dart';
 import 'package:flicko_video/page/web_content/view.dart';
+import 'package:flicko_video/utils/paywall_navigation.dart';
+import 'package:flutter/widgets.dart';
 
 final appRouter = GoRouter(
   initialLocation: AppBox.isFirstLaunch ? '/initial' : '/home',
@@ -90,8 +95,7 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/member',
-      redirect: (context, state) =>
-          UserBox.shouldUseWebPay ? '/web_member' : null,
+      redirect: (context, state) => _redirectWebPay('/web_member'),
       builder: (context, state) => const MemberView(),
     ),
     GoRoute(
@@ -110,9 +114,18 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/recharge',
-      redirect: (context, state) =>
-          UserBox.shouldUseWebPay ? '/web_recharge' : null,
+      redirect: (context, state) => _redirectWebPay('/web_recharge'),
       builder: (context, state) => const RechargeView(),
+    ),
+    GoRoute(
+      path: '/order_result',
+      redirect: _redirectOrderResultWithoutOrderId,
+      builder: _buildOrderResultView,
+    ),
+    GoRoute(
+      path: '/app/callback',
+      redirect: _redirectOrderResultWithoutOrderId,
+      builder: _buildOrderResultView,
     ),
     GoRoute(
       path: '/create_result',
@@ -142,33 +155,60 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/web_pay',
+      redirect: _redirectGuestExternalPaymentToLogin,
       builder: (context, state) {
-        return const WebContentView(
-          title: '',
-          showAppBar: false,
-          localEntry: 'member',
-        );
+        return ExternalPaymentLaunchView(url: buildIosPayMemberUrl());
       },
     ),
     GoRoute(
       path: '/web_member',
+      redirect: _redirectGuestExternalPaymentToLogin,
       builder: (context, state) {
-        return const WebContentView(
-          title: '',
-          showAppBar: false,
-          localEntry: 'member',
-        );
+        return ExternalPaymentLaunchView(url: buildIosPayMemberUrl());
       },
     ),
     GoRoute(
       path: '/web_recharge',
+      redirect: _redirectGuestExternalPaymentToLogin,
       builder: (context, state) {
-        return const WebContentView(
-          title: '',
-          showAppBar: false,
-          localEntry: 'recharge',
-        );
+        return ExternalPaymentLaunchView(url: buildIosPayRechargeUrl());
       },
     ),
   ],
 );
+
+String? _redirectWebPay(String webPayPath) {
+  if (!UserBox.shouldUseWebPay) {
+    return null;
+  }
+  return isCurrentGuestUser() ? '/login' : webPayPath;
+}
+
+String? _redirectGuestExternalPaymentToLogin(
+  BuildContext context,
+  GoRouterState state,
+) {
+  return isCurrentGuestUser() ? '/login' : null;
+}
+
+String? _redirectOrderResultWithoutOrderId(
+  BuildContext context,
+  GoRouterState state,
+) {
+  return _orderIdFromState(state).isEmpty ? '/home' : null;
+}
+
+OrderResultView _buildOrderResultView(
+  BuildContext context,
+  GoRouterState state,
+) {
+  return OrderResultView(orderId: _orderIdFromState(state));
+}
+
+String _orderIdFromState(GoRouterState state) {
+  final orderId =
+      state.uri.queryParameters['orderId'] ??
+      state.uri.queryParameters['order_id'] ??
+      '';
+  return orderId.trim();
+}

@@ -66,7 +66,7 @@ class LoginView extends ConsumerWidget {
 
   Widget _buildTryForFreeText(AppLocalizations l10n) {
     return Text(
-      "Flicko Video",
+      "Aivaro Video",
       style: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w600,

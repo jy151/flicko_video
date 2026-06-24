@@ -164,6 +164,13 @@ class Api {
     return null;
   }
 
+  static Future<ApiResponse> checkAigcModelOrder(String orderId) async {
+    return await _http.get(
+      '/ai/aigc/model/order/check',
+      params: {'order_id': orderId},
+    );
+  }
+
   static Future<OrderCreateResponse?> createOrder({
     required int productId,
     required String payType,

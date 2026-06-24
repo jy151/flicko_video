@@ -132,6 +132,18 @@ class AppLocalizations {
       'creditPurchaseSummary': '{credits} credits • {price}',
       'creditPurchaseDisclosure':
           'Credits are a one-time consumable purchase and can be used to generate videos in FlickoVideo.',
+      'orderResultTitle': 'Order Result',
+      'paymentChecking': 'Checking Payment',
+      'paymentSuccess': 'Payment Successful',
+      'paymentFailed': 'Payment Failed',
+      'paymentCheckingDesc':
+          'We are confirming your order. This usually takes a few seconds.',
+      'paymentSuccessDesc':
+          'Your purchase has been confirmed. You can start creating now.',
+      'paymentFailedDesc':
+          'We could not confirm this payment. Please try again later.',
+      'orderId': 'Order ID',
+      'backHome': 'Back Home',
       'termsOfUseEula': 'Terms of Use (EULA)',
       'viewDetails': 'View Details',
       'prompt': 'Prompt',
@@ -277,6 +289,15 @@ class AppLocalizations {
       'moreCreditFeatures': '更多积分功能即将上线，敬请期待。',
       'creditPurchaseSummary': '{credits} 积分 • {price}',
       'creditPurchaseDisclosure': '积分为一次性消耗型购买，可用于在 FlickoVideo 中生成视频。',
+      'orderResultTitle': '订单结果',
+      'paymentChecking': '正在确认支付',
+      'paymentSuccess': '支付成功',
+      'paymentFailed': '支付失败',
+      'paymentCheckingDesc': '正在确认你的订单，通常只需要几秒钟。',
+      'paymentSuccessDesc': '你的购买已确认，现在可以开始创作。',
+      'paymentFailedDesc': '暂未确认支付成功，请稍后重试。',
+      'orderId': '订单号',
+      'backHome': '返回首页',
       'termsOfUseEula': '使用条款 (EULA)',
       'viewDetails': '查看详情',
       'prompt': '提示词',
@@ -421,6 +442,15 @@ class AppLocalizations {
       'moreCreditFeatures': '更多積分功能即將上線，敬請期待。',
       'creditPurchaseSummary': '{credits} 積分 • {price}',
       'creditPurchaseDisclosure': '積分為一次性消耗型購買，可用於在 FlickoVideo 中生成影片。',
+      'orderResultTitle': '訂單結果',
+      'paymentChecking': '正在確認支付',
+      'paymentSuccess': '支付成功',
+      'paymentFailed': '支付失敗',
+      'paymentCheckingDesc': '正在確認你的訂單，通常只需要幾秒鐘。',
+      'paymentSuccessDesc': '你的購買已確認，現在可以開始創作。',
+      'paymentFailedDesc': '暫未確認支付成功，請稍後重試。',
+      'orderId': '訂單號',
+      'backHome': '返回首頁',
       'termsOfUseEula': '使用條款 (EULA)',
       'viewDetails': '查看詳情',
       'prompt': '提示詞',
@@ -565,6 +595,15 @@ class AppLocalizations {
       'moreCreditFeatures': 'クレジット機能は近日公開予定です。',
       'creditPurchaseSummary': '{credits} クレジット • {price}',
       'creditPurchaseDisclosure': 'クレジットは一回限りの消耗型購入で、FlickoVideo で動画生成に使用できます。',
+      'orderResultTitle': '注文結果',
+      'paymentChecking': 'お支払いを確認中',
+      'paymentSuccess': 'お支払いが完了しました',
+      'paymentFailed': 'お支払いに失敗しました',
+      'paymentCheckingDesc': '注文を確認しています。通常は数秒で完了します。',
+      'paymentSuccessDesc': '購入が確認されました。今すぐ作成を始められます。',
+      'paymentFailedDesc': 'お支払いを確認できませんでした。後でもう一度お試しください。',
+      'orderId': '注文ID',
+      'backHome': 'ホームへ戻る',
       'termsOfUseEula': '利用規約 (EULA)',
       'viewDetails': '詳細を見る',
       'prompt': 'プロンプト',
@@ -711,6 +750,15 @@ class AppLocalizations {
       'creditPurchaseSummary': '{credits} 크레딧 • {price}',
       'creditPurchaseDisclosure':
           '크레딧은 일회성 소모성 구매이며 FlickoVideo에서 비디오 생성에 사용할 수 있습니다.',
+      'orderResultTitle': '주문 결과',
+      'paymentChecking': '결제 확인 중',
+      'paymentSuccess': '결제 성공',
+      'paymentFailed': '결제 실패',
+      'paymentCheckingDesc': '주문을 확인하고 있습니다. 보통 몇 초 안에 완료됩니다.',
+      'paymentSuccessDesc': '구매가 확인되었습니다. 이제 제작을 시작할 수 있습니다.',
+      'paymentFailedDesc': '결제를 확인하지 못했습니다. 잠시 후 다시 시도해주세요.',
+      'orderId': '주문 ID',
+      'backHome': '홈으로',
       'termsOfUseEula': '이용 약관 (EULA)',
       'viewDetails': '상세 보기',
       'prompt': '프롬프트',
@@ -867,6 +915,18 @@ class AppLocalizations {
       'creditPurchaseSummary': '{credits} crédits • {price}',
       'creditPurchaseDisclosure':
           'Les crédits sont un achat consommable unique et peuvent être utilisés pour générer des vidéos dans FlickoVideo.',
+      'orderResultTitle': 'Résultat de commande',
+      'paymentChecking': 'Vérification du paiement',
+      'paymentSuccess': 'Paiement réussi',
+      'paymentFailed': 'Paiement échoué',
+      'paymentCheckingDesc':
+          'Nous confirmons votre commande. Cela prend généralement quelques secondes.',
+      'paymentSuccessDesc':
+          'Votre achat est confirmé. Vous pouvez commencer à créer.',
+      'paymentFailedDesc':
+          'Nous n’avons pas pu confirmer ce paiement. Veuillez réessayer plus tard.',
+      'orderId': 'ID de commande',
+      'backHome': 'Retour à l’accueil',
       'termsOfUseEula': 'Conditions d’utilisation (EULA)',
       'viewDetails': 'Voir les détails',
       'prompt': 'Prompt',
@@ -1020,6 +1080,15 @@ class AppLocalizations {
   String get recharge => _text('recharge');
   String get moreCreditFeatures => _text('moreCreditFeatures');
   String get creditPurchaseDisclosure => _text('creditPurchaseDisclosure');
+  String get orderResultTitle => _text('orderResultTitle');
+  String get paymentChecking => _text('paymentChecking');
+  String get paymentSuccess => _text('paymentSuccess');
+  String get paymentFailed => _text('paymentFailed');
+  String get paymentCheckingDesc => _text('paymentCheckingDesc');
+  String get paymentSuccessDesc => _text('paymentSuccessDesc');
+  String get paymentFailedDesc => _text('paymentFailedDesc');
+  String get orderId => _text('orderId');
+  String get backHome => _text('backHome');
   String get termsOfUseEula => _text('termsOfUseEula');
   String get viewDetails => _text('viewDetails');
   String get prompt => _text('prompt');

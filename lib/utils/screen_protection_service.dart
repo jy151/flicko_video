@@ -1,9 +1,12 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:screen_protector/screen_protector.dart';
+import 'package:flutter/services.dart';
 
 class ScreenProtectionService {
+  static const MethodChannel _channel = MethodChannel(
+    'flicko_video/native_screen_protection',
+  );
+
   static bool? _enabled;
 
   static Future<void> setEnabled(bool enabled) async {
@@ -12,13 +15,6 @@ class ScreenProtectionService {
     }
 
     _enabled = enabled;
-    if (enabled) {
-      await ScreenProtector.preventScreenshotOn();
-      await ScreenProtector.protectDataLeakageWithColor(Colors.black);
-    } else {
-      await ScreenProtector.preventScreenshotOff();
-      await ScreenProtector.protectDataLeakageWithColorOff();
-      await ScreenProtector.protectDataLeakageOff();
-    }
+    await _channel.invokeMethod<void>('setEnabled', {'enabled': enabled});
   }
 }

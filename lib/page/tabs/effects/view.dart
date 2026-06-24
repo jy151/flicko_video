@@ -259,7 +259,7 @@ class _EffectsViewState extends ConsumerState<EffectsView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Flicko',
+                  'Aivaro',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 28,

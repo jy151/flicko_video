@@ -5,6 +5,7 @@ import 'package:flicko_video/api/api.dart';
 import 'package:flicko_video/gen/assets.gen.dart';
 import 'package:flicko_video/i18n/app_localizations.dart';
 import 'package:flicko_video/page/tabs/me/controller.dart';
+import 'package:flicko_video/utils/work_status_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -141,7 +142,7 @@ class _CreateResultViewState extends ConsumerState<CreateResultView>
           ),
           SizedBox(
             width: 52,
-            child: state.isCompleted
+            child: state.isCompleted || state.isFailed
                 ? IconButton(
                     onPressed: () => _showMoreSheet(state),
                     icon: const Icon(
@@ -180,12 +181,15 @@ class _CreateResultViewState extends ConsumerState<CreateResultView>
               ),
             ),
             const SizedBox(height: 30),
-            Text(
-              _buildStatusText(state),
-              style: const TextStyle(
-                color: Color(0xFF7C7D88),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text(
+                _buildStatusText(state),
+                style: const TextStyle(
+                  color: Color(0xFF7C7D88),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -300,12 +304,12 @@ class _CreateResultViewState extends ConsumerState<CreateResultView>
 
   String _buildStatusText(CreateResultState state) {
     if (state.status == 'running') {
-      return 'Generating video...';
+      return translationInProgressMessage;
     }
     if (state.status == 'pending' && state.queuePosition != null) {
       return 'Queue position: ${state.queuePosition}';
     }
-    return 'Estimated wait: ${state.estimatedWaitLabel}';
+    return translationInProgressMessage;
   }
 
   Widget _buildActionRow(BuildContext context) {

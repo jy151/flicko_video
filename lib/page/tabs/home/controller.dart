@@ -180,9 +180,9 @@ class HomeNotifier extends StateNotifier<HomeState> {
       final member = await _syncUserInfoBeforeCreate();
       _applyUserFromCache();
 
-      if (!isActiveVipMember(member)) {
-        throw const HomeCreateException(HomeCreateError.requireMember);
-      }
+      // if (!isActiveVipMember(member)) {
+      //   throw const HomeCreateException(HomeCreateError.requireMember);
+      // }
 
       if (UserBox.credit < _selectedCreditCost) {
         throw const HomeCreateException(HomeCreateError.insufficientCredits);
